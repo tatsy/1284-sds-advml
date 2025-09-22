@@ -82,4 +82,4 @@ jobs:
       - name: Github Pages deployment
         id: deployment
         uses: actions/deploy-pages@v4
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
