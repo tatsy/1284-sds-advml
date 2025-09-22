@@ -15,8 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          submodules: true
-          token: ${{ secrets.MY_PAT }}
+          submodules: false
+          fetch-depth: 0
+
+      - name: Checkout submodules
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.MY_PAT }}@github.com/".insteadOf "https://github.com/tatsy-classes/"
+          git submodule sync --recursive
+          git submodule update --init --recursive
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
