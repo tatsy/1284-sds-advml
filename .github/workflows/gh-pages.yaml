@@ -3,12 +3,11 @@ name: GitHub Pages
 on:
   push:
     branches:
-      - master
+      - main
       - dev
 
 env:
   PYTHON_VERSION: "3.10"
-  POETRY_VERSION: "1.8.0"
 
 jobs:
   build:
@@ -37,23 +36,21 @@ jobs:
           restore-keys: |
             ${{ matrix.os }}-jupyter-
 
-      - name: Install Poetry
+      - name: Install UV
         run: |
-          pipx install poetry==${{ env.POETRY_VERSION }}
+          pipx install uv
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: "poetry"
 
       - name: Install packages
         run: |
-          poetry install
-          poetry install --all-extras
+          uv sync
 
       - name: Build
-        run: poetry run jb build --all .
+        run: uv run jb build --all .
 
       - name: Upload artifacts
         uses: actions/upload-pages-artifact@v3
