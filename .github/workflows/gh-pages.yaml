@@ -20,6 +20,7 @@ jobs:
 
       - name: Checkout submodules
         run: |
+          git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/tatsy/"
           git config --global url."https://x-access-token:${{ secrets.MY_PAT }}@github.com/".insteadOf "https://github.com/tatsy-classes/"
           git submodule sync --recursive
           git submodule update --init --recursive
