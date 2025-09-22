@@ -6,6 +6,10 @@ on:
       - main
       - dev
 
+permissions:
+  contents: read
+  pages: write
+
 env:
   PYTHON_VERSION: "3.10"
 
