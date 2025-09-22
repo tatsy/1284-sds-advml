@@ -16,12 +16,11 @@ jobs:
       - uses: actions/checkout@v5
         with:
           submodules: false
-          fetch-depth: 0
 
       - name: Checkout submodules
         run: |
-          git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/tatsy/"
-          git config --global url."https://x-access-token:${{ secrets.MY_PAT }}@github.com/".insteadOf "https://github.com/tatsy-classes/"
+          git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/tatsy-classes/".insteadOf "https://github.com/tatsy/"
+          git config --global url."https://x-access-token:${{ secrets.MY_PAT }}@github.com/tatsy/".insteadOf "https://github.com/tatsy-classes/"
           git submodule sync --recursive
           git submodule update --init --recursive
 
