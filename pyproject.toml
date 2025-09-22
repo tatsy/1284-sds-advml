@@ -1,118 +1,100 @@
-[tool.poetry]
+[project]
 name = "sdsadvml"
 version = "1.0.0"
 description = "Advanced machine learning course in Hitotsubashi University"
-authors = ["Tatsuya Yatagawa <tatsy.mail@gmail.com>"]
+authors = [{ name = "Tatsuya Yatagawa", email = "tatsy.mail@gmail.com" }]
 readme = "README.md"
-homepage = "https://tatsy.github.io/1284-sds-ml-advanced/"
-repository = "https://github.com/tatsy/1284-sds-ml-advanced.git"
-license = "CC BY-NC-SA 4.0"
-package-mode = false
+license = "CC-BY-NC-SA-4.0"
+requires-python = ">=3.10"
 
-exclude = [
-  "autograding/*",
-  "contents/*",
-  "data/*",
-  "dist/*",
-  "templates/*",
-  "_build/*",
-  "_static/*",
-  ".github/*",
-  ".mypy_cache/*",
-  ".pytest_cache/*",
+dependencies = [
+  "bokeh>=3.8.0",
+  "colorama>=0.4.6",
+  "docutils>=0.17.1",
+  "ffmpeg>=1.4",
+  "gymnasium[classic-control]>=1.2.0",
+  "ipykernel>=6.30.1",
+  "ipywidgets>=8.1.7",
+  "jupyter-bokeh>=4.0.5",
+  "jupyter-book>=1.0.3",
+  "jupyterlab-widgets>=3.0.15",
+  "lxml>=6.0.2",
+  "matplotlib>=3.10.6",
+  "networkx>=3.4.2",
+  "nodejs>=0.1.1",
+  "numpy>=2.2.6",
+  "opencv-python>=4.11.0.86",
+  "openpyxl>=3.1.5",
+  "pandas>=2.0.0",
+  "pydata-sphinx-theme>=0.15.4",
+  "pytest>=8.4.2",
+  "scikit-image>=0.25.2",
+  "scikit-learn>=1.7.2",
+  "scipy>=1.15.3",
+  "seaborn>=0.13.2",
+  "sphinxcontrib-sass>=0.3.5",
+  "tqdm>=4.67.1",
+  "torch (>=2.6.0,<2.7.0)",
+  "torchvision (>=0.21.0,<0.22.0)",
+  "sphinx (>=7.0.0,<8.0.0)",
+  "advml",
+  "othello",
+  "japanize-matplotlib>=1.1.3",
 ]
 
-[tool.poetry.dependencies]
-python = "~=3.10.0"
-numpy = "~1.26.0"
-scipy = "^1.14.1"
-scikit-learn = "^1.5.2"
-matplotlib = "^3.9.2"
-pandas = "^2.2.3"
-seaborn = "^0.12.2"
-opencv-python = "^4.8.0.74"
-opencv-contrib-python = "^4.8.0.76"
-networkx = "^3.1"
-openpyxl = "^3.1.2"
-tqdm = "^4.66.1"
-nodejs = "^0.1.1"
-scikit-image = "^0.24.0"
-bokeh = "^3.6.0"
-jupyterlab = "^4.0.0"
-jupyter-bokeh = "^3.0.7"
-jupyterlab-widgets = "^3.0.8"
-ipywidgets = "^8.1.0"
-pytest = "^8.3.3"
-ffmpeg = "^1.4"
-gymnasium = { extras = ["classic-control"], version = "^0.29.1" }
-japanize-matplotlib = "^1.1.3"
-colorama = "^0.4.6"
+[project.urls]
+Homepage = "https://tatsy.github.io/1284-sds-ml-advanced/"
+Repository = "https://github.com/tatsy/1284-sds-ml-advanced.git"
 
+[tool.uv.sources]
+advml = { path = "modules/advml", editable = true }
+othello = { path = "modules/othello", editable = true }
 torch = [
-  { markers = "sys_platform == 'win32'", version = "==2.2.2+cu121", source = "pytorch-cu121" },
-  { markers = "sys_platform == 'linux'", version = "==2.2.2+cu121", source = "pytorch-cu121" },
-  { markers = "sys_platform == 'darwin'", version = "<2.2.2" },
+  { marker = "sys_platform == 'win32'", index = "pytorch-cu124" },
+  { marker = "sys_platform == 'linux'", index = "pytorch-cu124" },
+  { marker = "sys_platform == 'darwin'", index = "pytorch-cpu" },
 ]
-
 torchvision = [
-  { markers = "sys_platform == 'win32'", version = "==0.17.2+cu121", source = "pytorch-cu121" },
-  { markers = "sys_platform == 'linux'", version = "==0.17.2+cu121", source = "pytorch-cu121" },
-  { markers = "sys_platform == 'darwin'", version = "<0.17.2" },
+  { marker = "sys_platform == 'win32'", index = "pytorch-cu124" },
+  { marker = "sys_platform == 'linux'", index = "pytorch-cu124" },
+  { marker = "sys_platform == 'darwin'", index = "pytorch-cpu" },
 ]
 
-advml = { path = "modules/advml", develop = true }
-othello = { path = "modules/othello", develop = true }
-
-[tool.poetry.group.dev.dependencies]
-pyproject-flake8 = "^6.0.0"
-mypy = "^1.4.1"
-isort = "^5.12.0"
-black = "^23.3.0"
-jupyterlab-code-formatter = "^2.2.1"
-lxml = "^4.9.3"
-jupyter-book = "^0.15.1"
-docutils = "==0.17.1"
-pydata-sphinx-theme = "<0.15.3"
-sphinxcontrib-sass = "^0.3.4"
-
-[[tool.poetry.source]]
-name = "PyPI"
-priority = "primary"
-
-[[tool.poetry.source]]
+[[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"
+explicit = true
 
-[[tool.poetry.source]]
-name = "pytorch-cu121"
-url = "https://download.pytorch.org/whl/cu121"
-priority = "explicit"
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.ruff]
+line-length = 120
+target-version = "py311"
 
-[tool.isort]
-profile = "black"
-length_sort = true
-line_length = 99
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ruff.lint]
+select = ["E", "W", "F"]
+ignore = []
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.isort]
+length-sort = true
+length-sort-straight = true
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 follow_imports = "silent"
+plugins = ["numpy.typing.mypy_plugin"]
 disallow_any_generics = true
 strict_optional = true
 check_untyped_defs = true
 allow_redefinition = true
-
-[tool.flake8]
-max-line-length = 99
-ignore = "Q000,E127,E203,E402,W503,W504"
-
-[tool.black]
-target-version = ["py310"]
-line-length = 99
 
 [tool.pytest.ini_options]
 log_cli = true

@@ -4,16 +4,24 @@
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
   },
   // Python
-  "flake8.path": "pflake8",
+  "python.defaultInterpreterPath": "python",
+  "python.languageServer": "Default",
+  "flake8.enabled": false,
   "[python]": {
-    "editor.tabSize": 4,
     "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
     "editor.formatOnType": false,
+    "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.codeActionsOnSave": {
-      "source.organizeImports": "always"
-    },
-    "editor.defaultFormatter": "ms-python.black-formatter"
+      "source.fixAll": "explicit",
+      "source.organizeImports.isort": "never",
+      "source.organizeImports.ruff": "explicit"
+    }
   },
+  "ruff.enable": true,
+  "ruff.lint.enable": true,
+  "ruff.configuration": "${workspaceFolder}/pyproject.toml",
+  "ruff.configurationPreference": "filesystemFirst",
   // Notebook
   "notebook.stickyScroll.enabled": true,
   "notebook.codeActionsOnSave": {
@@ -21,7 +29,7 @@
   },
   "notebook.formatOnSave.enabled": true,
   "notebook.formatOnCellExecution": true,
-  "notebook.defaultFormatter": "ms-python.black-formatter",
+  "notebook.defaultFormatter": "charliermarsh.ruff",
   // Live Server
   "liveServer.settings.port": 3000,
   "liveServer.settings.root": "./_build/html/",
