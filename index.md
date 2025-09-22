@@ -2,7 +2,6 @@
 ===
 
 [![GitHub Pages](https://github.com/tatsy-classes/1284-sds-advml/actions/workflows/gh-pages.yaml/badge.svg)](https://github.com/tatsy-classes/1284-sds-advml/actions/workflows/gh-pages.yaml)
-[![Python environment](https://github.com/tatsy-classes/1284-sds-advml/actions/workflows/python.yaml/badge.svg)](https://github.com/tatsy-classes/1284-sds-advml/actions/workflows/python.yaml)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 講義の概要
