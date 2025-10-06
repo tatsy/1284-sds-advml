@@ -1,6 +1,6 @@
 [submodule "modules/advml"]
 	path = modules/advml
-	url = https://github.com/tatsy-classes/1284-sds-advml-utils.git
+	url = https://github.com/tatsy/1284-sds-libadvml.git
 [submodule "modules/othello"]
 	path = modules/othello
 	url = https://github.com/tatsy-classes/cothello.git

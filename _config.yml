@@ -8,6 +8,7 @@ description: >-
 
 exclude_patterns:
   - _build
+  - .venv
   - data
   - modules
   - autograding
@@ -71,8 +72,9 @@ sphinx:
     math_numfig: true
     numfig_secnum_depth: 1
     # Theme
-    # pygments_style: gotthard-light
-    pygments_style: material
+    html_theme_options:
+      pygments_light_style: xcode
+      pygments_dark_style: lightbulb
     # MathJax
     mathjax_path: https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js
     mathjax3_config:

@@ -19,6 +19,7 @@ setup.py
 *.bak
 *.sav.tmp
 
+.venv/
 _build/
 openml/
 dist/
