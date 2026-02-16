@@ -46,16 +46,12 @@ jobs:
           restore-keys: |
             ${{ matrix.os }}-jupyter-
 
-      - name: Install UV
-        run: |
-          pipx install uv
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install packages
+      - name: Install packages with UV
         uses: astral-sh/setup-uv@v7
 
       - name: Build
