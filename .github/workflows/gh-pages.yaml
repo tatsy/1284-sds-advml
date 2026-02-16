@@ -56,8 +56,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install packages
-        run: |
-          uv sync
+        uses: astral-sh/setup-uv@v7
 
       - name: Build
         run: uv run jb build --all .
