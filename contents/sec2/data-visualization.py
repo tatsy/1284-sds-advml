@@ -40,11 +40,6 @@ import warnings
 import numpy as np
 import seaborn as sns
 
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
-
 # 乱数の固定
 random.seed(31415)
 np.random.seed(31415)
@@ -54,7 +49,6 @@ warnings.simplefilter('ignore', FutureWarning)
 
 # 実験に用いるサンプル数
 n_samples = 1500
-glue('n_samples', n_samples, display=False)
 
 # グラフの設定
 rc = {'figure.dpi': 150}
@@ -68,10 +62,10 @@ sns.set_theme(style='white', palette='colorblind', rc=rc)
 
 # %% editable=true slideshow={"slide_type": ""}
 # 必要なモジュールのインポート
-import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import cm
+import matplotlib.pyplot as plt
 from sklearn import datasets
+from matplotlib import cm
 
 # データセットの取り出し
 X_sr, y_sr = datasets.make_swiss_roll(n_samples=n_samples, noise=0.1)
@@ -111,7 +105,7 @@ plt.show()
 # $$
 # \begin{aligned}
 # \boldsymbol{\mu} &= \frac{1}{N} \sum_{i=1}^N \mathbf{x}_i \\
-# \mathbf{C} &= \frac{1}{N} \sum_{i=1}^N (\bar{\mathbf{x}} - \mathbf{x}_i) (\bar{\mathbf{x}} - \mathbf{x}_i)^\top 
+# \mathbf{C} &= \frac{1}{N} \sum_{i=1}^N (\bar{\mathbf{x}} - \mathbf{x}_i) (\bar{\mathbf{x}} - \mathbf{x}_i)^\top
 # \end{aligned}
 # $$
 
@@ -683,7 +677,7 @@ for i in range(n):
         eps *= tr
 
     AA += np.identity(AA.shape[0]) * eps
-    bb = np.ones((n_neighbors))
+    bb = np.ones(n_neighbors)
     w_i = np.linalg.solve(AA, bb)
 
     # w_iを要素の合計が1になるように正規化
@@ -923,7 +917,7 @@ for i, gamma in enumerate(gammas):
     z_sr = kpca.fit_transform(X_sr)
 
     axs[i].scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=8, lw=0)
-    axs[i].set_title('$\gamma$ = {:.4f}'.format(gamma))
+    axs[i].set_title(rf'$\gamma$ = {gamma:.4f}')
     axs[i].axis('equal')
     axs[i].set_xlim([-1.0, 1.0])
     axs[i].set_ylim([-1.0, 1.0])
@@ -966,7 +960,7 @@ gs = GridSpec(2, 4, figure=fig)
 for i in range(8):
     ax = plt.subplot(gs[i])
     ax.imshow(ims[i], cmap='gray', interpolation=None)
-    ax.set_title('label is {:d}'.format(y[i]))
+    ax.set_title(f'label is {y[i]:d}')
     ax.set_xticks([])
     ax.set_yticks([])
 plt.show()
@@ -1085,7 +1079,7 @@ gs = GridSpec(1, 5)
 for i in range(5):
     ax = plt.subplot(gs[i])
     ax.imshow(ims[i], cmap='gray', interpolation=None)
-    ax.set(title='#{:d}'.format(i + 1), xticks=[], yticks=[])
+    ax.set(title=f'#{i + 1:d}', xticks=[], yticks=[])
 
 plt.tight_layout()
 plt.show()
@@ -1097,9 +1091,9 @@ plt.show()
 
 # %% editable=true slideshow={"slide_type": ""} tags=["remove-input"]
 import numpy as np
-from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, CustomJS, Slider
-from bokeh.plotting import figure, output_notebook, show
+from bokeh.models import Slider, CustomJS, ColumnDataSource
+from bokeh.layouts import row, column
+from bokeh.plotting import show, figure, output_notebook
 from bokeh.resources import INLINE
 
 # BokehがMathJaxをロードしないようにする

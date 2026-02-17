@@ -82,16 +82,9 @@ import matplotlib.pyplot as plt
 from tqdm.notebook import tqdm
 from matplotlib.gridspec import GridSpec
 
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
-
 # 実験に使うサンプル数
 epochs = 5
 batch_size = 32
-glue('epochs', epochs, display=False)
-glue('batch_size', batch_size, display=False)
 
 # グラフの設定
 rc = {'figure.dpi': 150}
@@ -505,8 +498,8 @@ dzdx = torch.autograd.grad(z, inputs=x, create_graph=True)
 # 2階微分を計算
 ddz_ddx_auto = torch.autograd.grad(dzdx, inputs=x)
 ddz_ddx_analy = -2.0 * torch.sin(x**2.0) - 4.0 * x**2.0 * torch.cos(x**2)
-print('autograd: ddz_ddx = {:.5f}'.format(ddz_ddx_auto[0].item()))
-print('analytic: ddz_ddx = {:.5f}'.format(ddz_ddx_analy.item()))
+print(f'autograd: ddz_ddx = {ddz_ddx_auto[0].item():.5f}')
+print(f'analytic: ddz_ddx = {ddz_ddx_analy.item():.5f}')
 
 # %% [markdown]
 # このように、二階微分の場合も正しく計算できていることが分かる。以後、より高階な微分であっても`torch.autograd.grad`の引数で`create_graph=True`を指定する限りは計算し続けることができる。
@@ -931,7 +924,7 @@ class HiraganaDataset(Dataset):
     N_IMAGES_PER_CHAR = 200
 
     def __init__(self, dataroot, transform=None):
-        super(HiraganaDataset, self).__init__()
+        super().__init__()
 
         self.dataroot = dataroot
         self.transform = transform
@@ -966,7 +959,7 @@ class HiraganaDataset(Dataset):
         image_file, num = self.data[idx]
         image = Image.open(image_file)
         if image is None:
-            raise IOError('Failed to load image: {:s}'.format(f))
+            raise OSError(f'Failed to load image: {f:s}')
 
         if self.transform is not None:
             image = transform(image)
@@ -1151,7 +1144,7 @@ class Network(nn.Module):
     """
 
     def __init__(self, in_features, out_features):
-        super(Network, self).__init__()
+        super().__init__()
         self.fc1 = nn.Linear(in_features, 64)
         self.bn1 = nn.BatchNorm1d(64)
         self.fc2 = nn.Linear(64, 32)
@@ -1178,7 +1171,7 @@ class Network(nn.Sequential):
     """
 
     def __init__(self, in_features, out_features):
-        super(Network, self).__init__(
+        super().__init__(
             nn.Linear(in_features, 64),
             nn.BatchNorm1d(64),
             nn.ReLU(inplace=True),
@@ -1412,7 +1405,7 @@ for epoch in range(epochs):
 # %%
 # 移動平均を取る (= ボックス・フィルタをかける)
 box_size = 5
-box = np.ones((box_size)) / box_size
+box = np.ones(box_size) / box_size
 
 losses = np.convolve(losses, box, mode='valid')
 accuracies = np.convolve(accuracies, box, mode='valid')
@@ -1496,7 +1489,7 @@ class CNN(nn.Module):
     """
 
     def __init__(self, in_channels, out_channels):
-        super(CNN, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv2d(in_channels, 64, 3, 1, 1)
         self.bn1 = nn.BatchNorm2d(64)
         self.conv2 = nn.Conv2d(64, 32, 3, 1, 1)
@@ -1562,7 +1555,7 @@ for epoch in range(epochs):
         losses.append(loss.item())
         accuracies.append(acc.item())
 
-        pbar.set_description('[CNN] loss={:1.3f}, acc={:1.3f}'.format(loss.item(), acc.item()))
+        pbar.set_description(f'[CNN] loss={loss.item():1.3f}, acc={acc.item():1.3f}')
 
         optim.zero_grad()
         loss.backward()
@@ -1571,7 +1564,7 @@ for epoch in range(epochs):
 # %%
 # 移動平均を取る (= ボックス・フィルタをかける)
 box_size = 5
-box = np.ones((box_size)) / box_size
+box = np.ones(box_size) / box_size
 
 losses = np.convolve(losses, box, mode='valid')
 accuracies = np.convolve(accuracies, box, mode='valid')
