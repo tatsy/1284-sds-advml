@@ -1500,8 +1500,6 @@ slideshow:
   slide_type: ''
 tags: [remove-output]
 ---
-from itertools import product
-
 # グリッドサーチによる最適パラメータを探索
 max_acc = 0.0
 best_params = None
@@ -1683,6 +1681,16 @@ acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
+# | label: cv_acc_train
+print(f'{acc_train * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+# | label: cv_acc_test
+print(f'{acc_test * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
 :tags: [remove-cell]
 
 glue('cv_acc_train', acc_train * 100.0)
@@ -1827,7 +1835,6 @@ slideshow:
   slide_type: ''
 tags: [remove-input]
 ---
-import pandas as pd
 from IPython import display
 
 html_text = """
