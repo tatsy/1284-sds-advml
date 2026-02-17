@@ -39,13 +39,13 @@ import random
 import warnings
 from itertools import product
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.exceptions import ConvergenceWarning
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 from tqdm.notebook import tqdm
+from sklearn.exceptions import ConvergenceWarning
 
 # グラフの設定
 rc = mpl.rc_params_from_file('matplotlibrc')
@@ -235,8 +235,8 @@ slideshow:
   slide_type: ''
 tags: [remove-output]
 ---
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import make_pipeline
+from sklearn.neighbors import KNeighborsClassifier
 
 # 識別モデルの構築
 n_neighbors = 20
