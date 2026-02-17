@@ -1,5 +1,6 @@
+*.ipynb
 *.csv
 *.xlsx
+mnist
 image.jpg
-mnist/*
 copy.jpg

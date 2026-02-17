@@ -1,10 +1,6 @@
 title: 機械学習発展 (実践)
 author: Tatsuya Yatagawa
-copyright: "CC BY-NC-SA 4.0, 2023-2024"
 logo: ""
-
-description: >-
-  Pythonを用いて、画像認識と機械学習の実践的な利用法について学ぶ
 
 exclude_patterns:
   - _build
@@ -22,20 +18,6 @@ exclude_patterns:
   - "**.ipynb_checkpoints"
 
 only_build_toc_files: true
-
-execute:
-  allow_errors: false
-  execute_notebooks: cache
-  cache: ./.jupyter_cache
-  timeout: 180
-  exclude_patterns:
-    - "scikit-learn.ipynb"
-    - "exercise-sudoku.ipynb"
-    - "feature-extraction.ipynb"
-    - "deep-learning.ipynb"
-    - "deep-q-learning.ipynb"
-    - "othello-player.ipynb"
-    - "exercise-othello.ipynb"
 
 # HTML-specific settings
 html:

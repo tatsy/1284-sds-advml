@@ -1,0 +1,75 @@
+version: 1
+project:
+  id: e3f37e56-81c4-4ee8-ae33-90b1e24f5ca7
+  title: 機械学習発展 (実践)
+  license: CC-BY-NC-SA-4.0
+  copyright: "CC BY-NC-SA 4.0, 2023-2026"
+  github: tatsy/1284-sds-advml
+  jupyter: false
+  authors:
+    - name: Tatsuya Yatagawa
+      email: tatsy.mail@gmail.com
+      corresponding: true
+
+  description: Pythonを用いて、画像認識と機械学習の実践的な利用法について学ぶ
+  bibliography: references.bib
+  numbering:
+    title:
+      enabled: true
+      offset: 0
+    headings: true
+  toc:
+    - file: index.md
+      hidden: true
+    - title: 事前準備
+      children:
+        - title: Python環境の設定
+          url: https://tatsy-classes.github.io/1284-sds-prog2/contents/setup-python.html
+        - title: GitHubの設定
+          url: https://tatsy-classes.github.io/1284-sds-prog2/contents/setup-git.html
+    - title: 第0部 各種ライブラリの基本
+      children:
+        - file: contents/sec1/numpy.ipynb
+        - file: contents/sec1/matplotlib.ipynb
+        - file: contents/sec1/pandas.ipynb
+    - title: 第1部 画像読み取り式数独ソルバの作成
+      children:
+        - file: contents/sec1/opencv.ipynb
+        - file: contents/sec1/figure-detection.ipynb
+        - file: contents/sec1/scikit-learn.ipynb
+        - file: contents/sec1/exercise-sudoku.ipynb
+    - title: 第2部 ひらがなOCRソフトと百人一首エージェントの作成
+      children:
+        - file: contents/sec2/data-visualization.ipynb
+        - file: contents/sec2/feature-extraction.ipynb
+        - file: contents/sec2/deep-learning.ipynb
+        - file: contents/sec2/exercise-ogura.ipynb
+    - title: 第3部 強化学習の基礎とオセロプレイヤーの作成
+      children:
+        - file: contents/sec3/reinforcement-learning.ipynb
+        - file: contents/sec3/q-learning.ipynb
+        - file: contents/sec3/deep-q-learning.ipynb
+        - file: contents/sec3/othello-player.ipynb
+        - file: contents/sec3/exercise-othello.ipynb
+    - title: 付録
+      children:
+        - file: contents/appendix/submit-assignment.ipynb
+        - file: contents/appendix/notation.ipynb
+
+  settings:
+    parser:
+      dollarmath: true
+
+site:
+  template: book-theme
+  title: 機械学習発展 (実践)
+  nav: []
+  options:
+    logo: ""
+    style: ./_assets/custom.scss
+
+  actions:
+    - title: Google Colab
+      url: "https://colab.research.google.com"
+    - title: GitHub
+      url: "https://github.com/tatsy/1284-sds-advml"

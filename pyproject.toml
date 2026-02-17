@@ -7,7 +7,6 @@ readme = "README.md"
 license = "CC-BY-NC-SA-4.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.10,<3.14"
-
 dependencies = [
   "bokeh>=3.8.0",
   "colorama>=0.4.6",
@@ -17,7 +16,7 @@ dependencies = [
   "ipykernel>=6.30.1",
   "ipywidgets>=8.1.7",
   "jupyter-bokeh>=4.0.5",
-  "jupyter-book>=1.0.3",
+  "jupyter-book>=2.0.0",
   "jupyterlab-widgets>=3.0.15",
   "lxml>=6.0.2",
   "matplotlib>=3.10.6",
@@ -27,7 +26,6 @@ dependencies = [
   "opencv-python>=4.11.0.86",
   "openpyxl>=3.1.5",
   "pandas>=2.0.0",
-  "pydata-sphinx-theme==0.15.4",
   "pytest>=8.4.2",
   "scikit-image>=0.25.2",
   "scikit-learn>=1.7.2",
@@ -37,15 +35,16 @@ dependencies = [
   "tqdm>=4.67.1",
   "torch (>=2.6.0,<2.7.0)",
   "torchvision (>=0.21.0,<0.22.0)",
-  "sphinx (>=7.0.0,<8.0.0)",
   "japanize-matplotlib>=1.1.3",
+  "myst>=1.0.4",
+  "mystmd>=1.8.1",
   "advml",
   "othello",
 ]
 
 [project.urls]
-Homepage = "https://tatsy.github.io/1284-sds-ml-advanced/"
-Repository = "https://github.com/tatsy/1284-sds-ml-advanced.git"
+Homepage = "https://tatsy.github.io/1284-sds-advml/"
+Repository = "https://github.com/tatsy/1284-sds-advml.git"
 
 [tool.uv.sources]
 advml = { path = "modules/advml", editable = true }
@@ -102,3 +101,6 @@ log_cli = true
 log_cli_level = "INFO"
 log_cli_format = "%(asctime)s [%(levelname)s] %(message)s (%(filename)s:%(lineno)s)"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+[dependency-groups]
+dev = ["jupytext>=1.19.1"]
