@@ -36,8 +36,8 @@
 
 import warnings
 
-import matplotlib
 import seaborn as sns
+import matplotlib
 
 # 一部の警告を無視
 warnings.simplefilter('ignore', category=FutureWarning)
@@ -60,8 +60,8 @@ color_palette = sns.color_palette('colorblind')
 
 # %%
 # 必要なモジュールのインポート
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
 # 空のグラフを描画
 plt.figure()
@@ -292,7 +292,6 @@ plt.show()
 # 下記のコードでは`unit_of_pi`の中で、横軸の値を$\pi$で除算し、その商に応じて軸の表示方法を変更している。特に、横軸の値が$\pi$の-1 倍、0 倍、1 倍の場合にわざわざ$-1 \pi$と書くのは冗長なので、そのような場合には 1 を削ったり、単に 0 とだけ表示するようにしている。
 
 # %% editable=true slideshow={"slide_type": ""}
-import matplotlib
 from matplotlib.ticker import FuncFormatter
 
 
@@ -302,8 +301,8 @@ def unit_of_pi(value, tick_number):
     if N == 0:
         return '0'
     if abs(N) == 1:
-        return '{:s}$\pi$'.format('+' if N > 0 else '-')
-    return '{:d}$\pi$'.format(N)
+        return r'{:s}$\pi$'.format('+' if N > 0 else '-')
+    return r'{:d}$\pi$'.format(N)
 
 
 # データの用意
@@ -342,8 +341,8 @@ ys_sin = np.sin(xs)
 ys_cos = np.cos(xs)
 
 # 折れ線グラフの描画
-plt.plot(xs, ys_sin, label='$\sin(x)$')
-plt.plot(xs, ys_cos, label='$\cos(x)$')
+plt.plot(xs, ys_sin, label=r'$\sin(x)$')
+plt.plot(xs, ys_cos, label=r'$\cos(x)$')
 
 # タイトルの設定
 plt.title('trigonometric curves')
@@ -374,8 +373,8 @@ ys_sin = np.sin(xs)
 ys_cos = np.cos(xs)
 
 # 折れ線グラフの描画
-plt.plot(xs, ys_sin, label='$\sin(x)$')
-plt.plot(xs, ys_cos, label='$\cos(x)$')
+plt.plot(xs, ys_sin, label=r'$\sin(x)$')
+plt.plot(xs, ys_cos, label=r'$\cos(x)$')
 
 # タイトルの設定
 plt.title('trigonometric curves')
@@ -400,8 +399,8 @@ ys_sin = np.sin(xs)
 ys_cos = np.cos(xs)
 
 # 折れ線グラフの描画
-plt.plot(xs, ys_sin, label='$\sin(x)$')
-plt.plot(xs, ys_cos, label='$\cos(x)$')
+plt.plot(xs, ys_sin, label=r'$\sin(x)$')
+plt.plot(xs, ys_cos, label=r'$\cos(x)$')
 
 # タイトルの設定
 plt.title('trigonometric curves')
@@ -425,12 +424,12 @@ xs = np.linspace(0.0001, 10.0, 1000)
 ys = np.exp(-xs)
 
 # 折れ線グラフの描画
-plt.plot(xs, ys, label='$\log(x)$')
+plt.plot(xs, ys, label=r'$\log(x)$')
 
 # タイトルの設定
 plt.title('logarithmic curve')
 plt.xlabel('$x$')
-plt.ylabel('$\log(x)$')
+plt.ylabel(r'$\log(x)$')
 
 # 軸のスケール設定
 plt.yscale('log')
@@ -488,8 +487,8 @@ xs = np.linspace(-np.pi, np.pi, 100)
 ys_sin = np.sin(xs)
 ys_cos = np.cos(xs)
 # 折れ線グラフの描画
-plt.plot(xs, ys_sin, label='$\sin(x)$')
-plt.plot(xs, ys_cos, label='$\cos(x)$')
+plt.plot(xs, ys_sin, label=r'$\sin(x)$')
+plt.plot(xs, ys_cos, label=r'$\cos(x)$')
 # タイトルの設定
 plt.title('trigonometric curves')
 plt.xlabel('radian')
@@ -511,8 +510,8 @@ xs = np.linspace(-np.pi, np.pi, 100)
 ys_sin = np.sin(xs)
 ys_cos = np.cos(xs)
 # 折れ線グラフの描画
-plt.plot(xs, ys_sin, label='$\sin(x)$')
-plt.plot(xs, ys_cos, label='$\cos(x)$')
+plt.plot(xs, ys_sin, label=r'$\sin(x)$')
+plt.plot(xs, ys_cos, label=r'$\cos(x)$')
 # タイトルの設定
 plt.title('trigonometric curves')
 plt.xlabel('radian')
@@ -523,7 +522,7 @@ plt.grid(axis='y', color='tab:gray', linestyle='--', linewidth=0.5)
 plt.gca().set_facecolor((0.95, 0.95, 0.95))
 # 注釈を入れる
 plt.gca().annotate(
-    'This is a curve for $\sin(x)$',
+    r'This is a curve for $\sin(x)$',
     xy=(-0.7, -0.7),
     xytext=(-0.4, -0.9),
     arrowprops={'arrowstyle': '->', 'color': 'black'},
@@ -553,18 +552,18 @@ fig = plt.figure(figsize=(8, 4))
 
 # 1つ目のグラフ
 ax1 = fig.add_subplot(121)
-ax1.plot(xs, ys_sin, color=color_palette[0], label='$\sin(x)$')
-ax1.set_title('$\sin(x)$')
+ax1.plot(xs, ys_sin, color=color_palette[0], label=r'$\sin(x)$')
+ax1.set_title(r'$\sin(x)$')
 ax1.set_xlabel('$x$')
-ax1.set_ylabel('$\sin(x)$')
+ax1.set_ylabel(r'$\sin(x)$')
 ax1.legend(loc='upper left')
 
 # 2つ目のグラフ
 ax2 = fig.add_subplot(122)
-ax2.plot(xs, ys_cos, color=color_palette[1], label='$\cos(x)$')
-ax2.set_title('$\cos(x)$')
+ax2.plot(xs, ys_cos, color=color_palette[1], label=r'$\cos(x)$')
+ax2.set_title(r'$\cos(x)$')
 ax2.set_xlabel('$x$')
-ax2.set_ylabel('$\cos(x)$')
+ax2.set_ylabel(r'$\cos(x)$')
 ax2.legend(loc='upper left')
 
 # 複数のグラフを並べると、要素が重なることがあるのでplt.tight_layout()を呼ぶとよい
@@ -582,17 +581,17 @@ plt.subplotsを使う場合
 fig, axs = plt.subplots(1, 2, figsize=(8, 4))
 
 # 1つ目のグラフ
-axs[0].plot(xs, ys_sin, color=color_palette[0], label='$\sin(x)$')
-axs[0].set_title('$\sin(x)$')
+axs[0].plot(xs, ys_sin, color=color_palette[0], label=r'$\sin(x)$')
+axs[0].set_title(r'$\sin(x)$')
 axs[0].set_xlabel('$x$')
-axs[0].set_ylabel('$\sin(x)$')
+axs[0].set_ylabel(r'$\sin(x)$')
 axs[0].legend(loc='upper left')
 
 # 2つ目のグラフ
-axs[1].plot(xs, ys_cos, color=color_palette[1], label='$\cos(x)$')
-axs[1].set_title('$\cos(x)$')
+axs[1].plot(xs, ys_cos, color=color_palette[1], label=r'$\cos(x)$')
+axs[1].set_title(r'$\cos(x)$')
 axs[1].set_xlabel('$x$')
-axs[1].set_ylabel('$\cos(x)$')
+axs[1].set_ylabel(r'$\cos(x)$')
 axs[1].legend(loc='upper left')
 
 # 複数のグラフを並べると、要素が重なることがあるのでplt.tight_layout()を呼ぶとよい
@@ -610,7 +609,6 @@ plt.show()
 # あとは、これまで x 座標と y 座標だけを引数として渡していた`scatter`関数に対して、z 座標を表わす値を合わせて指定すれば良い。
 
 # %% editable=true slideshow={"slide_type": ""}
-from matplotlib import cm
 from sklearn.datasets import make_swiss_roll
 
 # データの取得

@@ -636,6 +636,7 @@ plt.show()
 #
 # Sobel フィルタはとある方向について、画像の勾配を取るときに、その垂直方向にぼかしのフィルタを同時にかけることで、ノイズの影響を減らしつつ、エッジを抽出することを目指している。最も単純な 3x3 のフィルタカーネルで表わされる Sobel フィルタ (x 方向の例を示す)は以下のようになる。
 
+
 # %% editable=true slideshow={"slide_type": ""} tags=["remove-input"]
 def draw_frame(problem, fig, ax):
     mask = np.zeros_like(problem)

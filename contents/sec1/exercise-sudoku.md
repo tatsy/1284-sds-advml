@@ -261,7 +261,7 @@ slideshow:
   slide_type: ''
 ---
 used_nums = np.concatenate([row_nums, col_nums, blk_nums])
-unused_nums = np.array([i for i in range(10) if not i in used_nums])
+unused_nums = np.array([i for i in range(10) if i not in used_nums])
 print('Unused numbers:', unused_nums)
 ```
 

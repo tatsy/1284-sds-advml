@@ -34,12 +34,11 @@ tags: [remove-input]
 """
 
 import seaborn as sns
-import matplotlib
 
 # グラフの設定
-rc = {"figure.dpi": 150}
-sns.set_theme(style="white", palette="colorblind", rc=rc)
-color_palette = sns.color_palette("colorblind")
+rc = {'figure.dpi': 150}
+sns.set_theme(style='white', palette='colorblind', rc=rc)
+color_palette = sns.color_palette('colorblind')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -56,7 +55,7 @@ Pandas の中核をなすデータ構造に`DataFrame`がある。DataFrame と�
 ```
 
 <div align="center">
-    
+
 (Pandasの[チュートリアル](https://pandas.pydata.org/docs/getting_started/intro_tutorials/01_table_oriented.html)より引用)
 
 </div>
@@ -71,15 +70,14 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 df = pd.DataFrame(
     {
-        "Name": ["Taro", "Jiro", "Hanako"],
-        "Math": [100, 90, 85],
-        "English": [85, 90, 100],
+        'Name': ['Taro', 'Jiro', 'Hanako'],
+        'Math': [100, 90, 85],
+        'English': [85, 90, 100],
     }
 )
 print(df)
@@ -123,10 +121,10 @@ slideshow:
 ---
 df_label = pd.DataFrame(
     {
-        "Math": [100, 90, 85],
-        "English": [85, 90, 100],
+        'Math': [100, 90, 85],
+        'English': [85, 90, 100],
     },
-    index=["Taro", "Jiro", "Hanako"],
+    index=['Taro', 'Jiro', 'Hanako'],
 )
 ```
 
@@ -162,7 +160,7 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-col = df["Math"]
+col = df['Math']
 print('type is "{:s}"'.format(type(col).__name__))
 ```
 
@@ -178,7 +176,7 @@ col
 また、複数のラベルを指定して、以下のように複数列を一度に取り出すこともできる。
 
 ```{code-cell} ipython3
-cols = df[["Math", "English"]]
+cols = df[['Math', 'English']]
 cols
 ```
 
@@ -191,7 +189,7 @@ df.iloc[0]
 ```
 
 ```{code-cell} ipython3
-df_label.loc["Taro"]
+df_label.loc['Taro']
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -213,7 +211,7 @@ tags: [remove-input]
 ---
 # 辞書型として使う場合 (df自体が書き換わるので注意)
 df_copy = df.copy()
-df_copy["Physics"] = [75, 85, 80]
+df_copy['Physics'] = [75, 85, 80]
 df_copy
 ```
 
@@ -224,7 +222,7 @@ slideshow:
   slide_type: ''
 ---
 # concatを用いる方法 (行ラベルがインデックス)
-new_col = pd.Series({0: 75, 1: 85, 2: 80}, name="Physics")
+new_col = pd.Series({0: 75, 1: 85, 2: 80}, name='Physics')
 pd.concat([df, new_col], axis=1)
 ```
 
@@ -232,7 +230,7 @@ pd.concat([df, new_col], axis=1)
 
 ```{code-cell} ipython3
 # concatを用いる方法 (行ラベルが文字列)
-new_col = pd.Series({"Taro": 75, "Jiro": 85, "Hanako": 80}, name="Physics")
+new_col = pd.Series({'Taro': 75, 'Jiro': 85, 'Hanako': 80}, name='Physics')
 pd.concat([df_label, new_col], axis=1)
 ```
 
@@ -245,14 +243,14 @@ pd.concat([df_label, new_col], axis=1)
 ```{code-cell} ipython3
 # locを用いる場合 (ラベルがインデックス)
 df_copy = df.copy()
-df_copy.loc[3] = ["Kikue", 100, 100]
+df_copy.loc[3] = ['Kikue', 100, 100]
 df_copy
 ```
 
 ```{code-cell} ipython3
 # locを用いる (ラベルが文字列他)
 df_copy = df_label.copy()
-df_copy.loc["Kikue"] = [100, 100]
+df_copy.loc['Kikue'] = [100, 100]
 df_copy
 ```
 
@@ -260,13 +258,13 @@ df_copy
 
 ```{code-cell} ipython3
 # concatを用いる (ラベルがインデックス)
-new_row = pd.Series({"Name": "Kikue", "Math": 100, "English": 100}, name=3)
+new_row = pd.Series({'Name': 'Kikue', 'Math': 100, 'English': 100}, name=3)
 pd.concat([df, pd.DataFrame(new_row).T], axis=0)
 ```
 
 ```{code-cell} ipython3
 # concatを用いる (ラベルが文字列)
-new_row = pd.Series({"Math": 100, "English": 100}, name="Kikue")
+new_row = pd.Series({'Math': 100, 'English': 100}, name='Kikue')
 pd.concat([df_label, pd.DataFrame(new_row).T], axis=0)
 ```
 
@@ -285,7 +283,7 @@ slideshow:
   slide_type: ''
 ---
 df_copy = df_label.copy()
-df_copy.drop(index=["Jiro"])
+df_copy.drop(index=['Jiro'])
 ```
 
 ```{code-cell} ipython3
@@ -295,7 +293,7 @@ slideshow:
   slide_type: ''
 ---
 df_copy = df_label.copy()
-df_copy.drop(columns=["Math"])
+df_copy.drop(columns=['Math'])
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -304,12 +302,12 @@ df_copy.drop(columns=["Math"])
 
 ```{code-cell} ipython3
 df_copy = df_label.copy()
-df_copy.drop(labels=["Taro"], axis=0)  # 行を削除
+df_copy.drop(labels=['Taro'], axis=0)  # 行を削除
 ```
 
 ```{code-cell} ipython3
 df_copy = df_label.copy()
-df_copy.drop(labels=["Math"], axis=1)  # 列を削除
+df_copy.drop(labels=['Math'], axis=1)  # 列を削除
 ```
 
 ### 要素へのアクセス
@@ -320,7 +318,7 @@ df_copy.drop(labels=["Math"], axis=1)  # 列を削除
 
 ```{code-cell} ipython3
 # ラベルを用いてアクセスする場合
-print(df_label.loc["Taro", "English"])
+print(df_label.loc['Taro', 'English'])
 ```
 
 ```{code-cell} ipython3
@@ -332,7 +330,7 @@ print(df_label.iloc[0, 1])
 
 ```{code-cell} ipython3
 # ラベルを用いて範囲指定
-print(df_label.loc["Taro":"Hanako", "Math"])
+print(df_label.loc['Taro':'Hanako', 'Math'])
 ```
 
 ```{code-cell} ipython3
@@ -344,7 +342,7 @@ print(df_label.iloc[0:3, 0])
 
 ```{code-cell} ipython3
 # ラベルを用いて指定
-print(df_label.loc[["Taro", "Jiro"], "Math"])
+print(df_label.loc[['Taro', 'Jiro'], 'Math'])
 ```
 
 ```{code-cell} ipython3
@@ -356,7 +354,7 @@ print(df_label.iloc[0:2, 0])
 
 ```{code-cell} ipython3
 df_copy = df_label.copy()
-df_copy.loc["Taro", :] = 100  # Taroの全科目を100点に修正
+df_copy.loc['Taro', :] = 100  # Taroの全科目を100点に修正
 df_copy
 ```
 
@@ -368,9 +366,9 @@ Pandas では、`DataFrame`の各行や各列、データ全体に対して統�
 
 ```{code-cell} ipython3
 # Taroの平均点を計算
-print("Taro's avg: {:.3f}".format(df_label.loc["Taro"].mean()))
+print("Taro's avg: {:.3f}".format(df_label.loc['Taro'].mean()))
 # Englishの平均点を計算
-print("English avg: {:.3f}".format(df_label["English"].mean()))
+print('English avg: {:.3f}'.format(df_label['English'].mean()))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -384,8 +382,8 @@ slideshow:
   slide_type: ''
 ---
 # 数学の偏差値を計算
-math_dev = 50.0 + (df["Math"] - df["Math"].mean()) / df["Math"].std() * 10.0
-math_dev.name = "Math dev."
+math_dev = 50.0 + (df['Math'] - df['Math'].mean()) / df['Math'].std() * 10.0
+math_dev.name = 'Math dev.'
 print(math_dev)
 ```
 
@@ -396,8 +394,8 @@ slideshow:
   slide_type: ''
 ---
 # 英語の偏差値を計算
-eng_dev = 50.0 + (df["English"] - df["English"].mean()) / df["English"].std() * 10.0
-eng_dev.name = "Eng. dev."
+eng_dev = 50.0 + (df['English'] - df['English'].mean()) / df['English'].std() * 10.0
+eng_dev.name = 'Eng. dev.'
 print(eng_dev)
 ```
 
@@ -413,16 +411,16 @@ df_copy
 行や列の順序を入れ替えたい場合には`loc`や`iloc`に入れ替え後のラベルやインデックスの配列を指定すれば良い。
 
 ```{code-cell} ipython3
-df_copy = df_copy.loc[:, ["Math", "Math dev.", "English", "Eng. dev."]]
+df_copy = df_copy.loc[:, ['Math', 'Math dev.', 'English', 'Eng. dev.']]
 df_copy
 ```
 
 最後に Math と English のそれぞれについて平均点を追加してみる。
 
 ```{code-cell} ipython3
-math_avg = df["Math"].mean()
-eng_avg = df["Math"].mean()
-df_copy.loc["Avg"] = [math_avg, "N/A", eng_avg, "N/A"]
+math_avg = df['Math'].mean()
+eng_avg = df['Math'].mean()
+df_copy.loc['Avg'] = [math_avg, 'N/A', eng_avg, 'N/A']
 df_copy
 ```
 
@@ -440,20 +438,20 @@ CSV を出力する場合には`DataFrame`の`to_csv`を用いれば良く、第
 
 ```{code-cell} ipython3
 # 最初の列の表記を変更
-df_copy = df_label.rename(index={"Taro": "太郎", "Jiro": "次郎", "Hanako": "花子"})
+df_copy = df_label.rename(index={'Taro': '太郎', 'Jiro': '次郎', 'Hanako': '花子'})
 df_copy
 ```
 
 ```{code-cell} ipython3
 # CSVに出力
-df_copy.to_csv("pandas.csv", encoding="utf_8_sig")
+df_copy.to_csv('pandas.csv', encoding='utf_8_sig')
 ```
 
 Excel ファイルを出力する場合は、`to_excel`に対して、出力ファイル名を含むいくつかの引数を指定する。Excel の場合は、エンコーディングを指定する必要はない (指定できない)。なお、Excel ファイルの操作を行う場合には、Pandas 以外に`openpyxl`をインストールしておく必要がある。
 
 ```{code-cell} ipython3
 # Excelファイルに出力
-df_copy.to_excel("pandas.xlsx")
+df_copy.to_excel('pandas.xlsx')
 ```
 
 正しく出力されると、Excel 上で以下のように表の内容が確認できる。
@@ -470,24 +468,24 @@ df_copy.to_excel("pandas.xlsx")
 ファイルからの読み取りには`read_csv`や`read_exel`といった関数を代わりに用いる。
 
 ```{code-cell} ipython3
-df_csv = pd.read_csv("pandas.csv")
+df_csv = pd.read_csv('pandas.csv')
 df_csv
 ```
 
 ```{code-cell} ipython3
-df_excel = pd.read_excel("pandas.xlsx")
+df_excel = pd.read_excel('pandas.xlsx')
 df_excel
 ```
 
 ただし、上記の例ではファイル保存時に index が文字列となっているファイルを保存しているため、そのまま読み込むと、自動的に index が数字となっている列が追加されてしまう。これを防ぐためには index に相当する列が何列目なのかを`index_col=...`で指定すれば良い。
 
 ```{code-cell} ipython3
-df_csv = pd.read_csv("pandas.csv", index_col=0)
+df_csv = pd.read_csv('pandas.csv', index_col=0)
 df_csv
 ```
 
 ```{code-cell} ipython3
-df_excel = pd.read_excel("pandas.xlsx", index_col=0)
+df_excel = pd.read_excel('pandas.xlsx', index_col=0)
 df_excel
 ```
 
@@ -506,9 +504,9 @@ slideshow:
 # 再度DataFrameを作成
 df = pd.DataFrame(
     {
-        "Name": ["Taro", "Jiro", "Hanako"],
-        "Math": [100, 90, 85],
-        "English": [85, 90, 100],
+        'Name': ['Taro', 'Jiro', 'Hanako'],
+        'Math': [100, 90, 85],
+        'English': [85, 90, 100],
     }
 )
 ```
@@ -520,7 +518,7 @@ slideshow:
   slide_type: ''
 ---
 # 棒グラフの作成
-df.plot.bar(x="Name", y=["Math", "English"])
+df.plot.bar(x='Name', y=['Math', 'English'])
 plt.show()
 ```
 
@@ -531,7 +529,7 @@ slideshow:
   slide_type: ''
 ---
 # plot(..., kind=...)を使う場合
-df.plot(x="Name", y=["Math", "English"], kind="bar")
+df.plot(x='Name', y=['Math', 'English'], kind='bar')
 plt.show()
 ```
 
@@ -545,12 +543,12 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-df.plot.bar(x="Name", y=["Math", "English"])
-plt.title("Exam scores")
-plt.xlabel("Student")
-plt.ylabel("Score")
+df.plot.bar(x='Name', y=['Math', 'English'])
+plt.title('Exam scores')
+plt.xlabel('Student')
+plt.ylabel('Score')
 plt.ylim([0, 120])
-plt.legend(loc="upper right")
+plt.legend(loc='upper right')
 plt.show()
 ```
 
@@ -567,12 +565,12 @@ slideshow:
 fig = plt.figure(figsize=(8, 4))
 
 ax = fig.add_subplot(121)
-df.plot(ax=ax, x="Name", y="Math", kind="bar", legend=False, color=color_palette[0])
-ax.set_title("Math")
+df.plot(ax=ax, x='Name', y='Math', kind='bar', legend=False, color=color_palette[0])
+ax.set_title('Math')
 
 ax = fig.add_subplot(122)
-df.plot(ax=ax, x="Name", y="English", kind="bar", legend=False, color=color_palette[1])
-ax.set_title("English")
+df.plot(ax=ax, x='Name', y='English', kind='bar', legend=False, color=color_palette[1])
+ax.set_title('English')
 
 plt.tight_layout()
 plt.show()
