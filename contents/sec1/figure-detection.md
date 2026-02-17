@@ -61,7 +61,7 @@ import cv2
 import numpy as np
 
 # 画像の読み込み
-image = cv2.imread("../../data/figures.png", cv2.IMREAD_COLOR)
+image = cv2.imread('../../data/figures.png', cv2.IMREAD_COLOR)
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 # 画像をグレースケールにする
@@ -72,7 +72,7 @@ dx = cv2.Sobel(gray, cv2.CV_8U, 1, 0)
 dy = cv2.Sobel(gray, cv2.CV_8U, 0, 1)
 sobel = np.sqrt(dx * dx + dy * dy)
 sobel = (sobel - sobel.min()) / (sobel.max() - sobel.min())
-sobel = (sobel * 255.0).astype("uint8")
+sobel = (sobel * 255.0).astype('uint8')
 _, sobel = cv2.threshold(sobel, 10, 255, cv2.THRESH_BINARY)
 
 # Canny法
@@ -95,15 +95,15 @@ import matplotlib.pyplot as plt
 fig = plt.figure(figsize=(15, 5))
 ax = fig.add_subplot(131)
 ax.imshow(image)
-ax.axis("off")
+ax.axis('off')
 
 ax = fig.add_subplot(132)
-ax.imshow(sobel, cmap="gray")
-ax.axis("off")
+ax.imshow(sobel, cmap='gray')
+ax.axis('off')
 
 ax = fig.add_subplot(133)
-ax.imshow(canny, cmap="gray")
-ax.axis("off")
+ax.imshow(canny, cmap='gray')
+ax.axis('off')
 
 plt.tight_layout()
 plt.show()
@@ -141,11 +141,11 @@ tags: [hide-input]
 ---
 fig = plt.figure(figsize=(8, 4))
 ax = fig.add_subplot(121)
-ax.imshow(res_dilate, cmap="gray")
-ax.set_title("Dilation")
+ax.imshow(res_dilate, cmap='gray')
+ax.set_title('Dilation')
 ax = fig.add_subplot(122)
-ax.imshow(res_erode, cmap="gray")
-ax.set_title("Erosion")
+ax.imshow(res_erode, cmap='gray')
+ax.set_title('Erosion')
 plt.tight_layout()
 plt.show()
 ```
@@ -172,7 +172,7 @@ slideshow:
   slide_type: ''
 tags: [hide-input]
 ---
-plt.imshow(res, cmap="gray")
+plt.imshow(res, cmap='gray')
 plt.show()
 ```
 
@@ -199,7 +199,7 @@ slideshow:
   slide_type: ''
 tags: [hide-input]
 ---
-plt.imshow(res_close, cmap="gray")
+plt.imshow(res_close, cmap='gray')
 plt.show()
 ```
 
@@ -294,7 +294,7 @@ for i, cnt in enumerate(contours):
     # 輪郭線の近似
     approx = cv2.approxPolyDP(cnt, 0.01 * arclen, True)
     # 何角形かを見てみる
-    print("Figure #{:d} has {:2d} corners!".format(i + 1, len(approx)))
+    print('Figure #{:d} has {:2d} corners!'.format(i + 1, len(approx)))
     # 輪郭線の描画
     cv2.drawContours(image, [approx], -1, (255, 0, 0), 3, cv2.LINE_AA)
 ```
@@ -349,7 +349,7 @@ def dist_p2l(px, py, x0, x1, y0, y1):
 
 
 fig = plt.figure()
-plt.gca().set_aspect("equal")
+plt.gca().set_aspect('equal')
 plt.xlim(-1.0, 1.0)
 plt.ylim(-1.0, 1.0)
 
@@ -365,9 +365,9 @@ num_frames = 9
 for i in range(num_frames):
     # Draw the current frame
     # plt.clf()
-    pts = plt.scatter(px, py, color="tab:red", zorder=2)
-    lns = plt.plot(px, py, color="tab:blue", linestyle="--", zorder=1)
-    frame = plt.plot(xs, ys, color="tab:blue", zorder=0)
+    pts = plt.scatter(px, py, color='tab:red', zorder=2)
+    lns = plt.plot(px, py, color='tab:blue', linestyle='--', zorder=1)
+    frame = plt.plot(xs, ys, color='tab:blue', zorder=0)
     frames.append([pts] + lns + frame)
 
     # Find the point farthest from the current polyline
@@ -406,17 +406,17 @@ slideshow:
   slide_type: ''
 ---
 n_gon = len(approx)
-text = "unknown"
+text = 'unknown'
 if n_gon > 10:
-    text = "circle"
+    text = 'circle'
 elif n_gon == 6:
-    text = "hexagon"
+    text = 'hexagon'
 elif n_gon == 5:
-    text = "pentagon"
+    text = 'pentagon'
 elif n_gon == 4:
-    text = "rectangle"
+    text = 'rectangle'
 elif n_gon == 3:
-    text = "triangle"
+    text = 'triangle'
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -438,19 +438,19 @@ for cnt in contours:
     cv2.drawContours(result, [approx], -1, (255, 0, 0), 3)
 
     n_gon = len(approx)
-    text = "unknown"
+    text = 'unknown'
     if n_gon > 10:
-        text = "circle"
+        text = 'circle'
     elif n_gon == 6:
-        text = "hexagon"
+        text = 'hexagon'
     elif n_gon == 5:
-        text = "pentagon"
+        text = 'pentagon'
     elif n_gon == 4:
-        text = "rectangle"
+        text = 'rectangle'
     elif n_gon == 3:
-        text = "triangle"
+        text = 'triangle'
 
-    position = np.asarray(approx).reshape((-1, 2)).max(axis=0).astype("int32")
+    position = np.asarray(approx).reshape((-1, 2)).max(axis=0).astype('int32')
     px, py = position
     cv2.putText(result, text, (px + 10, py + 10), font, 1.0, (255, 255, 255), 2, cv2.LINE_AA)
 ```
@@ -463,7 +463,7 @@ slideshow:
 tags: [hide-input]
 ---
 plt.imshow(result)
-plt.axis("off")
+plt.axis('off')
 plt.show()
 ```
 
@@ -510,7 +510,7 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-image = cv2.imread("../../data/inawashiro.jpg", cv2.IMREAD_COLOR)
+image = cv2.imread('../../data/inawashiro.jpg', cv2.IMREAD_COLOR)
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
@@ -528,7 +528,7 @@ slideshow:
   slide_type: ''
 tags: [hide-input]
 ---
-plt.imshow(binary, cmap="gray")
+plt.imshow(binary, cmap='gray')
 plt.title("Otsu's binarization (threshold={:d})".format(int(thr)))
 plt.show()
 ```
@@ -553,8 +553,8 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-plt.imshow(binary, cmap="gray")
-plt.title("Binarization (threshold={:d})".format(int(new_thr)))
+plt.imshow(binary, cmap='gray')
+plt.title('Binarization (threshold={:d})'.format(int(new_thr)))
 plt.show()
 ```
 
@@ -587,8 +587,8 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-plt.imshow(edge, cmap="gray")
-plt.title("After morphology operation".format(int(new_thr)))
+plt.imshow(edge, cmap='gray')
+plt.title('After morphology operation'.format(int(new_thr)))
 plt.show()
 ```
 
@@ -664,7 +664,7 @@ approx = cv2.approxPolyDP(longest_cnt, arclen * 1.0e-1, True)
 result = image.copy()
 cv2.drawContours(result, [approx], -1, (255, 0, 0), 3, cv2.LINE_AA)
 plt.imshow(result)
-plt.title("Red region has {:d} corners".format(len(approx)))
+plt.title('Red region has {:d} corners'.format(len(approx)))
 plt.show()
 ```
 
@@ -764,7 +764,7 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-src_pts = approx.reshape((-1, 2)).astype("float32")
+src_pts = approx.reshape((-1, 2)).astype('float32')
 
 # 縦横比の計算
 w = np.linalg.norm(src_pts[3] - src_pts[0])
@@ -774,7 +774,7 @@ aspect = abs(w) / abs(h)
 # 新しい画像サイズを設定
 new_w = int(1000 * aspect)
 new_h = 1000
-dst_pts = np.array([(0, 0), (0, new_h), (new_w, new_h), (new_w, 0)], dtype="float32")
+dst_pts = np.array([(0, 0), (0, new_h), (new_w, new_h), (new_w, 0)], dtype='float32')
 
 # 射影変換を計算して、パースをキャンセルする
 warp = cv2.getPerspectiveTransform(src_pts, dst_pts)
@@ -817,7 +817,6 @@ plt.show()
 
 :::{bibliography}
 :filter: docname in docnames
-:style: alpha
 :::
 
 ```{code-cell} ipython3

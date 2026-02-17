@@ -12,7 +12,7 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++ {"editable": true, "slideshow": {"slide_type": ""}, "tags": ["remove-cell"]}
 
 (sec:scikit-learn)=
 # scikit-learnによる機械分類の基本
@@ -39,6 +39,7 @@ import random
 import warnings
 from itertools import product
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -46,14 +47,8 @@ import seaborn as sns
 from sklearn.exceptions import ConvergenceWarning
 from tqdm.notebook import tqdm
 
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
-
-
 # グラフの設定
-rc = {'figure.dpi': 150}
+rc = mpl.rc_params_from_file('matplotlibrc')
 sns.set_theme(style='white', palette='colorblind', rc=rc)
 
 # シードの固定
@@ -62,7 +57,6 @@ np.random.seed(31415)
 
 # 実験に使うデータ数
 n_samples = 10000
-glue('n_samples', n_samples, display=False)
 
 # 一部の警告を無視
 warnings.simplefilter('ignore', ConvergenceWarning)
@@ -298,8 +292,8 @@ result_df.loc[len(result_df), :] = ['k-nearest', acc_test, 'Test']
 
 **結果: 最近傍探索による分類**
 
-- 訓練時精度: ![](#knn_acc_train) %
-- 評価時精度: ![](#knn_acc_test) %
+- 訓練時精度: ![](#knn_acc_train)%
+- 評価時精度: ![](#knn_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -359,8 +353,20 @@ acc_test = clf.score(X_test, y_test)
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-glue('logis_acc_train', acc_train * 100.0)
-glue('logis_acc_test', acc_test * 100.0)
+# | label: logit_acc_train
+print(f'{acc_train * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: logit_acc_test
+print(f'{acc_test * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
 result_df.loc[len(result_df), :] = ['Logistic', acc_train, 'Train']
 result_df.loc[len(result_df), :] = ['Logistic', acc_test, 'Test']
 ```
@@ -369,8 +375,8 @@ result_df.loc[len(result_df), :] = ['Logistic', acc_test, 'Test']
 
 **結果: ロジスティック回帰による分類**
 
-- 訓練時精度: {glue:text}`logis_acc_train:.2f`%
-- 評価時精度: {glue:text}`logis_acc_test:.2f`%
+- 訓練時精度: ![](#logit_acc_train)%
+- 評価時精度: ![](#logit_acc_test)%
 
 +++
 
@@ -477,8 +483,20 @@ acc_test = clf.score(X_test, y_test)
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-glue('bag_acc_train', acc_train * 100.0)
-glue('bag_acc_test', acc_test * 100.0)
+# | label: bag_acc_train
+print(f'{acc_train * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: bag_acc_text
+print(f'{acc_test * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
 result_df.loc[len(result_df), :] = ['Bagging', acc_train, 'Train']
 result_df.loc[len(result_df), :] = ['Bagging', acc_test, 'Test']
 ```
@@ -487,8 +505,8 @@ result_df.loc[len(result_df), :] = ['Bagging', acc_test, 'Test']
 
 **結果: バギングによる分類**
 
-- 訓練時精度: {glue:text}`bag_acc_train:.2f`%
-- 評価時精度: {glue:text}`bag_acc_test:.2f`%
+- 訓練時精度: ![](#bag_acc_train)%
+- 評価時精度: ![](#bag_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -599,8 +617,20 @@ acc_test = clf.score(X_test, y_test)
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-glue('rf_acc_train', acc_train * 100.0)
-glue('rf_acc_test', acc_test * 100.0)
+# | label: rf_acc_train
+print(f'{acc_train * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: rf_acc_test
+print(f'{acc_test * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
 result_df.loc[len(result_df), :] = ['Random forest', acc_train, 'Train']
 result_df.loc[len(result_df), :] = ['Random forest', acc_test, 'Test']
 ```
@@ -609,8 +639,8 @@ result_df.loc[len(result_df), :] = ['Random forest', acc_test, 'Test']
 
 **結果: ランダム・フォレストによる分類**
 
-- 訓練時精度: {glue:text}`rf_acc_train:.2f`%
-- 評価時精度: {glue:text}`rf_acc_test:.2f`%
+- 訓練時精度: ![](#rf_acc_train)%
+- 評価時精度: ![](#rf_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -671,8 +701,20 @@ acc_test = clf.score(X_test, y_test)
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-glue('ada_acc_train', acc_train * 100.0)
-glue('ada_acc_test', acc_test * 100.0)
+# | label: ada_acc_train
+print(f'{acc_train * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: ada_acc_test
+print(f'{acc_test * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
 result_df.loc[len(result_df), :] = ['AdaBoost', acc_train, 'Train']
 result_df.loc[len(result_df), :] = ['AdaBoost', acc_test, 'Test']
 ```
@@ -681,8 +723,8 @@ result_df.loc[len(result_df), :] = ['AdaBoost', acc_test, 'Test']
 
 **結果: AdaBoost による分類**
 
-- 訓練時精度: {glue:text}`ada_acc_train:.2f`%
-- 評価時精度: {glue:text}`ada_acc_test:.2f`%
+- 訓練時精度: ![](#ada_acc_train)%
+- 評価時精度: ![](#ada_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -754,8 +796,20 @@ acc_test = clf.score(X_test, y_test)
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-glue('gbst_acc_train', acc_train * 100.0)
-glue('gbst_acc_test', acc_test * 100.0)
+# | label: gb_acc_train
+print(f'{acc_train * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: gb_acc_test
+print(f'{acc_test * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
 result_df.loc[len(result_df), :] = ['Gradient boosting', acc_train, 'Train']
 result_df.loc[len(result_df), :] = ['Gradient boosting', acc_test, 'Test']
 ```
@@ -764,15 +818,15 @@ result_df.loc[len(result_df), :] = ['Gradient boosting', acc_test, 'Test']
 
 **結果: 勾配ブースティングによる分類**
 
-- 訓練時精度: {glue:text}`gbst_acc_train:.2f`%
-- 評価時精度: {glue:text}`gbst_acc_test:.2f`%
+- 訓練時精度: ![](#gb_acc_train)%
+- 評価時精度: ![](#gb_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 ::::{admonition} 勾配ブースティングは非深層学習の有望株？
 :class: note
 
-現在、深層学習を用いない機械分類のアルゴリズムの中では勾配ブースティングの発展形が大きな成果を挙げている。その中には**XGBoost** {cite}`chen2016xgboost` や**LightGBM** {cite}`ke2017lightgbm`などがあり、いずれもscikit-learnと類似したインターフェースで利用が可能なので、興味がある読者はこれらのライブラリを試してみとともに、原著の論文についても、ぜひ目を通してほしい。
+現在、深層学習を用いない機械分類のアルゴリズムの中では勾配ブースティングの発展形が大きな成果を挙げている。その中には**XGBoost** {cite:p}`chen2016xgboost` や**LightGBM** {cite:p}`ke2017lightgbm`などがあり、いずれもscikit-learnと類似したインターフェースで利用が可能なので、興味がある読者はこれらのライブラリを試してみとともに、原著の論文についても、ぜひ目を通してほしい。
 ::::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -1004,8 +1058,20 @@ acc_test = clf.score(X_test, y_test)
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-glue('lsvm_acc_train', acc_train * 100.0)
-glue('lsvm_acc_test', acc_test * 100.0)
+# | label: lsvm_acc_train
+print(f'{acc_train * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: lsvm_acc_test
+print(f'{acc_test * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
 result_df.loc[len(result_df), :] = ['Linear SVM', acc_train, 'Train']
 result_df.loc[len(result_df), :] = ['Linear SVM', acc_test, 'Test']
 ```
@@ -1014,8 +1080,8 @@ result_df.loc[len(result_df), :] = ['Linear SVM', acc_test, 'Test']
 
 **結果: 線形SVMによる分類**
 
-- 訓練時精度: {glue:text}`lsvm_acc_train:.2f`%
-- 評価時精度: {glue:text}`lsvm_acc_test:.2f`%
+- 訓練時精度: ![](#lsvm_acc_train)%
+- 評価時精度: ![](#lsvm_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1042,7 +1108,7 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-labels = ['$0$', '$1$']
+labels = ['$x_1$', '$x_2$']
 for i in range(len(labels)):
     idx = np.where(y_circ == i)
     plt.scatter(X_circ[idx, 0], X_circ[idx, 1], label=labels[i])
@@ -1093,7 +1159,7 @@ DecisionBoundaryDisplay.from_estimator(
 )
 
 y_pred = clf.predict(X_circ)
-labels = ['$0$', '$1$']
+labels = ['$x_1$', '$x_2$']
 for i in range(len(labels)):
     idx = np.where(y_pred == i)
     plt.scatter(X_circ[idx, 0], X_circ[idx, 1], label=labels[i])
@@ -1127,7 +1193,7 @@ fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
 ax.view_init(elev=10)
 
-labels = ['$0$', '$1$']
+labels = ['$x_1$', '$x_2$']
 for i in range(len(labels)):
     idx = np.where(y_circ == i)
     ax.scatter(
@@ -1265,7 +1331,7 @@ DecisionBoundaryDisplay.from_estimator(
 )
 
 y_pred = clf.predict(X_circ)
-labels = ['$0$', '$1$']
+labels = ['$x_1$', '$x_2$']
 for i in range(len(labels)):
     idx = np.where(y_pred == i)
     plt.scatter(X_circ[idx, 0], X_circ[idx, 1], label=labels[i])
@@ -1315,8 +1381,20 @@ acc_test = clf.score(X_test, y_test)
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-glue('ksvm_acc_train', acc_train * 100.0)
-glue('ksvm_acc_test', acc_test * 100.0)
+# | label: ksvm_acc_train
+print(f'{acc_train * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: ksvm_acc_test
+print(f'{acc_test * 100.0:.2f}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
 result_df.loc[len(result_df), :] = ['Kernel SVM', acc_train, 'Train']
 result_df.loc[len(result_df), :] = ['Kernel SVM', acc_test, 'Test']
 ```
@@ -1325,8 +1403,8 @@ result_df.loc[len(result_df), :] = ['Kernel SVM', acc_test, 'Test']
 
 **結果: カーネルSVMのよる分類**
 
-- 訓練時精度: {glue:text}`ksvm_acc_train:.2f`%
-- 評価時精度: {glue:text}`ksvm_acc_test:.2f`%
+- 訓練時精度: ![](#ksvm_acc_train)%
+- 評価時精度: ![](#ksvm_acc_test)%
 
 +++
 
@@ -1979,14 +2057,15 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
-glue('micro-avg', micro_avg * 100.0)
+# | label: micro_avg
+print(f'{micro_avg * 100.0:.2f}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: マイクロ平均の値**
 
-- maicro-avg: {glue:text}`micro-avg:.3f`
+- maicro-avg: ![](#micro-avg:.3f)
 
 +++
 
@@ -2003,7 +2082,6 @@ glue('micro-avg', micro_avg * 100.0)
 
 ```{bibliography}
 :filter: docname in docnames
-:style: alpha
 ```
 
 ```{code-cell} ipython3

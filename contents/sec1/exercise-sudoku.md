@@ -467,7 +467,6 @@ glue('avg_time_recursive', avg_time)
 
 +++
 
-
 また、各自の確認用に難易度の異なる4問を示しておく。
 
 ```{code-cell} ipython3

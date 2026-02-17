@@ -1268,7 +1268,6 @@ Gaussian フィルタは画像の高周波信号を取り除く「ローパス�
 
 :::{bibliography}
 :filter: docname in docnames
-:style: alpha
 :::
 
 ```{code-cell} ipython3
