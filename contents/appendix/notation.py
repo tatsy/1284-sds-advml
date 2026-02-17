@@ -24,6 +24,9 @@
 # %% [markdown]
 # 資料中では、特に指定がない場合、以下のようにモジュールがエイリアスを使ってインポートされているとする。従って、`numpy.array`などは、資料中で`np.array`のように略記することがあるので注意すること。
 
+# %% tags=["remove-cell"]
+# ruff: noqa: I001
+
 # %%
 # NumPyなど前半で使うモジュール
 import matplotlib as mpl

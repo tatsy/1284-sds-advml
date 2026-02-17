@@ -78,10 +78,10 @@ target-version = "py311"
 quote-style = "single"
 
 [tool.ruff.lint]
-select = ["E", "W", "F"]
+select = ["E", "W", "F", "UP", "B"]
 ignore = []
 fixable = ["ALL"]
-unfixable = []
+unfixable = ["F401"]
 
 [tool.ruff.lint.isort]
 length-sort = true
