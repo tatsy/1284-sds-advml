@@ -1,9 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap");
 
 :root {
-  --default-font-family: "roboto", "m plus 1p", "noto color emoji", sans-serif;
+  --default-font-family: "Roboto", "M PLUS 1p", "Noto Color Emoji", sans-serif;
+  --code-font-family: "Roboto Mono", sans-serif;
 }
 
 body {
@@ -19,6 +21,13 @@ h4,
 h5,
 h6 {
   font-family: var(--default-font-family);
+}
+
+.article {
+  p {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
 }
 
 /* Image and figure */
@@ -66,6 +75,21 @@ div[data-name="output-decoration-notebook-output"] {
     padding: 0 !important;
     overflow-x: clip !important;
   }
+
+  div[data-name="safe-output-stream"] {
+    div {
+      .myst-jp-stream-output {
+        background: none;
+        border: none;
+        margin: 0;
+        padding: 0;
+        & * {
+          font-size: inherit !important;
+          font-family: var(--default-font-family) !important;
+        }
+      }
+    }
+  }
 }
 
 .lm-Widget {
@@ -81,11 +105,43 @@ div[data-name="output-decoration-notebook-output"] {
   font-family: inherit;
 }
 
-.myst-jp-stream-output * {
-  font-size: inherit !important;
-  font-family: var(--default-font-family) !important;
+
+
+/* Code input */
+.myst-code {
+  margin-bottom: 0.25rem;
+  box-shadow: none;
+
+  &:hover {
+    box-shadow: none;
+  }
+
+  .myst-code-body {
+    code {
+      span {
+
+      }
+    }
+  }
 }
 
+/* Code output */
+.myst-jp-stream-output {
+  border-left: 4px solid rgba(0.5, 0.5, 0.5, 0.75);
+  margin-top: 0.1rem;
+  padding: 0.5rem;
+  background-color: #f6f6f6;
+  .dark & {
+    background-color: #444444;
+  }
+  code {
+    span {
+      font-family: var(--code-font-family) !important;
+    }
+  } 
+}
+
+/* Figure caption */
 .caption-number {
   font-style: normal !important;
   font-weight: bold;
@@ -106,6 +162,12 @@ div.cell_output td {
   text-align: left !important;
 }
 
+/* Admonition */
+.myst-admonition-header {
+  font-family: var(--default-font-family);
+  font-weight: bold;
+}
+
 /* Question admonition */
 div {
   &.question {
@@ -120,5 +182,14 @@ div {
       font-family: "Font Awesome 5 Free";
       content: "\f059";
     }
+  }
+}
+
+/* Linked image */
+.link-text {
+  img {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: inline-block;    
   }
 }
