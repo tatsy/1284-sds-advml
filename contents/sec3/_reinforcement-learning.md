@@ -35,18 +35,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
-
 # スロットアームの数
 n_arms = 5
-glue("n_arms", n_arms)
 
 # 試行回数
 n_play = 20000
-glue("n_play", n_play)
 
 # シード値の設定
 random.seed(31415)
@@ -69,6 +62,20 @@ rc = {
     "legend.framealpha": 1.0,
 }
 sns.set_theme(style="whitegrid", palette="colorblind", rc=rc)
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: n_arms
+print(f'{n_arms}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: n_play
+print(f'{n_play}')
 ```
 
 強化学習とは、何らかの目的を達成するために、「行動」と「評価」を繰り返しながら、より良い行動を取ることを目指す機械学習法である。
@@ -131,7 +138,7 @@ class SlotArm(object):
 
 この`SlotArm`クラスを配列として、スロット台のアームを複数用意する。
 
-以下の例では、{glue:}`n_arms`本のアームを持つスロット台を用意し、各アームが当たりを出す確率が0.1から0.2刻みで0.9までになるように設定する。
+以下の例では、![](#n_arms) 本のアームを持つスロット台を用意し、各アームが当たりを出す確率が0.1から0.2刻みで0.9までになるように設定する。
 
 なお、**これらの当たり確率は未知の値である**。
 
@@ -154,17 +161,20 @@ arms = [SlotArm(ratio=ratio) for ratio in ratios]
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
-glue("avg_ratio", np.mean(ratios))
-glue("best_ratio", np.max(ratios))
+:tags: [remove-cell]
+
+# | label: avg_ratio
+print(f'{np.mean(ratios):.2f}')
 ```
 
-このようにアームの当たり確率を割り当てた場合、平均の当たり確率は{glue:}`avg_ratio`であり、当たり確率最大のアームの当たり確率は{glue:}`best_ratio`である。
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: best_ratio
+print(f'{np.max(ratios):.2f}')
+```
+
+このようにアームの当たり確率を割り当てた場合、平均の当たり確率は ![](#avg_ratio) であり、当たり確率最大のアームの当たり確率は ![](#best_ratio) である。
 
 以下にアーム選択の戦略のいくつかを示すが、各戦略は
 
@@ -181,7 +191,7 @@ glue("best_ratio", np.max(ratios))
 
 まずは、上記の問題設定で、ランダムにアームを選んでスロットを回すという行動をとった場合に、どの程度の当たりが出るかを見てみよう。
 
-以下の実験では{glue:}`n_play`回スロットをプレイできるとして実験を行う。
+以下の実験では ![](#n_play) 回スロットをプレイできるとして実験を行う。
 
 ```{code-cell} ipython3
 ---
@@ -201,7 +211,7 @@ for i in range(n_play):
         history.append(0.0)
 ```
 
-こちらの例で `history` には{glue:}`n_play`回の各試行が当たりならば1が、外れならば0が格納されている。この値を用いて、**平均の当たり確率**と**当たり確率の標準偏差**の変移を計算する。
+こちらの例で `history` には ![](#n_play) 回の各試行が当たりならば1が、外れならば0が格納されている。この値を用いて、**平均の当たり確率**と**当たり確率の標準偏差**の変移を計算する。
 
 ```{code-cell} ipython3
 history = np.array(history)  # 各試行の当たり外れの履歴
@@ -213,13 +223,10 @@ S_rand = np.sqrt((history - E_rand) ** 2.0 / play_count)  # 推定当たり確�
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
-glue("random_ratio", E_rand[-1])
+:tags: [remove-cell]
+
+# | label: random_ratio
+print(f'{E_rand[-1]:.3f}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -227,7 +234,7 @@ glue("random_ratio", E_rand[-1])
 :::{admonition} 結果: ランダムな行動選択
 :class: note
 
-当たり確率: {glue:text}`random_ratio:.3f`
+当たり確率: ![](#random_ratio)
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -241,6 +248,8 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
+# | label: random_plot
+
 fig, ax = plt.subplots()
 
 ax.fill_between(
@@ -260,18 +269,16 @@ ax.set_title("Multi-Arm Bandit")
 
 ax.legend(loc="lower right")
 fig.tight_layout()
-
-glue("random_plot", fig)
-plt.close()
+plt.show()
 ```
 
-:::{glue:figure} random_plot
-:figclass: image-stylish
+:::{figure} #random_plot
+:class: image-stylish
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-このように、ランダムに回すと、得られる報酬は、当たり確率の{glue:text}`avg_ratio`程度に張り付くことが分かる。
+このように、ランダムに回すと、得られる報酬は、当たり確率の ![](#avg_ratio) 程度に張り付くことが分かる。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -330,13 +337,10 @@ S_greedy = np.sqrt((history - E_greedy) ** 2.0 / play_count)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
-glue("greedy_ratio", E_greedy[-1], display=False)
+:tags: [remove-cell]
+
+# | label: greedy_ratio
+print(f'{E_greedy[-1]:.3f}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -344,7 +348,7 @@ glue("greedy_ratio", E_greedy[-1], display=False)
 :::{admonition} 結果: 貪欲法
 :class: note
 
-当たり確率: {glue:text}`greedy_ratio:.3f`
+当たり確率: ![](#greedy_ratio)
 :::
 
 +++
@@ -358,6 +362,8 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
+# | label: greedy_plot
+
 fig, ax = plt.subplots()
 
 ax.fill_between(
@@ -386,20 +392,18 @@ ax.set_title("Multi-Arm Bandit")
 
 ax.legend(loc="lower right")
 fig.tight_layout()
-
-glue("greedy_plot", fig)
-plt.close()
+plt.show()
 ```
 
-:::{glue:figure} greedy_plot
-:figclass: image-stylish
+:::{figure} #greedy_plot
+:class: image-stylish
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 上記の結果を見てみると、一番当たっている物を回す、という戦略はそれほど悪くはないように見える。
 
-実際、最終的な報酬は、最も当たりやすいスロットの当たり確率である{glue:text}`best_ratio:.2f`に近づいている。
+実際、最終的な報酬は、最も当たりやすいスロットの当たり確率である ![](#best_ratio) に近づいている。
 
 しかし、**最初の10%を回した時点の当たり確率の推定値にその後の報酬が強く依存**する上、**ランダムに回す最初の10%の試行で得られる報酬は有意に増加しない**。
 
@@ -459,13 +463,10 @@ S_eps = np.sqrt((history - E_eps) ** 2.0 / play_count)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
-glue("eps_ratio", E_eps[-1])
+:tags: [remove-cell]
+
+# | label: eps_ratio
+print(f'{E_eps[-1]:.3f}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -473,7 +474,7 @@ glue("eps_ratio", E_eps[-1])
 :::{admonition} 結果: $\varepsilon$-greedy法
 :class: note
 
-当たり確率: {glue:text}`eps_ratio:.3f`
+当たり確率: ![](#eps_ratio)
 
 :::
 
@@ -488,6 +489,8 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
+# | label: eps_greedy_plot
+
 fig, ax = plt.subplots()
 
 ax.fill_between(
@@ -525,13 +528,11 @@ ax.set_title("Multi-Arm Bandit")
 
 ax.legend(loc="lower right")
 fig.tight_layout()
-
-glue("eps_greedy_plot", fig)
-plt.close()
+plt.show()
 ```
 
-:::{glue:figure} eps_greedy_plot
-:figclass: image-stylish
+:::{figure} #eps_greedy_plot
+:class: image-stylish
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -555,7 +556,7 @@ $$
 
 $\varepsilon$-greedy法においては、通常、試行回数が増えれば増えるほど、各スロットの当たり確率の推定値が真値に近づいていくので、$\varepsilon$の値は、試行回数とともに徐々に小さくしていくことが多い。
 
-上記の例では$\varepsilon$の値を常に0.1としていたが、$\varepsilon=0.5$を初期値とし、最終{glue:}`n_play`回の時に$\varepsilon=0.001$となるように等比数列的に$\varepsilon$の値を下げていくと性能がどのように変化するかを調べよ。
+上記の例では$\varepsilon$の値を常に0.1としていたが、$\varepsilon=0.5$を初期値とし、最終 ![](#n_play) 回の時に$\varepsilon=0.001$となるように等比数列的に$\varepsilon$の値を下げていくと性能がどのように変化するかを調べよ。
 
 ::::
 
@@ -640,13 +641,10 @@ S_smax = np.sqrt((history - E_smax) ** 2.0 / play_count)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
-glue("softmax_ratio", E_smax[-1], display=False)
+:tags: [remove-cell]
+
+# | label: softmax_ratio
+print(f'{E_smax[-1]:.3f}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -654,7 +652,7 @@ glue("softmax_ratio", E_smax[-1], display=False)
 :::{admonition} 結果: ソフトマックス探索
 :class: note
 
-当たり確率: {glue:text}`softmax_ratio:.3f`
+当たり確率: ![](#softmax_ratio)
 
 :::
 
@@ -665,6 +663,8 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
+# | label: softmax_plot
+
 fig, ax = plt.subplots()
 
 ax.fill_between(
@@ -711,13 +711,11 @@ ax.set_title("Multi-Arm Bandit")
 
 ax.legend(loc="lower right")
 fig.tight_layout()
-
-glue("softmax_plot", fig)
-plt.close()
+plt.show()
 ```
 
-:::{glue:figure} softmax_plot
-:figclass: image-stylish
+:::{figure} #softmax_plot
+:class: image-stylish
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -789,13 +787,10 @@ S_ucb = np.sqrt((history - E_ucb) ** 2.0 / play_count)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
-glue("ucb_ratio", E_ucb[-1], display=False)
+:tags: [remove-cell]
+
+# | label: ucb_ratio
+print(f'{E_ucb[-1]:.3f}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -803,7 +798,7 @@ glue("ucb_ratio", E_ucb[-1], display=False)
 :::{admonition} 結果: UCB1
 :class: note
 
-当たり確率: {glue:text}`ucb_ratio:.3f`
+当たり確率: ![](#ucb_ratio)
 :::
 
 +++
@@ -817,6 +812,8 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
+# | label: ucb_plot
+
 fig, ax = plt.subplots()
 
 ax.fill_between(
@@ -872,13 +869,11 @@ ax.set_title("Multi-Arm Bandit")
 
 ax.legend(loc="lower right")
 fig.tight_layout()
-
-glue("ucb_plot", fig)
-plt.close()
+plt.show()
 ```
 
-:::{glue:figure} ucb_plot
-:figclass: image-stylish
+:::{figure} #ucb_plot
+:class: image-stylish
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
