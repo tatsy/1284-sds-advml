@@ -178,7 +178,7 @@ slideshow:
 # サブフォルダの数を調べる
 dirname = 'hiragana73'
 folders = sorted([d for d in os.listdir(dirname)])
-print('There are {:d} folders in "{:s}".'.format(len(folders), dirname))
+print(f'There are {len(folders):d} folders in "{dirname:s}".')
 
 # フォルダに対応する文字を列挙
 for i, d in enumerate(folders):
@@ -283,7 +283,7 @@ pbar = tqdm(total=n_total)
 for c in chars:
     # 文字に対する数字を計算
     num = char2num[c]
-    char_dir = os.path.join(dirname, 'U{:04X}'.format(ord(c)))
+    char_dir = os.path.join(dirname, f'U{ord(c):04X}')
 
     # 画像の読み込み
     image_files = [os.path.join(char_dir, f) for f in os.listdir(char_dir)]
@@ -294,7 +294,7 @@ for c in chars:
         # グレースケールで画像を読み込む
         image = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
         if image is None:
-            raise IOError('Failed to load image: {:s}'.format(f))
+            raise OSError(f'Failed to load image: {f:s}')
 
         # ランダム輝度変更
         factor = np.random.uniform(0.9, 1.1)
@@ -536,7 +536,7 @@ def draw_frame(problem, fig, ax):
     ims = plt.imshow(mask * 0.2, cmap='Blues', vmin=0.0, vmax=1.0)
     frame.append(ims)
     for (i, j), z in np.ndenumerate(problem):
-        txt = ax.text(j, i, '{:d}'.format(z), ha='center', va='center', color='k', fontsize=15)
+        txt = ax.text(j, i, f'{z:d}', ha='center', va='center', color='k', fontsize=15)
         frame.append(txt)
 
     ax.grid(which='minor', color='k', linestyle='-', linewidth=0.5)
@@ -1938,7 +1938,7 @@ tmp0 = diff**2 / (sigma[None, :, :] ** 3)
 tmp1 = 1.0 / sigma[None, :, :]
 dLds = np.sum(gamma[:, :, None] * (tmp0 - tmp1), axis=0)
 
-fisher_vector = np.concatenate([dLda, dLdm.reshape((-1)), dLds.reshape((-1))])
+fisher_vector = np.concatenate([dLda, dLdm.reshape(-1), dLds.reshape(-1)])
 ```
 
 ```{code-cell} ipython3
@@ -1999,7 +1999,7 @@ class FisherVectorFeature(TransformerMixin):
             tmp1 = 1.0 / sigma[None, :, :]
             dLds = np.sum(gamma[:, :, None] * (tmp0 - tmp1), axis=0)
 
-            fv = np.concatenate([dLda, dLdm.reshape((-1)), dLds.reshape((-1))])
+            fv = np.concatenate([dLda, dLdm.reshape(-1), dLds.reshape(-1)])
             features.append(fv)
 
         return np.stack(features, axis=0)

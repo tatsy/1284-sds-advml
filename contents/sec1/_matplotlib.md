@@ -388,7 +388,7 @@ def unit_of_pi(value, tick_number):
         return '0'
     if abs(N) == 1:
         return r'{:s}$\pi$'.format('+' if N > 0 else '-')
-    return r'{:d}$\pi$'.format(N)
+    return rf'{N:d}$\pi$'
 
 
 # データの用意

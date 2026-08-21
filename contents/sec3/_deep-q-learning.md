@@ -40,10 +40,10 @@ IN_COLAB = True
 try:
     import google.colab
 
-    print("You are running the code in Google Colab.")
+    print('You are running the code in Google Colab.')
 except ImportError:
     IN_COLAB = False
-    print("You are running the code on the local computer.")
+    print('You are running the code on the local computer.')
 
 if IN_COLAB:
     # Gymnasiumのインストール
@@ -72,7 +72,7 @@ except ImportError:
 
 # パラメータ
 n_episodes = 200
-glue("n_episodes", n_episodes)
+glue('n_episodes', n_episodes)
 
 # 乱数のシードを固定
 random.seed(31415)
@@ -80,21 +80,21 @@ np.random.seed(31415)
 
 # グラフの設定
 rc = {
-    "figure.dpi": 150,
-    "axes.linewidth": 1,
-    "axes.edgecolor": "black",
-    "grid.color": "gray",
-    "grid.linestyle": "--",
-    "grid.linewidth": 0.5,
-    "xtick.major.size": 2,
-    "ytick.major.size": 2,
-    "legend.frameon": True,
-    "legend.borderpad": 0.5,
-    "legend.facecolor": "white",
-    "legend.edgecolor": "black",
-    "legend.framealpha": 1.0,
+    'figure.dpi': 150,
+    'axes.linewidth': 1,
+    'axes.edgecolor': 'black',
+    'grid.color': 'gray',
+    'grid.linestyle': '--',
+    'grid.linewidth': 0.5,
+    'xtick.major.size': 2,
+    'ytick.major.size': 2,
+    'legend.frameon': True,
+    'legend.borderpad': 0.5,
+    'legend.facecolor': 'white',
+    'legend.edgecolor': 'black',
+    'legend.framealpha': 1.0,
 }
-sns.set_theme(style="whitegrid", palette="colorblind", rc=rc)
+sns.set_theme(style='whitegrid', palette='colorblind', rc=rc)
 ```
 
 ## 深層Q学習の実装
@@ -141,7 +141,7 @@ class Network(nn.Sequential):
     """
 
     def __init__(self, n_inputs, n_outputs):
-        super(Network, self).__init__(
+        super().__init__(
             nn.Linear(n_inputs, 128, bias=False),
             nn.BatchNorm1d(128),
             nn.ReLU(inplace=True),
@@ -165,11 +165,11 @@ class Network(nn.Sequential):
 
 # デバイスの設定
 if torch.cuda.is_available():
-    device = torch.device("cuda")
-    print(f"Your device is {device} ({torch.cuda.get_device_name(device)}).")
+    device = torch.device('cuda')
+    print(f'Your device is {device} ({torch.cuda.get_device_name(device)}).')
 else:
-    device = torch.device("cpu")
-    print(f"Your device is {device}.")
+    device = torch.device('cpu')
+    print(f'Your device is {device}.')
 
 # ネットワークの初期化
 # CartPoleは状態変数の数が4で、出力パラメータ数が2
@@ -196,15 +196,15 @@ steps_per_episode = 1000
 memory_size = 10000
 
 # ゲーム環境の作成
-env = gym.make("CartPole-v1", render_mode="rgb_array")
+env = gym.make('CartPole-v1', render_mode='rgb_array')
 ```
 
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-glue("batch_size", batch_size)
-glue("steps_per_episode", steps_per_episode)
-glue("memory_size", memory_size)
+glue('batch_size', batch_size)
+glue('steps_per_episode', steps_per_episode)
+glue('memory_size', memory_size)
 ```
 
 今回の実験では、1プレイ (エピソード)ごとにサイズが{glue:}`batch_size`のミニバッチで{glue:}`steps_per_episode`ステップ分訓練を行う。
@@ -377,7 +377,7 @@ dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, sampler
 :tags: [hide-input, remove-output]
 
 # ゲーム環境の作成
-env = gym.make("CartPole-v1", render_mode="rgb_array")
+env = gym.make('CartPole-v1', render_mode='rgb_array')
 
 # リプレイ・バッファの準備
 replay_buffer = deque(maxlen=memory_size)
@@ -476,9 +476,7 @@ for epi in range(n_episodes):
 
         # 進捗状況の表示
         if i % 100 == 0:
-            pbar.set_description(
-                f"Episode {epi+1}/{n_episodes}, Steps: {avg_steps:.2f}, Loss: {loss.item():.3f}"
-            )
+            pbar.set_description(f'Episode {epi + 1}/{n_episodes}, Steps: {avg_steps:.2f}, Loss: {loss.item():.3f}')
         pbar.update()
 
     # Q-networkの更新
@@ -523,7 +521,7 @@ ax.set(xticks=[], yticks=[])
 draw = []
 for i, f in enumerate(frames):
     ims = plt.imshow(f)
-    txt = plt.text(20, 30, f"frame #{i+1:d}")
+    txt = plt.text(20, 30, f'frame #{i + 1:d}')
     draw.append([ims, txt])
     fig.tight_layout()
 
@@ -568,7 +566,7 @@ class ConvNet(nn.Sequential):
     """
 
     def __init__(self, in_channels, num_actions):
-        super(ConvNet, self).__init__(
+        super().__init__(
             # 畳み込み層 #1
             nn.Conv2d(in_channels, 128, kernel_size=8, stride=4, bias=False),
             nn.BatchNorm2d(128),
@@ -626,7 +624,7 @@ optim = torch.optim.SGD(q_net_online.parameters(), lr=1.0e-3, momentum=0.9)
 ```{code-cell} ipython3
 def preprocess(img):
     """画像の前処理"""
-    img = (img / 255.0).astype("float32")
+    img = (img / 255.0).astype('float32')
     img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     img = cv2.resize(img, (84, 84), interpolation=cv2.INTER_AREA)
     return img
@@ -650,7 +648,7 @@ def preprocess(img):
 :tags: [hide-input]
 
 # ゲーム環境の作成
-env = gym.make("CartPole-v1", render_mode="rgb_array")
+env = gym.make('CartPole-v1', render_mode='rgb_array')
 
 # リプレイ・バッファの準備
 replay_buffer = deque(maxlen=memory_size)
@@ -757,9 +755,7 @@ for epi in range(n_episodes):
 
         # 進捗状況の表示
         if i % 100 == 0:
-            pbar.set_description(
-                f"Episode {epi+1}/{n_episodes}, Steps: {avg_steps:.2f}, Loss: {loss.item():.3f}"
-            )
+            pbar.set_description(f'Episode {epi + 1}/{n_episodes}, Steps: {avg_steps:.2f}, Loss: {loss.item():.3f}')
         pbar.update()
 
     # Q-networkの更新
@@ -816,7 +812,7 @@ ax.set(xticks=[], yticks=[])
 draw = []
 for i, f in enumerate(frames):
     ims = plt.imshow(f)
-    txt = plt.text(20, 30, f"frame #{i+1:d}")
+    txt = plt.text(20, 30, f'frame #{i + 1:d}')
     draw.append([ims, txt])
     fig.tight_layout()
 

@@ -47,10 +47,10 @@ IN_COLAB = True
 try:
     import google.colab
 
-    print("You are running the code in Google Colab.")
+    print('You are running the code in Google Colab.')
 except ImportError:
     IN_COLAB = False
-    print("You are running the code on the local computer.")
+    print('You are running the code on the local computer.')
 
 if IN_COLAB:
     # othelloモジュールのインストール
@@ -82,8 +82,8 @@ try:
 except ImportError:
     glue = lambda *args, **kwargs: None
 
-rc = {"figure.dpi": 150}
-sns.set_theme(style="white", rc=rc)
+rc = {'figure.dpi': 150}
+sns.set_theme(style='white', rc=rc)
 
 # 乱数シードの固定
 random.seed(12345)
@@ -91,7 +91,7 @@ np.random.seed(12345)
 
 # 実験に用いるエピソード数
 n_episodes = 100
-glue("n_episodes", n_episodes)
+glue('n_episodes', n_episodes)
 
 # 並列化スレッド数
 n_jobs = min(4, mp.cpu_count())
@@ -108,10 +108,10 @@ def tqdm_joblib(total, callback=None, **kwargs):
 
     class TqdmBatchCompletionCallBack(joblib.parallel.BatchCompletionCallBack):
         def __call__(self, out):
-            super(TqdmBatchCompletionCallBack, self).__call__(out)
+            super().__call__(out)
             with self.parallel._lock:
                 if callback is not None:
-                    if hasattr(self, "_result"):
+                    if hasattr(self, '_result'):
                         for r in self._result:
                             callback(progress_bar, *r)
                 progress_bar.update(n=self.batch_size)
@@ -190,12 +190,10 @@ def check(p1_fn, p2_fn):
         else:
             draw += 1
 
-        pbar.set_description(f"B:{b_win:d}, W:{w_win:d}, D:{draw:d}")
+        pbar.set_description(f'B:{b_win:d}, W:{w_win:d}, D:{draw:d}')
 
     with tqdm_joblib(total=n_episodes, callback=callback):
-        Parallel(n_jobs=n_jobs, batch_size=1)(
-            delayed(game)(p1_fn, p2_fn) for _ in range(n_episodes)
-        )
+        Parallel(n_jobs=n_jobs, batch_size=1)(delayed(game)(p1_fn, p2_fn) for _ in range(n_episodes))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -244,8 +242,7 @@ slideshow:
   slide_type: ''
 ---
 # オセロモジュールのインポート
-import othello
-from othello import Action, Player
+from othello import Action
 ```
 
 ```{code-cell} ipython3
@@ -456,8 +453,8 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-print(f"#black: {env.count(Player.BLACK):d}")
-print(f"#white: {env.count(Player.WHITE):d}")
+print(f'#black: {env.count(Player.BLACK):d}')
+print(f'#white: {env.count(Player.WHITE):d}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -488,9 +485,9 @@ slideshow:
 tags: [remove-cell]
 ---
 check(action_by_random, action_by_random)
-glue("rand_b_win", b_win)
-glue("rand_w_win", w_win)
-glue("rand_draw", draw)
+glue('rand_b_win', b_win)
+glue('rand_w_win', w_win)
+glue('rand_draw', draw)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -552,7 +549,7 @@ SCORE_BOARD = np.array(
         [-20, -40, -5, -5, -5, -5, -40, -20],
         [120, -20, 20, 5, 5, 20, -20, 120],
     ],
-    dtype="float64",
+    dtype='float64',
 )
 ```
 
@@ -573,14 +570,14 @@ ax.set_yticklabels(np.arange(1, 9))
 ax.set_xticks(np.arange(1, 9) - 0.5, minor=True)
 ax.set_yticks(np.arange(1, 9) - 0.5, minor=True)
 
-ax.imshow(SCORE_BOARD, cmap="tab20", interpolation=None)
+ax.imshow(SCORE_BOARD, cmap='tab20', interpolation=None)
 for (i, j), z in np.ndenumerate(SCORE_BOARD):
-    txt = ax.text(j, i, f"{int(z):d}", ha="center", va="center", color="k", fontsize=15)
+    txt = ax.text(j, i, f'{int(z):d}', ha='center', va='center', color='k', fontsize=15)
 
-ax.grid(which="minor", color="k", linestyle="-", linewidth=0.5)
+ax.grid(which='minor', color='k', linestyle='-', linewidth=0.5)
 ax.xaxis.tick_top()
 
-glue("cell_scores", fig)
+glue('cell_scores', fig)
 plt.close()
 ```
 
@@ -623,9 +620,9 @@ slideshow:
 tags: [remove-cell]
 ---
 check(action_by_score, action_by_random)
-glue("score_b_win", b_win)
-glue("score_w_win", w_win)
-glue("score_draw", draw)
+glue('score_b_win', b_win)
+glue('score_w_win', w_win)
+glue('score_draw', draw)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -684,7 +681,7 @@ def score_fn(env, current_player):
     elif current_player.is_white():
         return -np.sum(env.board * SCORE_BOARD)
     else:
-        raise ValueError("Invalid player")
+        raise ValueError('Invalid player')
 ```
 
 ミニマックス探索を行う`minimax`関数では、以下の3つの場合を考える。
@@ -771,9 +768,9 @@ slideshow:
 tags: [remove-cell]
 ---
 check(action_by_minimax, action_by_random)
-glue("minimax_b_win", b_win)
-glue("minimax_w_win", w_win)
-glue("minimax_draw", draw)
+glue('minimax_b_win', b_win)
+glue('minimax_w_win', w_win)
+glue('minimax_draw', draw)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -921,9 +918,9 @@ def action_by_alpha_beta(env, depth=2):
 :tags: [remove-cell]
 
 check(action_by_alpha_beta, action_by_minimax)
-glue("ab_vs_minimax_b_win", b_win)
-glue("ab_vs_minimax_w_win", w_win)
-glue("ab_vs_minimax_draw", draw)
+glue('ab_vs_minimax_b_win', b_win)
+glue('ab_vs_minimax_w_win', w_win)
+glue('ab_vs_minimax_draw', draw)
 ```
 
 :::{admonition} 対局結果: アルファベータ探索 (#1) vs ミニマックス探索 (#2)
@@ -1029,9 +1026,9 @@ def action_by_alpha_beta_deepen(env, time_limit=1.0e-2):
 :tags: [remove-cell]
 
 check(action_by_alpha_beta_deepen, action_by_minimax_deepen)
-glue("ab_vs_minimax_deepen_b_win", b_win)
-glue("ab_vs_minimax_deepen_w_win", w_win)
-glue("ab_vs_minimax_deepen_draw", draw)
+glue('ab_vs_minimax_deepen_b_win', b_win)
+glue('ab_vs_minimax_deepen_w_win', w_win)
+glue('ab_vs_minimax_deepen_draw', draw)
 ```
 
 反復深化を取り入ればアルファベータ探索とミニマックス探索の対戦結果は次の通りであり、同じ探索時間ではアルファベータ探索の方が圧倒的に強く、より多くの局面を探索できていることが確認できる。
@@ -1148,9 +1145,7 @@ def action_by_monte_carlo(env, time_limit=1.0e-2):
                 break
         else:
             # 全ての有効手を最低1回調べたら、UCB1値に基づいて着手
-            ucb1_values = [
-                v / n + np.sqrt(2.0 * np.log(n_trials) / n) for v, n in zip(values, n_checks)
-            ]
+            ucb1_values = [v / n + np.sqrt(2.0 * np.log(n_trials) / n) for v, n in zip(values, n_checks)]
             action_idx = np.argmax(ucb1_values)
 
         # 手を進めてプレイアウトする
@@ -1183,9 +1178,9 @@ slideshow:
 tags: [remove-cell]
 ---
 check(action_by_monte_carlo, action_by_alpha_beta_deepen)
-glue("mc_vs_alpha_beta_b_win", b_win)
-glue("mc_vs_alpha_beta_w_win", w_win)
-glue("mc_vs_alpha_beta_draw", draw)
+glue('mc_vs_alpha_beta_b_win', b_win)
+glue('mc_vs_alpha_beta_w_win', w_win)
+glue('mc_vs_alpha_beta_draw', draw)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -1408,7 +1403,7 @@ slideshow:
   slide_type: ''
 tags: [hide-input]
 ---
-class UctNode(object):
+class UctNode:
     """
     UCB1値を用いた子ノードの探索を行うノード
     """
@@ -1509,8 +1504,7 @@ class UctNode(object):
         # UCB1値の計算
         # 子ノードの評価値は相手の手番の評価値なので、平均勝率の符号が逆になる
         ucb1_values = [
-            (-node.value / node.n_check) + np.sqrt(2.0 * np.log(t) / node.n_check)
-            for node in self.child_nodes
+            (-node.value / node.n_check) + np.sqrt(2.0 * np.log(t) / node.n_check) for node in self.child_nodes
         ]
         return self.child_nodes[np.argmax(ucb1_values)]
 ```
@@ -1531,9 +1525,9 @@ slideshow:
 tags: [remove-cell]
 ---
 check(action_by_mcts, action_by_alpha_beta_deepen)
-glue("mcts_vs_alpha_beta_b_win", b_win)
-glue("mcts_vs_alpha_beta_w_win", w_win)
-glue("mcts_vs_alpha_beta_draw", draw)
+glue('mcts_vs_alpha_beta_b_win', b_win)
+glue('mcts_vs_alpha_beta_w_win', w_win)
+glue('mcts_vs_alpha_beta_draw', draw)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -1559,9 +1553,9 @@ glue("mcts_vs_alpha_beta_draw", draw)
 :tags: [remove-cell]
 
 check(action_by_mcts, action_by_monte_carlo)
-glue("mcts_vs_mc_b_win", b_win)
-glue("mcts_vs_mc_w_win", w_win)
-glue("mcts_vs_mc_draw", draw)
+glue('mcts_vs_mc_b_win', b_win)
+glue('mcts_vs_mc_w_win', w_win)
+glue('mcts_vs_mc_draw', draw)
 ```
 
 :::{admonition} 対局結果: モンテカルロ木探索 (#1) vs 原始モンテカルロ (#2)
@@ -1612,7 +1606,7 @@ while not env.is_done():
     elif env.player.is_white():
         action = action_by_alpha_beta_deepen(env, time_limit=1.0)
     else:
-        raise ValueError("Invalid player")
+        raise ValueError('Invalid player')
 
     # 着手による盤の状態の更新
     env.update(action)

@@ -44,10 +44,10 @@ IN_COLAB = True
 try:
     import google.colab
 
-    print("You are running the code in Google Colab.")
+    print('You are running the code in Google Colab.')
 except ImportError:
     IN_COLAB = False
-    print("You are running the code on the local computer.")
+    print('You are running the code on the local computer.')
 
 if IN_COLAB:
     # Gymnasiumのインストール
@@ -79,7 +79,7 @@ except ImportError:
 
 # パラメータ
 n_episodes = 10000
-glue("n_episodes", n_episodes)
+glue('n_episodes', n_episodes)
 
 # 乱数のシードを固定
 random.seed(31415)
@@ -87,21 +87,21 @@ np.random.seed(31415)
 
 # グラフの設定
 rc = {
-    "figure.dpi": 150,
-    "axes.linewidth": 1,
-    "axes.edgecolor": "black",
-    "grid.color": "gray",
-    "grid.linestyle": "--",
-    "grid.linewidth": 0.5,
-    "xtick.major.size": 2,
-    "ytick.major.size": 2,
-    "legend.frameon": True,
-    "legend.borderpad": 0.5,
-    "legend.facecolor": "white",
-    "legend.edgecolor": "black",
-    "legend.framealpha": 1.0,
+    'figure.dpi': 150,
+    'axes.linewidth': 1,
+    'axes.edgecolor': 'black',
+    'grid.color': 'gray',
+    'grid.linestyle': '--',
+    'grid.linewidth': 0.5,
+    'xtick.major.size': 2,
+    'ytick.major.size': 2,
+    'legend.frameon': True,
+    'legend.borderpad': 0.5,
+    'legend.facecolor': 'white',
+    'legend.edgecolor': 'black',
+    'legend.framealpha': 1.0,
 }
-sns.set_theme(style="whitegrid", palette="colorblind", rc=rc)
+sns.set_theme(style='whitegrid', palette='colorblind', rc=rc)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -255,7 +255,7 @@ slideshow:
 import gymnasium as gym
 
 # ゲーム環境の作成
-env = gym.make("CartPole-v1", render_mode="rgb_array")
+env = gym.make('CartPole-v1', render_mode='rgb_array')
 
 # ゲーム環境のリセット
 obsrv = env.reset(seed=31415)
@@ -277,7 +277,7 @@ fig, ax = plt.subplots()
 ax.imshow(img)
 ax.set(xticks=[], yticks=[])
 
-glue("cartpole_init_state", fig)
+glue('cartpole_init_state', fig)
 plt.close()
 ```
 
@@ -335,8 +335,8 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-print(f"Lower bound: {env.observation_space.low}")
-print(f"Upper bound: {env.observation_space.high}")
+print(f'Lower bound: {env.observation_space.low}')
+print(f'Upper bound: {env.observation_space.high}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -385,9 +385,9 @@ slideshow:
   slide_type: ''
 ---
 obsrv, reward, done, _, _ = env.step(0)
-print("Observation:", obsrv)
-print("Reward:", reward)
-print("Finished?:", done)
+print('Observation:', obsrv)
+print('Reward:', reward)
+print('Finished?:', done)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -436,7 +436,7 @@ ax.set(xticks=[], yticks=[])
 draw = []
 for i, f in enumerate(frames):
     ims = plt.imshow(f)
-    txt = plt.text(20, 30, f"frame #{i+1:d}")
+    txt = plt.text(20, 30, f'frame #{i + 1:d}')
     draw.append([ims, txt])
     fig.tight_layout()
 
@@ -504,10 +504,10 @@ slideshow:
   slide_type: ''
 ---
 bins = np.transpose(np.linspace(lower, upper, N_DIGITS))
-print("Cart position:\n", bins[0])
-print("Cart velocity:\n", bins[1])
-print("Pole angle:\n", bins[2])
-print("Pole angular velocity:\n", bins[3])
+print('Cart position:\n', bins[0])
+print('Cart velocity:\n', bins[1])
+print('Pole angle:\n', bins[2])
+print('Pole angular velocity:\n', bins[3])
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -671,7 +671,7 @@ ax.set(xticks=[], yticks=[])
 draw = []
 for i, f in enumerate(frames):
     ims = plt.imshow(f)
-    txt = plt.text(20, 30, f"frame #{i+1:d}")
+    txt = plt.text(20, 30, f'frame #{i + 1:d}')
     draw.append([ims, txt])
     fig.tight_layout()
 
@@ -793,7 +793,7 @@ ax.set(xticks=[], yticks=[])
 draw = []
 for i, f in enumerate(frames):
     ims = plt.imshow(f)
-    txt = plt.text(20, 30, f"frame #{i+1:d}")
+    txt = plt.text(20, 30, f'frame #{i + 1:d}')
     draw.append([ims, txt])
     fig.tight_layout()
 

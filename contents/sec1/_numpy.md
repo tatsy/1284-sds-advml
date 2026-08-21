@@ -288,7 +288,7 @@ class Human(object):
         self.age = age
 
     def intro(self):
-        print("Hi, my name is {:s}. I\'m {:d} years old.".format(self.name, self.age))
+        print("Hi, my name is {:s}. I'm {:d} years old.".format(self.name, self.age))
 ```
 
 このようなクラスにおいて、クラスが保持する変数 (= `self.name`や`self.age`)のことを**パラメータ**や**フィールド**と呼び、クラスが備える関数(= `intro`)のことを**メソッド**と呼ぶ。
@@ -296,7 +296,7 @@ class Human(object):
 また、上記のクラスを用いて、実際の`Human`を作ること、すなわち
 
 ```python
-taro = Human("Taro", 22)
+taro = Human('Taro', 22)
 ```
 
 という処理を**インスタンス化**と呼ぶ。またインスタンス化の際に呼ばれるメソッドは`__init__`で定義されたもので、これを**コンストラクタ**と呼ぶ。
@@ -360,7 +360,7 @@ NumPy では`reshape`を用いることで、配列の形を変更すること�
 
 ```{code-cell} ipython3
 arr2d = np.array([[1, 2], [3, 4]])
-arr1d = arr2d.reshape((4))
+arr1d = arr2d.reshape(4)
 print(arr1d)
 ```
 
@@ -377,7 +377,7 @@ print('After:\n', arr3x2)
 
 ```{code-cell} ipython3
 arr2d = np.array([[1, 2], [3, 4]])
-print('reshape:', arr2d.reshape((-1)))
+print('reshape:', arr2d.reshape(-1))
 print('flatten:', arr2d.flatten())
 print('ravel:', arr2d.ravel())
 ```
@@ -556,8 +556,8 @@ A = np.array([[1, 2], [2, 4]])
 try:
     np.linalg.inv(A)
 except Exception as e:
-    print('Exception: {:s}'.format(type(e).__name__))
-    print('Message: {:s}'.format(str(e)))
+    print(f'Exception: {type(e).__name__:s}')
+    print(f'Message: {str(e):s}')
 ```
 
 上記の例では、例外処理をしており、**LinAlgError**が発生して、その例外メッセージが**Singular matrix**となることが確認できる。実際、上記の行列のランクは 1 で行列式は 0.0 になるので、各自で調べて見てほしい。

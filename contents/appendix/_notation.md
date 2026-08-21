@@ -7,7 +7,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.1
 kernelspec:
-  display_name: sdsadvml
+  display_name: sdsadvml (3.11.14)
   language: python
   name: python3
 ---
@@ -31,11 +31,11 @@ kernelspec:
 
 ```{code-cell} ipython3
 # NumPyなど前半で使うモジュール
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 import seaborn as sns
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 ```
 
 ```{code-cell} ipython3

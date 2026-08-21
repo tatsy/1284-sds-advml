@@ -1,43 +1,52 @@
 repos:
+  # Synchronize staged MyST/notebook pairs before notebook tools mutate them.
+  - repo: https://github.com/jupytext/jupytext
+    rev: v1.19.1
+    hooks:
+      - id: jupytext
+        name: jupytext-pre
+        args: ["--sync"]
+
   # Ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.4
     hooks:
-      # Run the linter.
-      - id: ruff
-        name: ruff
-        description: "Run 'ruff' for extremely fast Python linting"
-        entry: ruff check --force-exclude
-        language: python
-        types_or: [python, pyi]
-        # --fix: enable lint fixes
-        args: [--fix]
-        require_serial: true
-        additional_dependencies: []
-        minimum_pre_commit_version: "2.9.2"
+      # # Run the linter.
+      # - id: ruff
+      #   name: ruff
+      #   description: "Run 'ruff' for extremely fast Python linting"
+      #   entry: ruff check --force-exclude
+      #   language: python
+      #   types_or: [jupyter]
+      #   files: \.ipynb$
+      #   # --fix: enable lint fixes
+      #   args: [--fix]
+      #   require_serial: true
+      #   additional_dependencies: []
+      #   minimum_pre_commit_version: "2.9.2"
       # Run the formatter.
       - id: ruff-format
         name: ruff-format
         description: "Run 'ruff format' for extremely fast Python formatting"
         entry: ruff format --force-exclude
         language: python
-        types_or: [python, pyi]
+        types_or: [jupyter]
+        files: \.ipynb$
         args: []
         require_serial: true
         additional_dependencies: []
         minimum_pre_commit_version: "2.9.2"
-  # mypy
-  - repo: https://github.com/pre-commit/mirrors-mypy
+  # ty
+  # - repo: https://github.com/astral-sh/ty-pre-commit
+  #   rev: v0.0.73
+  #   hooks:
+  #     - id: ty
+  #       files: \.ipynb$
+
+  # Propagate Ruff's notebook updates to their paired MyST files.
+  - repo: https://github.com/jupytext/jupytext
     rev: v1.19.1
     hooks:
-      # Run the mypy.
-      - id: mypy
-        name: mypy
-        description: "Run 'mypy' for Python linting"
-        entry: mypy
-        language: python
-        args: [--strict, --ignore-missing-imports]
-        require_serial: true
-        # Add types package list
-        additional_dependencies: []
-        minimum_pre_commit_version: "2.9.2"
+      - id: jupytext
+        name: jupytext-post
+        args: ["--sync"]

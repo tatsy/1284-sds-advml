@@ -61,9 +61,16 @@ rc = {'figure.dpi': 150}
 sns.set_theme(style='white', palette='colorblind', rc=rc)
 ```
 
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: n_samples
+print(f'{n_samples}')
+```
+
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-今回は、以下のスイスロールのデータを題材に次元削減と可視化の方法について見ていこう。例によって、計算時間を削減するために、下記の例では{glue:text}`n_samples`個の頂点をサンプルしている。
+今回は、以下のスイスロールのデータを題材に次元削減と可視化の方法について見ていこう。例によって、計算時間を削減するために、下記の例では ![](#n_samples) 個の頂点をサンプルしている。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1228,7 +1235,7 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-例のごとく、実験にかかる時間を短縮するために、先頭{glue}`n_samples`個のデータだけを実験に用いる。
+例のごとく、実験にかかる時間を短縮するために、先頭 ![](#n_samples) 個のデータだけを実験に用いる。
 
 ```{code-cell} ipython3
 ---

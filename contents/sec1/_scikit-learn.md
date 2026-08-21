@@ -129,7 +129,7 @@ fig, axs = plt.subplots(2, 4, figsize=(6, 3))
 axs = axs.flatten()
 for i in range(8):
     axs[i].imshow(ims[i], cmap='gray', vmin=0, vmax=1, interpolation=None)
-    axs[i].set_title('label is {:d}'.format(y_org[i]))
+    axs[i].set_title(f'label is {y_org[i]:d}')
     axs[i].set(xticks=[], yticks=[])
 
 plt.tight_layout()
@@ -206,8 +206,8 @@ from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import LinearRegression
 
 clf = make_pipeline(
-  StandardScaler(),
-  LinearRegression(),
+    StandardScaler(),
+    LinearRegression(),
 )
 clf.train(X, y)
 ```
@@ -444,7 +444,7 @@ slideshow:
 ---
 # 精度計算
 acc_test = 100.0 * np.sum(y_pred == y_test) / len(y_test)
-print('Bagging: acc(test)={:.2f}%'.format(acc_test))
+print(f'Bagging: acc(test)={acc_test:.2f}%')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -579,7 +579,7 @@ slideshow:
 ---
 # 精度計算
 acc_test = 100.0 * np.sum(y_pred == y_test) / len(y_test)
-print('Random Forest: acc(test)={:.2f}%'.format(acc_test))
+print(f'Random Forest: acc(test)={acc_test:.2f}%')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -925,9 +925,9 @@ slideshow:
 ---
 data_size = 250
 X_1 = np.random.multivariate_normal(mean=(-1, 0), cov=0.05 * np.eye(2), size=(data_size))
-y_1 = np.ones((data_size)) * (-1.0)
+y_1 = np.ones(data_size) * (-1.0)
 X_2 = np.random.multivariate_normal(mean=(+1, 0), cov=0.05 * np.eye(2), size=(data_size))
-y_2 = np.ones((data_size)) * (+1.0)
+y_2 = np.ones(data_size) * (+1.0)
 
 X_two_class = np.concatenate([X_1, X_2], axis=0)
 y_two_class = np.concatenate([y_1, y_2], axis=0)
@@ -968,7 +968,7 @@ matA = np.block(
         [YX, y_two_class[:, None], np.zeros((len(y_two_class), len(y_two_class)))],
     ]
 )
-matB = np.zeros((matA.shape[1]))
+matB = np.zeros(matA.shape[1])
 matB[-len(y_two_class) :] = 1.0
 
 ans = np.linalg.solve(matA + np.eye(len(matA)) * 1.0e-4, matB)

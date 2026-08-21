@@ -229,7 +229,7 @@ NumPy を用いると、`i`行目にある数字は`problem[i, :]`という配�
 ```python
 k = 3 * (i // 3)
 l = 3 * (j // 3)
-blk_nums = problem[k:k+3, l:l+3].flatten()  # 一次元配列として取り出す
+blk_nums = problem[k : k + 3, l : l + 3].flatten()  # 一次元配列として取り出す
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -648,7 +648,7 @@ def solve(image: npt.NDArray[np.uint8], level: int) -> npt.NDArray[np.int32]:
     """
     # 以下、数独の問題を解く処理
     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-    return np.zeros((9, 9), dtype="int32")
+    return np.zeros((9, 9), dtype='int32')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -1047,11 +1047,11 @@ $$
 このルールに従うと、Algorithm X で処理すべき Pandas の`DataFrame`は以下のように作成できる。
 
 ```{code-cell} ipython3
-index = ['R{:d}C{:d}#{:d}'.format(i, j, n) for i in range(1, 10) for j in range(1, 10) for n in range(1, 10)]
-cond1 = ['R{:d}C{:d}'.format(i, j) for i in range(1, 10) for j in range(1, 10)]
-cond2 = ['R{:d}#{:d}'.format(i, n) for i in range(1, 10) for n in range(1, 10)]
-cond3 = ['C{:d}#{:d}'.format(j, n) for j in range(1, 10) for n in range(1, 10)]
-cond4 = ['B{:d}#{:d}'.format(b, n) for b in range(1, 10) for n in range(1, 10)]
+index = [f'R{i:d}C{j:d}#{n:d}' for i in range(1, 10) for j in range(1, 10) for n in range(1, 10)]
+cond1 = [f'R{i:d}C{j:d}' for i in range(1, 10) for j in range(1, 10)]
+cond2 = [f'R{i:d}#{n:d}' for i in range(1, 10) for n in range(1, 10)]
+cond3 = [f'C{j:d}#{n:d}' for j in range(1, 10) for n in range(1, 10)]
+cond4 = [f'B{b:d}#{n:d}' for b in range(1, 10) for n in range(1, 10)]
 conds = cond1 + cond2 + cond3 + cond4
 
 df = pd.DataFrame(index=index, columns=conds, dtype='bool')
@@ -1068,11 +1068,11 @@ for i in range(9):
             r = i + 1
             c = j + 1
             b = (i // 3) * 3 + (j // 3) + 1
-            op = 'R{:d}C{:d}#{:d}'.format(r, c, n)
-            cd1 = 'R{:d}C{:d}'.format(r, c)
-            cd2 = 'R{:d}#{:d}'.format(r, n)
-            cd3 = 'C{:d}#{:d}'.format(c, n)
-            cd4 = 'B{:d}#{:d}'.format(b, n)
+            op = f'R{r:d}C{c:d}#{n:d}'
+            cd1 = f'R{r:d}C{c:d}'
+            cd2 = f'R{r:d}#{n:d}'
+            cd3 = f'C{c:d}#{n:d}'
+            cd4 = f'B{b:d}#{n:d}'
             df.loc[op, [cd1, cd2, cd3, cd4]] = 1
 
 display.display(df)
@@ -1113,11 +1113,11 @@ for i in range(9):
             c = j + 1
             b = (i // 3) * 3 + (j // 3) + 1
             n = problem[i, j]
-            del_op1 = ['R{:d}C{:d}#{:d}'.format(r, c, n_) for n_ in range(1, 10) if n != n_]
-            del_op2 = ['R{:d}C{:d}#{:d}'.format(r_, c, n) for r_ in range(1, 10) if r != r_]
-            del_op3 = ['R{:d}C{:d}#{:d}'.format(r, c_, n) for c_ in range(1, 10) if c != c_]
+            del_op1 = [f'R{r:d}C{c:d}#{n_:d}' for n_ in range(1, 10) if n != n_]
+            del_op2 = [f'R{r_:d}C{c:d}#{n:d}' for r_ in range(1, 10) if r != r_]
+            del_op3 = [f'R{r:d}C{c_:d}#{n:d}' for c_ in range(1, 10) if c != c_]
             del_op4 = [
-                'R{:d}C{:d}#{:d}'.format(r_, c_, n)
+                f'R{r_:d}C{c_:d}#{n:d}'
                 for r_ in range(i // 3 * 3 + 1, i // 3 * 3 + 4)
                 for c_ in range(j // 3 * 3 + 1, j // 3 * 3 + 4)
                 if r != r_ or c != c_
