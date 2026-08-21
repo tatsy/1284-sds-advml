@@ -1943,7 +1943,7 @@ print(f'Acc: {total_acc:.3f}')
 これを防ぐには`torch.load`の引数に`map_location=...`を指定して、どの種類のデバイスに読み込むのかを指定する。例えばCUDA上で学習を行って得たパラメータをCPU上で読み込む場合には、以下のようにすれば良い。
 
 ```python
-ckpt = torch.load("ckpt.pth", map_location=torch.device("cpu"))
+ckpt = torch.load('ckpt.pth', map_location=torch.device('cpu'))
 ```
 
 :::

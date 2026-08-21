@@ -53,6 +53,7 @@ sns.set_theme(style='white', palette='colorblind', rc=rc)
 
 ```python
 import os
+
 os.getcwd()
 ```
 
@@ -87,7 +88,7 @@ img = cv2.imread(filename, cv2.IMREAD_COLOR)
 
 # 読み込みの成否を確認
 if img is None:
-    raise IOError(f'Failed to load image: {filename:s}')
+    raise OSError(f'Failed to load image: {filename:s}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -185,7 +186,7 @@ outname = 'copy.jpg'
 img_rgb = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 succ = cv2.imwrite(outname, img_rgb)
 if not succ:
-    raise IOError('Failed to save image file: {:s}'.format(outname))
+    raise OSError(f'Failed to save image file: {outname:s}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -908,7 +909,7 @@ def draw_frame(problem, fig, ax):
         txt = ax.text(
             j,
             i,
-            '{:d}'.format(z),
+            f'{z:d}',
             ha='center',
             va='center',
             color='k',

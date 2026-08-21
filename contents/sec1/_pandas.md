@@ -161,7 +161,7 @@ slideshow:
   slide_type: ''
 ---
 col = df['Math']
-print('type is "{:s}"'.format(type(col).__name__))
+print(f'type is "{type(col).__name__:s}"')
 ```
 
 ```{code-cell} ipython3

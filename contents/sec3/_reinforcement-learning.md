@@ -47,21 +47,21 @@ np.random.seed(31415)
 
 # グラフの設定
 rc = {
-    "figure.dpi": 150,
-    "axes.linewidth": 1,
-    "axes.edgecolor": "black",
-    "grid.color": "gray",
-    "grid.linestyle": "--",
-    "grid.linewidth": 0.5,
-    "xtick.major.size": 2,
-    "ytick.major.size": 2,
-    "legend.frameon": True,
-    "legend.borderpad": 0.5,
-    "legend.facecolor": "white",
-    "legend.edgecolor": "black",
-    "legend.framealpha": 1.0,
+    'figure.dpi': 150,
+    'axes.linewidth': 1,
+    'axes.edgecolor': 'black',
+    'grid.color': 'gray',
+    'grid.linestyle': '--',
+    'grid.linewidth': 0.5,
+    'xtick.major.size': 2,
+    'ytick.major.size': 2,
+    'legend.frameon': True,
+    'legend.borderpad': 0.5,
+    'legend.facecolor': 'white',
+    'legend.edgecolor': 'black',
+    'legend.framealpha': 1.0,
 }
-sns.set_theme(style="whitegrid", palette="colorblind", rc=rc)
+sns.set_theme(style='whitegrid', palette='colorblind', rc=rc)
 ```
 
 ```{code-cell} ipython3
@@ -114,7 +114,7 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-class SlotArm(object):
+class SlotArm:
     """
     スロットアームを表わすクラス
     """
@@ -152,7 +152,7 @@ slideshow:
 ratios = np.linspace(0.1, 0.9, n_arms, endpoint=True)
 # その後、順番をランダムに入れ替える
 ratios = np.random.permutation(ratios)
-print(f"Ratios: {ratios}")
+print(f'Ratios: {ratios}')
 ```
 
 ```{code-cell} ipython3
@@ -200,7 +200,7 @@ slideshow:
   slide_type: ''
 ---
 history = []
-for i in range(n_play):
+for _ in range(n_play):
     # ランダムに1つのスロットを選ぶ
     k = np.random.randint(0, n_arms)
 
@@ -259,15 +259,15 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(np.arange(n_play), E_rand, label="random")
+ax.plot(np.arange(n_play), E_rand, label='random')
 
 ax.set_xlim(0, n_play)
 ax.set_ylim(0.0, 1.0)
-ax.set_xlabel("#play")
-ax.set_ylabel("hit ratio [%]")
-ax.set_title("Multi-Arm Bandit")
+ax.set_xlabel('#play')
+ax.set_ylabel('hit ratio [%]')
+ax.set_title('Multi-Arm Bandit')
 
-ax.legend(loc="lower right")
+ax.legend(loc='lower right')
 fig.tight_layout()
 plt.show()
 ```
@@ -373,7 +373,7 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_rand, label="random")
+ax.plot(play_count, E_rand, label='random')
 
 ax.fill_between(
     play_count,
@@ -382,15 +382,15 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_greedy, label="greedy")
+ax.plot(play_count, E_greedy, label='greedy')
 
 ax.set_xlim(0, n_play)
 ax.set_ylim(0.0, 1.0)
-ax.set_xlabel("#play")
-ax.set_ylabel("hit ratio [%]")
-ax.set_title("Multi-Arm Bandit")
+ax.set_xlabel('#play')
+ax.set_ylabel('hit ratio [%]')
+ax.set_title('Multi-Arm Bandit')
 
-ax.legend(loc="lower right")
+ax.legend(loc='lower right')
 fig.tight_layout()
 plt.show()
 ```
@@ -434,7 +434,7 @@ epsilon = 0.1
 history = []
 n_arm_hit = np.zeros(n_arms)
 n_arm_play = np.zeros(n_arms)
-for i in range(n_play):
+for _ in range(n_play):
     for k in range(n_arms):
         if n_arm_play[k] == 0:
             break
@@ -500,7 +500,7 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_rand, label="random")
+ax.plot(play_count, E_rand, label='random')
 
 ax.fill_between(
     play_count,
@@ -509,7 +509,7 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_greedy, label="greedy")
+ax.plot(play_count, E_greedy, label='greedy')
 
 ax.fill_between(
     play_count,
@@ -518,15 +518,15 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_eps, label="$\epsilon$-greedy")
+ax.plot(play_count, E_eps, label=r'$\epsilon$-greedy')
 
 ax.set_xlim(0, n_play)
 ax.set_ylim(0.0, 1.0)
-ax.set_xlabel("#play")
-ax.set_ylabel("hit ratio [%]")
-ax.set_title("Multi-Arm Bandit")
+ax.set_xlabel('#play')
+ax.set_ylabel('hit ratio [%]')
+ax.set_title('Multi-Arm Bandit')
 
-ax.legend(loc="lower right")
+ax.legend(loc='lower right')
 fig.tight_layout()
 plt.show()
 ```
@@ -615,7 +615,7 @@ tau = 0.1
 history = []
 n_arm_hit = np.zeros(n_arms)
 n_arm_play = np.zeros(n_arms)
-for i in range(n_play):
+for _ in range(n_play):
     for k in range(n_arms):
         if n_arm_play[k] == 0:
             break
@@ -674,7 +674,7 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_rand, label="random")
+ax.plot(play_count, E_rand, label='random')
 
 ax.fill_between(
     play_count,
@@ -683,7 +683,7 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_greedy, label="greedy")
+ax.plot(play_count, E_greedy, label='greedy')
 
 ax.fill_between(
     play_count,
@@ -692,7 +692,7 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_eps, label="$\epsilon$-greedy")
+ax.plot(play_count, E_eps, label=r'$\epsilon$-greedy')
 
 ax.fill_between(
     play_count,
@@ -701,15 +701,15 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_smax, label="softmax")
+ax.plot(play_count, E_smax, label='softmax')
 
 ax.set_xlim(0, n_play)
 ax.set_ylim(0.0, 1.0)
-ax.set_xlabel("#play")
-ax.set_ylabel("hit ratio [%]")
-ax.set_title("Multi-Arm Bandit")
+ax.set_xlabel('#play')
+ax.set_ylabel('hit ratio [%]')
+ax.set_title('Multi-Arm Bandit')
 
-ax.legend(loc="lower right")
+ax.legend(loc='lower right')
 fig.tight_layout()
 plt.show()
 ```
@@ -823,7 +823,7 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_rand, label="random")
+ax.plot(play_count, E_rand, label='random')
 
 ax.fill_between(
     play_count,
@@ -832,7 +832,7 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_greedy, label="greedy")
+ax.plot(play_count, E_greedy, label='greedy')
 
 ax.fill_between(
     play_count,
@@ -841,7 +841,7 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_eps, label="$\epsilon$-greedy")
+ax.plot(play_count, E_eps, label=r'$\epsilon$-greedy')
 
 ax.fill_between(
     play_count,
@@ -850,7 +850,7 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_smax, label="softmax")
+ax.plot(play_count, E_smax, label='softmax')
 
 ax.fill_between(
     play_count,
@@ -859,15 +859,15 @@ ax.fill_between(
     alpha=0.5,
     linewidth=0,
 )
-ax.plot(play_count, E_ucb, label="UCB")
+ax.plot(play_count, E_ucb, label='UCB')
 
 ax.set_xlim(0, n_play)
 ax.set_ylim(0.0, 1.0)
-ax.set_xlabel("#play")
-ax.set_ylabel("hit ratio [%]")
-ax.set_title("Multi-Arm Bandit")
+ax.set_xlabel('#play')
+ax.set_ylabel('hit ratio [%]')
+ax.set_title('Multi-Arm Bandit')
 
-ax.legend(loc="lower right")
+ax.legend(loc='lower right')
 fig.tight_layout()
 plt.show()
 ```

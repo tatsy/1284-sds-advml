@@ -294,7 +294,7 @@ for i, cnt in enumerate(contours):
     # 輪郭線の近似
     approx = cv2.approxPolyDP(cnt, 0.01 * arclen, True)
     # 何角形かを見てみる
-    print('Figure #{:d} has {:2d} corners!'.format(i + 1, len(approx)))
+    print(f'Figure #{i + 1:d} has {len(approx):2d} corners!')
     # 輪郭線の描画
     cv2.drawContours(image, [approx], -1, (255, 0, 0), 3, cv2.LINE_AA)
 ```
@@ -529,7 +529,7 @@ slideshow:
 tags: [hide-input]
 ---
 plt.imshow(binary, cmap='gray')
-plt.title("Otsu's binarization (threshold={:d})".format(int(thr)))
+plt.title(f"Otsu's binarization (threshold={int(thr):d})")
 plt.show()
 ```
 
@@ -554,7 +554,7 @@ slideshow:
   slide_type: ''
 ---
 plt.imshow(binary, cmap='gray')
-plt.title('Binarization (threshold={:d})'.format(int(new_thr)))
+plt.title(f'Binarization (threshold={int(new_thr):d})')
 plt.show()
 ```
 
@@ -588,7 +588,7 @@ slideshow:
   slide_type: ''
 ---
 plt.imshow(edge, cmap='gray')
-plt.title('After morphology operation'.format(int(new_thr)))
+plt.title('After morphology operation')
 plt.show()
 ```
 
@@ -664,7 +664,7 @@ approx = cv2.approxPolyDP(longest_cnt, arclen * 1.0e-1, True)
 result = image.copy()
 cv2.drawContours(result, [approx], -1, (255, 0, 0), 3, cv2.LINE_AA)
 plt.imshow(result)
-plt.title('Red region has {:d} corners'.format(len(approx)))
+plt.title(f'Red region has {len(approx):d} corners')
 plt.show()
 ```
 
