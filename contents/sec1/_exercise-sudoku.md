@@ -361,13 +361,15 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
+# | label: avg_time_bt_simple
+
 avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-glue('avg_time_bt_simple', avg_time)
+print(avg_time)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-上記は、素直にバックトラック法を実装した場合の実行時間であるが、一回の問題を解くのに平均{glue:text}`avg_time_bt_simple`となっており、十分高速であることが分かる
+上記は、素直にバックトラック法を実装した場合の実行時間であるが、一回の問題を解くのに平均[](#avg_time_bt_simple)となっており、十分高速であることが分かる
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -440,6 +442,7 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
+# | label: avg_time_bt_hard
 avg_time = ' '.join(perf.stdout.split(' ')[0:2])
 glue('avg_time_bt_hard', avg_time)
 ```
@@ -455,15 +458,16 @@ solver.recursive(problem.copy())
 ```
 
 ```{code-cell} ipython3
+# | label: avg_time_recursive
 avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-glue('avg_time_recursive', avg_time)
+print(avg_time)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-この問題だと、上記の通り{glue:text}`avg_time_bt_hard`ほどの時間がかかる。
+この問題だと、上記の通り[](#avg_time_bt_hard)ほどの時間がかかる。
 
-バックトラック法を高速化する手法には、候補の数が少ないものから埋めていく、などの様々な方法が考えられるので、各自、プログラムを書いて試してみてほしい。参考までに再帰関数を用いた実装に要する計算時間は{glue:text}`avg_time_recursive`であったので多少の高速化には成功しているだろうか。
+バックトラック法を高速化する手法には、候補の数が少ないものから埋めていく、などの様々な方法が考えられるので、各自、プログラムを書いて試してみてほしい。参考までに再帰関数を用いた実装に要する計算時間は[](#avg_time_recursive)であったので多少の高速化には成功しているだろうか。
 
 +++
 
@@ -1184,14 +1188,16 @@ if has_advml:
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
+# | label: avg_time_ec
+
 if has_advml:
     avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-    glue('avg_time_ec', avg_time)
+    print(avg_time)
 else:
-    glue('avg_time_ec', 'Not available')
+    print('Not available')
 ```
 
-Exact coverに基づく解法を用いると、先ほどまで1秒以上かかっていた問題が、**たったの{glue:text}`avg_time_ec`で解けている**ことが分かる。このように、数独の問題を Exact Cover の問題と捉えることが、通常のバックトラック法よりも遙かに高速に問題を解けることが確認できた。
+Exact coverに基づく解法を用いると、先ほどまで1秒以上かかっていた問題が、**たったの[](#avg_time_ec)で解けている**ことが分かる。このように、数独の問題を Exact Cover の問題と捉えることが、通常のバックトラック法よりも遙かに高速に問題を解けることが確認できた。
 
 +++
 

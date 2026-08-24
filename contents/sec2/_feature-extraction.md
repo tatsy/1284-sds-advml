@@ -45,7 +45,6 @@ except ImportError:
 
 # 実験に用いるデータ数
 n_images_per_char = 200
-glue('n_images_per_char', n_images_per_char)
 
 # 一部の警告を無視
 warnings.simplefilter('ignore', FutureWarning)
@@ -233,6 +232,17 @@ def custom_style(df):
 df.style.format(precision=0).format_index('', axis=1).format_index('', axis=0).apply(custom_style, axis=None)
 ```
 
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: n_images_per_char
+print(n_images_per_char)
+```
+
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 この表が示すとおり、各文字について、約1000の画像が含まれていることが確認できる。ただし、半濁音のひらがなは全体的に少なめで100-200程度となっている。
@@ -247,7 +257,7 @@ MNISTでは手書き文字の画像が28x28=576次元ベクトル、ラベルが
 
 このようなデータをひらがなデータセットに対して自前で作成しよう。今回のデータセットは、
 - 濁音や半濁音、小文字を含まないひらがな46文字を扱う
-- 各文字の画像をランダムに{glue:text}`n_images_per_char`枚取り出す
+- 各文字の画像をランダムに[](#n_images_per_char)枚取り出す
 - 分類の難易度を上げるため、画像をランダムに回転したり、拡大縮小したりする
 という条件の下で作成する。
 
@@ -417,18 +427,29 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
-glue('naive_acc_train', acc_train * 100.0)
-glue('naive_acc_test', acc_test * 100.0)
+# | label: naive_acc_train
 result_df.loc[len(result_df), :] = ['Image', acc_train, 'Train']
+print('%.2f' % (acc_train * 100.0))
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: naive_acc_test
 result_df.loc[len(result_df), :] = ['Image', acc_test, 'Test']
+print('%.2f' % (acc_test * 100.0))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: 画像をそのまま入力**
 
-- 訓練時精度: {glue:text}`naive_acc_train:.2f`%
-- 評価時精度: {glue:text}`naive_acc_test:.2f`%
+- 訓練時精度: [](#naive_acc_train)%
+- 評価時精度: [](#naive_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -484,18 +505,29 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
-glue('pca_acc_train', acc_train * 100.0)
-glue('pca_acc_test', acc_test * 100.0)
+# | label: pca_acc_train
 result_df.loc[len(result_df), :] = ['PCA', acc_train, 'Train']
+print('%.2f' % (acc_train * 100.0))
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: pca_acc_test
 result_df.loc[len(result_df), :] = ['PCA', acc_test, 'Test']
+print('%.2f' % (acc_test * 100.0))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: 主成分分析による次元圧縮**
 
-- 訓練時精度: {glue:text}`pca_acc_train:.2f`%
-- 評価時精度: {glue:text}`pca_acc_test:.2f`%
+- 訓練時精度: [](#pca_acc_train)%
+- 評価時精度: [](#pca_acc_test)%
 
 +++
 
@@ -783,18 +815,29 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
-glue('lbp_acc_train', acc_train * 100.0)
-glue('lbp_acc_test', acc_test * 100.0)
+# | label: lbp_acc_train
 result_df.loc[len(result_df), :] = ['LBP', acc_train, 'Train']
+print('%.2f' % (acc_train * 100.0))
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: lbp_acc_test
 result_df.loc[len(result_df), :] = ['LBP', acc_test, 'Test']
+print('%.2f' % (acc_test * 100.0))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: Local Binary Patternの利用**
 
-- 訓練時精度: {glue:text}`lbp_acc_train:.2f`%
-- 評価時精度: {glue:text}`lbp_acc_test:.2f`%
+- 訓練時精度: [](#lbp_acc_train)%
+- 評価時精度: [](#lbp_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
