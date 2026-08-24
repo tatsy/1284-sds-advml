@@ -8,19 +8,14 @@
   --code-font-family: "Roboto Mono", sans-serif;
   
   --myst-color-primary: #3157a4;
-
   --myst-color-link: #3157a4;
   --myst-color-link-hover: #24417c;
-
   --myst-color-active: #3157a4;
   --myst-color-active-bg: #e8eef9;
-
   --myst-color-bg: #ffffff;
   --myst-color-bg-secondary: #f7f9fc;
-
   --myst-color-border: #e2e7ef;
   --myst-color-border-strong: #ccd4e0;
-
   --myst-color-text: #20242b;
   --myst-color-prose-body: #343941;
 }
@@ -43,21 +38,6 @@ body {
     width: 19.5rem;
     margin-left: auto;
   }
-}
-
-.myst-top-nav {
-  background: rgba(255, 255, 255, 0.96);
-  border-bottom: 1px solid var(--myst-color-border);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
-}
-
-.myst-toc-item,
-.myst-primary-sidebar-item {
-  border-radius: 0.35rem;
-}
-
-.myst-toc-item-exact {
-  font-weight: 600;
 }
 
 h1,
@@ -98,38 +78,6 @@ h6 {
   }
 }
 
-.myst-fm-block-title {
-  font-size: 2.1rem;
-  line-height: 1.25;
-  font-weight: 700;
-  letter-spacing: -0.015em;
-}
-
-.myst-fm-block-enumerator {
-  color: var(--myst-color-active);
-  font-weight: 600;
-}
-
-.myst-code {
-  margin: 1.25rem 0;
-  border: 1px solid var(--myst-color-border);
-  border-radius: 0.5rem;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
-
-  &:hover {
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
-  }
-}
-
-.myst-admonition {
-  border-radius: 0.4rem;
-}
-
-.myst-admonition-header {
-  font-weight: 700;
-}
-
 /* Image and figure */
 img {
   &.image-with-border {
@@ -163,35 +111,63 @@ figure {
   }
 }
 
+/*
+ * MyST theme customizations
+ */ 
+.myst-top-nav {
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--myst-color-border);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
+}
+
+.myst-toc-item,
+.myst-primary-sidebar-item {
+  border-radius: 0.35rem;
+}
+
+.myst-toc-item-exact {
+  font-weight: 600;
+}
+
+
+.myst-fm-block-title {
+  font-size: 2.1rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.myst-fm-block-enumerator {
+  color: var(--myst-color-active);
+  font-weight: 600;
+}
+
+.myst-code {
+  margin: 1.25rem 0;
+  border: 1px solid var(--myst-color-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+
+  &:hover {
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+  }
+}
+
+.myst-admonition {
+  border-radius: 0.4rem;
+}
+
+.myst-admonition-header {
+  font-weight: 700;
+}
+
+
+
 
 /*
  * Display Jupyter output
  */
-div[data-name="output-decoration-notebook-output"] {
-  display: inline-block;
-
-  div[data-name="outputs-container"] {
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow-x: clip !important;
-  }
-
-  div[data-name="safe-output-stream"] {
-    div {
-      .myst-jp-stream-output {
-        background: none;
-        border: none;
-        margin: 0;
-        padding: 0;
-        & * {
-          font-size: inherit !important;
-          font-family: var(--default-font-family) !important;
-        }
-      }
-    }
-  }
-}
-
 .lm-Widget {
   overflow: clip !important;
 }
@@ -223,33 +199,25 @@ div[data-name="output-decoration-notebook-output"]
 }
 
 /* Embedded outputs such as [](#label) */
-a.hover-link {
+a[href^="#"] {
   div[data-name="output-decoration-notebook-output"],
   div[data-name="outputs-container"],
   [data-name="safe-output-stream"],
-  [data-name="safe-output-text"] {
-    display: inline;
+  [data-name="safe-output-text"],
+  .myst-jp-stream-output {
+    display: inline !important;
     margin: 0 !important;
     padding: 0 !important;
-    border: none;
-    background: transparent;
-  }
-}
 
-/* Code output */
-.myst-jp-stream-output {
-  border-left: 4px solid rgba(0.5, 0.5, 0.5, 0.75);
-  margin-top: 0.1rem;
-  padding: 0.5rem;
-  background-color: #f6f6f6;
-  .dark & {
-    background-color: #444444;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+
+    font-family: inherit !important;
+    font-size: inherit !important;
+    white-space: normal !important;
   }
-  code {
-    span {
-      font-family: var(--code-font-family) !important;
-    }
-  } 
 }
 
 /* Figure caption */
