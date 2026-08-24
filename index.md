@@ -1,3 +1,7 @@
+---
+numbering: false
+---
+
 # 機械学習発展 (実践)
 
 [![GitHub Pages](https://github.com/tatsy-classes/1284-sds-advml/actions/workflows/gh-pages.yaml/badge.svg)](https://github.com/tatsy-classes/1284-sds-advml/actions/workflows/gh-pages.yaml)
