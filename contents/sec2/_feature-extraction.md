@@ -979,20 +979,35 @@ acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
-:tags: [remove-cell]
-
-glue('ulbp_acc_train', acc_train * 100.0)
-glue('ulbp_acc_test', acc_test * 100.0)
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: ulbp_acc_train
 result_df.loc[len(result_df), :] = ['Uniform LBP', acc_train, 'Train']
+print('%.2f' % (acc_train * 100.0))
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: ulbp_acc_test
 result_df.loc[len(result_df), :] = ['Uniform LBP', acc_test, 'Test']
+print('%.2f' % (acc_test * 100.0))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: Uniform LBPの利用**
 
-- 訓練時精度: {glue:text}`ulbp_acc_train:.2f`%
-- 評価時精度: {glue:text}`ulbp_acc_test:.2f`%
+- 訓練時精度: [](#ulbp_acc_train)%
+- 評価時精度: [](#ulbp_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1231,18 +1246,29 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
-glue('hog_acc_train', acc_train * 100.0)
-glue('hog_acc_test', acc_test * 100.0)
+# | label: hog_acc_train
 result_df.loc[len(result_df), :] = ['HOG', acc_train, 'Train']
+print('%.2f' % (acc_train * 100.0))
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: hog_acc_test
 result_df.loc[len(result_df), :] = ['HOG', acc_test, 'Test']
+print('%.2f' % (acc_test * 100.0))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: Histogram of Oriented Gradientの利用**
 
-- 訓練時精度: {glue:text}`hog_acc_train:.2f`%
-- 評価時精度: {glue:text}`hog_acc_test:.2f`%
+- 訓練時精度: [](#hog_acc_train)%
+- 評価時精度: [](#hog_acc_test)%
 
 +++
 
@@ -1647,18 +1673,29 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
-glue('bovw_acc_train', acc_train * 100.0)
-glue('bovw_acc_test', acc_test * 100.0)
+# | label: bovw_acc_train
 result_df.loc[len(result_df), :] = ['BoVW', acc_train, 'Train']
+print('%.2f' % (acc_train * 100.0))
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: bovw_acc_test
 result_df.loc[len(result_df), :] = ['BoVW', acc_test, 'Test']
+print('%.2f' % (acc_test * 100.0))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: Bag of Visual Wordsの利用**
 
-- 訓練時精度: {glue:text}`bovw_acc_train:.2f`%
-- 評価時精度: {glue:text}`bovw_acc_test:.2f`%
+- 訓練時精度: [](#bovw_acc_train)%
+- 評価時精度: [](#bovw_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1683,7 +1720,7 @@ $$ (eq:gaussian-mixture)
 ガウス混合分布を用いると、とある特徴量$\mathbf{x}$が$k$個のGauss分布のそれぞれにどの程度の寄与率$\gamma_k(\mathbf{x})$を持つかを以下のように計算できる。
 
 $$
-\gamma_k(\mathbf{x}) = \frac{\alpha_k}{(2\pi)^{D/2} \left| \boldsymbol\Sigma_k \right|^{1/2}}\frac{\exp \left( - \frac{1}{2}(\mathbf{x} - \boldsymbol{\mu}_k)^\top \boldsymbol\Sigma_k^{-1}  (\mathbf{x} - \boldsymbol{\mu}_k) \right) }{P(\mathbf{x})}
+\gamma_k(\mathbf{x}) = \frac{\alpha_k}{(2\pi)^{D/2} \left| \boldsymbol\Sigma_k \right|^{1/2}}\frac{\exp \left( - \frac{1}{2}(\mathbf{x} - \boldsymbol{\mu}_k)^\top \boldsymbol\Sigma_k^{-1}  (\mathbf{x} - \boldsymbol\mu_k) \right) }{P(\mathbf{x})}
 $$ (eq:membership)
 
 これにより、特徴量$\mathbf{x}$に対する、特徴表現として、
@@ -1779,20 +1816,35 @@ acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
-:tags: [remove-cell]
-
-glue('bovwg_acc_train', acc_train * 100.0)
-glue('bovwg_acc_test', acc_test * 100.0)
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: bovwg_acc_train
 result_df.loc[len(result_df), :] = ['GMM-BoVW', acc_train, 'Train']
+print('%.2f' % (acc_train * 100.0))
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: bovwg_acc_test
 result_df.loc[len(result_df), :] = ['GMM-BoVW', acc_test, 'Test']
+print('%.2f' % (acc_test * 100.0))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: GMM-BoVW**
 
-- 訓練時精度: {glue:text}`bovwg_acc_train:.2f`%
-- 評価時精度: {glue:text}`bovwg_acc_test:.2f`%
+- 訓練時精度: [](#bovwg_acc_train)%
+- 評価時精度: [](#bovwg_acc_test)%
 
 +++
 
@@ -2076,20 +2128,35 @@ acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
-:tags: [remove-cell]
-
-glue('fisher_acc_train', acc_train * 100.0)
-glue('fisher_acc_test', acc_test * 100.0)
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: fisher_acc_train
 result_df.loc[len(result_df), :] = ['Fisher-BoVW', acc_train, 'Train']
+print('%.2f' % (acc_train * 100.0))
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: fisher_acc_test
 result_df.loc[len(result_df), :] = ['Fisher-BoVW', acc_test, 'Test']
+print('%.2f' % (acc_test * 100.0))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: FisherベクトルによるBoVW**
 
-- 訓練時精度: {glue:text}`fisher_acc_train:.2f`%
-- 評価時精度: {glue:text}`fisher_acc_test:.2f`%
+- 訓練時精度: [](#fisher_acc_train)%
+- 評価時精度: [](#fisher_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
