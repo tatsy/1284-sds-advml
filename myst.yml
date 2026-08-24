@@ -65,7 +65,7 @@ site:
   title: 機械学習発展 (実践)
   nav: []
   options:
-    logo: ""
+    logo_text: "機械学習発展 (実践)"
     style: ./_assets/custom.scss
 
   actions:

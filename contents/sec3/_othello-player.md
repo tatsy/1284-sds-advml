@@ -595,6 +595,8 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
+# | label: fig:cell_scores
+
 fig, ax = plt.subplots()
 
 ax.set_xticks(np.arange(0, 8))
@@ -612,13 +614,12 @@ for (i, j), z in np.ndenumerate(SCORE_BOARD):
 ax.grid(which='minor', color='k', linestyle='-', linewidth=0.5)
 ax.xaxis.tick_top()
 
-glue('cell_scores', fig)
-plt.close()
+plt.show()
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-:::{glue:figure} cell_scores
+:::{figure} #fig:cell_scores
 :figclass: image-stylish sm:w-full md:w-1/2
 :name: "オセロ盤のセル評価値"
 :::
