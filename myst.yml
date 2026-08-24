@@ -24,9 +24,9 @@ project:
     - title: 事前準備
       children:
         - title: Python環境の設定
-          url: https://tatsy-classes.github.io/1284-sds-prog2/contents/setup-python.html
+          url: https://tatsy.github.io/1284-sds-prog2/contents/setup-python.html
         - title: GitHubの設定
-          url: https://tatsy-classes.github.io/1284-sds-prog2/contents/setup-git.html
+          url: https://tatsy.github.io/1284-sds-prog2/contents/setup-git.html
     - title: 第0部 各種ライブラリの基本
       children:
         - file: contents/sec1/numpy.ipynb

@@ -490,7 +490,7 @@ print(f'{acc_train * 100.0:.2f}')
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-# | label: bag_acc_text
+# | label: bag_acc_test
 print(f'{acc_test * 100.0:.2f}')
 ```
 

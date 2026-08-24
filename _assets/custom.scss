@@ -162,9 +162,6 @@ figure {
   font-weight: 700;
 }
 
-
-
-
 /*
  * Display Jupyter output
  */
@@ -198,26 +195,71 @@ div[data-name="output-decoration-notebook-output"]
   border-radius: 0 0.35rem 0.35rem 0;
 }
 
-/* Embedded outputs such as [](#label) */
-a[href^="#"] {
-  div[data-name="output-decoration-notebook-output"],
-  div[data-name="outputs-container"],
-  [data-name="safe-output-stream"],
-  [data-name="safe-output-text"],
-  .myst-jp-stream-output {
-    display: inline !important;
-    margin: 0 !important;
-    padding: 0 !important;
+/*
+ * Inline scalar outputs embedded with ![](#label)
+ *
+ * MyST renders an embedded notebook output as a block-level <div>.
+ * Depending on SSR/hydration, it can either remain inside <p> or split
+ * the surrounding paragraph into p / div / p. Handle both cases.
+ */
 
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    background: transparent !important;
+/* Case 1: the embedded output remains inside the paragraph */
+.article p > div[data-name="output-decoration-notebook-output"]:has(
+    [data-name="safe-output-stream"],
+    [data-name="safe-output-text"]
+  ),
+.article p > div[data-name="output-decoration-notebook-output"]:has(
+    [data-name="safe-output-stream"],
+    [data-name="safe-output-text"]
+  ) * {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  white-space: normal !important;
+}
 
-    font-family: inherit !important;
-    font-size: inherit !important;
-    white-space: normal !important;
-  }
+/* Case 2: HTML parsing splits p / output / p */
+.article p:has(
+    + div[data-name="output-decoration-notebook-output"]:has(
+        [data-name="safe-output-stream"],
+        [data-name="safe-output-text"]
+      )
+  ),
+.article
+  div[data-name="output-decoration-notebook-output"]:has(
+    [data-name="safe-output-stream"],
+    [data-name="safe-output-text"]
+  ),
+.article
+  div[data-name="output-decoration-notebook-output"]:has(
+    [data-name="safe-output-stream"],
+    [data-name="safe-output-text"]
+  )
+  *,
+.article
+  div[data-name="output-decoration-notebook-output"]:has(
+    [data-name="safe-output-stream"],
+    [data-name="safe-output-text"]
+  )
+  + p {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  white-space: normal !important;
 }
 
 /* Figure caption */
