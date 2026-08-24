@@ -65,14 +65,8 @@ import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 from matplotlib.animation import ArtistAnimation
 
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
-
 # パラメータ
 n_episodes = 200
-glue('n_episodes', n_episodes)
 
 # 乱数のシードを固定
 random.seed(31415)
@@ -202,14 +196,27 @@ env = gym.make('CartPole-v1', render_mode='rgb_array')
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-glue('batch_size', batch_size)
-glue('steps_per_episode', steps_per_episode)
-glue('memory_size', memory_size)
+# | label: dqn-batch-size
+print(f'{batch_size}')
 ```
 
-今回の実験では、1プレイ (エピソード)ごとにサイズが{glue:}`batch_size`のミニバッチで{glue:}`steps_per_episode`ステップ分訓練を行う。
+```{code-cell} ipython3
+:tags: [remove-cell]
 
-過去のゲームの状態を保存するリプレイメモリのサイズは最大{glue:}`memory_size`状態としておき、それ以後は古いものから順に捨てていくこととする。このようなリプレイ・バッファの実装は`collections.deque`を用いると容易である。
+# | label: dqn-steps-per-episode
+print(f'{steps_per_episode}')
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: dqn-memory-size
+print(f'{memory_size}')
+```
+
+今回の実験では、1プレイ (エピソード)ごとにサイズが![](#dqn-batch-size)のミニバッチで![](#dqn-steps-per-episode)ステップ分訓練を行う。
+
+過去のゲームの状態を保存するリプレイメモリのサイズは最大![](#dqn-memory-size)状態としておき、それ以後は古いものから順に捨てていくこととする。このようなリプレイ・バッファの実装は`collections.deque`を用いると容易である。
 
 ```python
 from collections import deque
@@ -355,7 +362,7 @@ dataset = ReplayMemoryDataset(replay_buffer)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 ```
 
-しかし、この方法だと、エピソードごとに学習するステップ数が変わってしまう (特に学習初期のリプレイデータが少ない時)ので、リプレイデータをランダムにサンプルしながら、事前に決めておいた{glue:}`steps_per_episode`回だけパラメータ更新を実行することにしよう。
+しかし、この方法だと、エピソードごとに学習するステップ数が変わってしまう (特に学習初期のリプレイデータが少ない時)ので、リプレイデータをランダムにサンプルしながら、事前に決めておいた![](#dqn-steps-per-episode)回だけパラメータ更新を実行することにしよう。
 
 このような`Dataset`からのランダムサンプルには`RandomSampler`クラスを用いる。以下のように`num_samples`に`batch_size`と`steps_per_episode`の積を入力しておくと、ミニバッチによる更新回数が`steps_per_episode`に一致するようになる。
 

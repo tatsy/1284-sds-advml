@@ -109,6 +109,13 @@ sns.set_theme(style='white', palette='colorblind', rc=rc)
 color_palette = sns.color_palette('colorblind')
 ```
 
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: deep-learning-epochs
+print(f'{epochs}')
+```
+
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **平仮名データセットの準備**
@@ -1580,7 +1587,7 @@ criterion = nn.NLLLoss()
 
 さて、ここまで準備ができたら、最後にニューラルネットワークを訓練するための繰り返し計算をforループによって実装しよう。
 
-深層学習においては、トレーニングデータを何周分トレーニングするかを**エポック**という用語で表わす。以下の例では{glue}`epochs`周分、すなわち{glue}`epochs`エポックの学習を行なっている。
+深層学習においては、トレーニングデータを何周分トレーニングするかを**エポック**という用語で表わす。以下の例では![](#deep-learning-epochs)周分、すなわち![](#deep-learning-epochs)エポックの学習を行なっている。
 
 学習と同時に、進行状況が分かるようにしておくことはとても大事で、以下の例では`tqdm`モジュールを用いて、訓練の進み具合と、その時の損失関数の値、ならびに識別精度を表示するようにしている。
 
