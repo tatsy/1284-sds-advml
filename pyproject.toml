@@ -102,3 +102,6 @@ log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 
 [dependency-groups]
 dev = ["jupytext>=1.19.1", "ruff>=0.16.4", "ty>=0.0.73"]
+
+[tool.jupytext]
+notebook_metadata_filter = "kernelspec,jupytext,downloads"
