@@ -23,13 +23,13 @@ kernelspec:
 
 資料中では、特に指定がない場合、以下のようにモジュールがエイリアスを使ってインポートされているとする。従って、`numpy.array`などは、資料中で`np.array`のように略記することがあるので注意すること。
 
-```{code-cell} ipython3
+```{code-cell}
 :tags: [remove-cell]
 
 # ruff: noqa: I001
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # NumPyなど前半で使うモジュール
 import numpy as np
 import scipy as sp
@@ -38,7 +38,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # PyTorch系のモジュール
 import torch.nn as nn
 import torch.nn.functional as F
@@ -78,6 +78,6 @@ import torch.nn.functional as F
 | $\mathcal{H}$ | Hilbert空間 |
 | $\langle f, g \rangle$ | Hilbert空間上での内積 |
 
-```{code-cell} ipython3
+```{code-cell}
 
 ```

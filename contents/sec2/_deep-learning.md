@@ -19,7 +19,7 @@ kernelspec:
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-前回、[特徴量抽出](sec:feature-extraction)では、画像から特徴量を検出し、それを画像識別に利用する方法を見てきた。
+前回、[特徴量抽出](#sec:feature-extraction)では、画像から特徴量を検出し、それを画像識別に利用する方法を見てきた。
 
 2000年台まで、画像識別の分野では、**画像を如何に特徴化するか**と**得られた特徴からどのように物体を認識するか**という二つの研究が中心となってきた。
 
@@ -1033,11 +1033,11 @@ plt.show()
 
 PyTorchを使った深層学習をするために準備すべきことはいくつかある。以下では、
 
-- [データローダの準備](ssec:dataloader-preparation)
-- [ネットワークの構築](ssec:network-architecture)
-- [オプティマイザの準備](ssec:optimizer-preparation)
-- [損失関数の設定](ssec:loss-function)
-- [学習ループの実装](ssec:training-loop)
+- [データローダの準備](#ssec:dataloader-preparation)
+- [ネットワークの構築](#ssec:network-architecture)
+- [オプティマイザの準備](#ssec:optimizer-preparation)
+- [損失関数の設定](#ssec:loss-function)
+- [学習ループの実装](#ssec:training-loop)
 
 のそれぞれについて順に説明する。
 
@@ -1123,7 +1123,7 @@ class HiraganaDataset(Dataset):
 
 なお、PyTorch 2.0以降は`transforms.v2`という新しいモジュールが導入されており、従来の`transforms`よりも幅広いタスクを前処理に追加することができる ([参考](https://pytorch.org/vision/main/auto_examples/transforms/plot_transforms_getting_started.html))。本項でも`v2`を使用して前処理を行なっていく。
 
-`transforms`を用いると、例えば、[特徴量の抽出](sec:feature-extraction)で行っていたような
+`transforms`を用いると、例えば、[特徴量の抽出](#sec:feature-extraction)で行っていたような
 
 - 画像をグレースケールに変更
 - 画像をランダムに回転、拡大・縮小
@@ -2005,7 +2005,7 @@ PyTorchで実装する場合には、活性化関数の後に`nn.Dropout`ある�
 ::::{admonition} 問
 :class: question
 
-[過学習を防ぐための工夫](ssec:avoid-overfit)に示した方法によって、どの程度、過学習が抑制できるかを実際に試してみよ。
+[過学習を防ぐための工夫](#ssec:avoid-overfit)に示した方法によって、どの程度、過学習が抑制できるかを実際に試してみよ。
 
 ::::
 

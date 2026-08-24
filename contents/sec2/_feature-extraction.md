@@ -375,7 +375,7 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-まずは、MNISTの時と同様にscikit-learnによる分類を試してみる。この時、[scikit-learnの節](sec:scikit-learn)で紹介したように、予め入力データの輝度を正規化する処理である`StandardScaler`を使用する。
+まずは、MNISTの時と同様にscikit-learnによる分類を試してみる。この時、[scikit-learnの節](#sec:scikit-learn)で紹介したように、予め入力データの輝度を正規化する処理である`StandardScaler`を使用する。
 
 ただし、従来の`LiearSVC`は学習がやや低速であるので、今回はミニバッチにより効率的に学習が可能な`SGDClassifier`を代わりに用いる。このクラスは、内部でデータセットの一部だけミニバッチとして分類器のパラメータ更新に用いる**確率的最急降下法** (SGD=Stochastic Gradient Descent)により学習を行う。
 
@@ -445,7 +445,7 @@ result_df.loc[len(result_df), :] = ['Image', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-まずは、学習の効率化を図るために、前項、[次元削減](sec:data-visualization)で紹介した主成分分析を用いて、画像データを低次元ベクトルに変換する。
+まずは、学習の効率化を図るために、前項、[次元削減](#sec:data-visualization)で紹介した主成分分析を用いて、画像データを低次元ベクトルに変換する。
 
 `make_pipeline`を用いた分類器の定義において、`StandardScaler`の前に`PCA`による次元削減を追加する。
 
@@ -2097,7 +2097,6 @@ BoVWの性能がSIFT以外の特徴量 (OpenCVにはORB {cite}`rublee2011orb` (=
 
 ```{bibliography}
 :filter: docname in docnames
-:style: alpha
 ```
 
 ```{code-cell} ipython3

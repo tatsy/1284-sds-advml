@@ -950,7 +950,7 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-**カーネル主成分分析**は[サポートベクトルマシン](ssec:support-vector-machine)の項で紹介したカーネル法を用いた主成分分析の拡張であり、非線形の次元削減法に分類される。
+**カーネル主成分分析**は[サポートベクトルマシン](#ssec:support-vector-machine)の項で紹介したカーネル法を用いた主成分分析の拡張であり、非線形の次元削減法に分類される。
 
 カーネル法では、与えられたデータ$\mathbf{x}_i$をとある線形汎関数$\phi \in \mathcal{H}$を用いて、$\phi(\mathbf{x}_i)$のように変換する。カーネル主成分分析はこの$\phi(\mathbf{x}_i)$に対して主成分分析を行う手法である。
 
@@ -1257,7 +1257,7 @@ X, y = X[:n_samples], y[:n_samples]
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-まずは、MNISTの画像データを784次元のベクトルと見なして、主成分分析により、2次元ベクトルに次元削減してみる。ここでは見やすさのために[Seabornの併用](ssec:seaborn)で紹介した`seaborn`の`jointplot`を用いて可視化してみる。
+まずは、MNISTの画像データを784次元のベクトルと見なして、主成分分析により、2次元ベクトルに次元削減してみる。ここでは見やすさのために[Seabornの併用](#ssec:seaborn)で紹介した`seaborn`の`jointplot`を用いて可視化してみる。
 
 ```{code-cell} ipython3
 ---
@@ -1532,7 +1532,6 @@ scikit-learnには次元削減の手法としては他にもHessian Eigenmap{cit
 
 ```{bibliography}
 :filter: docname in docnames
-:style: alpha
 ```
 
 ```{code-cell} ipython3
