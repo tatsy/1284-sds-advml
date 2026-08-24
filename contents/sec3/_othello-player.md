@@ -490,9 +490,6 @@ slideshow:
 tags: [remove-cell]
 ---
 check(action_by_random, action_by_random)
-glue('rand_b_win', b_win)
-glue('rand_w_win', w_win)
-glue('rand_draw', draw)
 ```
 
 ```{code-cell} ipython3
@@ -648,7 +645,7 @@ def action_by_score(env):
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-このルーチンを用いて、先ほどと同様に{glue:}`n_episodes`回の対戦を行ない、ランダムな着手に比べて、どのくらい勝率が上昇するかを見てみよう。
+このルーチンを用いて、先ほどと同様に[](#n_episodes)回の対戦を行ない、ランダムな着手に比べて、どのくらい勝率が上昇するかを見てみよう。
 
 ```{code-cell} ipython3
 ---
@@ -658,9 +655,39 @@ slideshow:
 tags: [remove-cell]
 ---
 check(action_by_score, action_by_random)
-glue('score_b_win', b_win)
-glue('score_w_win', w_win)
-glue('score_draw', draw)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: score_b_win
+print(b_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: score_w_win
+print(w_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: score_draw
+print(draw)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -668,9 +695,9 @@ glue('score_draw', draw)
 :::{admonition} 対局結果: セル評価値 (#1) vs ランダム (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** {glue:}`score_b_win`
-- **プレイヤー#2 勝ち:** {glue:}`score_w_win`
-- **両者引き分け:** {glue:}`score_draw`
+- **プレイヤー#1 勝ち:** [](#score_b_win)
+- **プレイヤー#2 勝ち:** [](#score_w_win)
+- **両者引き分け:** [](#score_draw)
 
 :::
 
@@ -806,9 +833,39 @@ slideshow:
 tags: [remove-cell]
 ---
 check(action_by_minimax, action_by_random)
-glue('minimax_b_win', b_win)
-glue('minimax_w_win', w_win)
-glue('minimax_draw', draw)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: minimax_b_win
+print(b_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: minimax_w_win
+print(w_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: minimax_draw
+print(draw)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -820,9 +877,9 @@ glue('minimax_draw', draw)
 :::{admonition} 対局結果: ミニマックス探索 (#1) vs ランダム (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** {glue:}`minimax_b_win`
-- **プレイヤー#2 勝ち:** {glue:}`minimax_w_win`
-- **両者引き分け:** {glue:}`minimax_draw`
+- **プレイヤー#1 勝ち:** [](#minimax_b_win)
+- **プレイヤー#2 勝ち:** [](#minimax_w_win)
+- **両者引き分け:** [](#minimax_draw)
 
 :::
 
@@ -956,17 +1013,47 @@ def action_by_alpha_beta(env, depth=2):
 :tags: [remove-cell]
 
 check(action_by_alpha_beta, action_by_minimax)
-glue('ab_vs_minimax_b_win', b_win)
-glue('ab_vs_minimax_w_win', w_win)
-glue('ab_vs_minimax_draw', draw)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: ab_vs_minimax_b_win
+print(b_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: ab_vs_minimax_w_win
+print(w_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: ab_vs_minimax_draw
+print(draw)
 ```
 
 :::{admonition} 対局結果: アルファベータ探索 (#1) vs ミニマックス探索 (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** {glue:}`ab_vs_minimax_b_win`
-- **プレイヤー#2 勝ち:** {glue:}`ab_vs_minimax_w_win`
-- **両者引き分け:** {glue:}`ab_vs_minimax_draw`
+- **プレイヤー#1 勝ち:** [](#ab_vs_minimax_b_win)
+- **プレイヤー#2 勝ち:** [](#ab_vs_minimax_w_win)
+- **両者引き分け:** [](#ab_vs_minimax_draw)
 
 :::
 
@@ -1064,9 +1151,39 @@ def action_by_alpha_beta_deepen(env, time_limit=1.0e-2):
 :tags: [remove-cell]
 
 check(action_by_alpha_beta_deepen, action_by_minimax_deepen)
-glue('ab_vs_minimax_deepen_b_win', b_win)
-glue('ab_vs_minimax_deepen_w_win', w_win)
-glue('ab_vs_minimax_deepen_draw', draw)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: ab_vs_minimax_deepen_b_win
+print(b_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: ab_vs_minimax_deepen_w_win
+print(w_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: ab_vs_minimax_deepen_draw
+print(draw)
 ```
 
 反復深化を取り入ればアルファベータ探索とミニマックス探索の対戦結果は次の通りであり、同じ探索時間ではアルファベータ探索の方が圧倒的に強く、より多くの局面を探索できていることが確認できる。
@@ -1076,9 +1193,9 @@ glue('ab_vs_minimax_deepen_draw', draw)
 :::{admonition} 対局結果: 反復深化アルファベータ (#1) vs 反復深化ミニマックス (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** {glue:}`ab_vs_minimax_deepen_b_win`
-- **プレイヤー#2 勝ち:** {glue:}`ab_vs_minimax_deepen_w_win`
-- **両者引き分け:** {glue:}`ab_vs_minimax_deepen_draw`
+- **プレイヤー#1 勝ち:** [](#ab_vs_minimax_deepen_b_win)
+- **プレイヤー#2 勝ち:** [](#ab_vs_minimax_deepen_w_win)
+- **両者引き分け:** [](#ab_vs_minimax_deepen_draw)
 
 :::
 
@@ -1216,9 +1333,39 @@ slideshow:
 tags: [remove-cell]
 ---
 check(action_by_monte_carlo, action_by_alpha_beta_deepen)
-glue('mc_vs_alpha_beta_b_win', b_win)
-glue('mc_vs_alpha_beta_w_win', w_win)
-glue('mc_vs_alpha_beta_draw', draw)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: mc_vs_alpha_beta_b_win
+print(b_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: mc_vs_alpha_beta_w_win
+print(w_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: mc_vs_alpha_beta_draw
+print(draw)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -1226,9 +1373,9 @@ glue('mc_vs_alpha_beta_draw', draw)
 :::{admonition} 対局結果: 原始モンテカルロ (#1) vs アルファベータ探索 (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** {glue:}`mc_vs_alpha_beta_b_win`
-- **プレイヤー#2 勝ち:** {glue:}`mc_vs_alpha_beta_w_win`
-- **両者引き分け:** {glue:}`mc_vs_alpha_beta_draw`
+- **プレイヤー#1 勝ち:** [](#mc_vs_alpha_beta_b_win)
+- **プレイヤー#2 勝ち:** [](#mc_vs_alpha_beta_w_win)
+- **両者引き分け:** [](#mc_vs_alpha_beta_draw)
 
 :::
 
@@ -1563,9 +1710,39 @@ slideshow:
 tags: [remove-cell]
 ---
 check(action_by_mcts, action_by_alpha_beta_deepen)
-glue('mcts_vs_alpha_beta_b_win', b_win)
-glue('mcts_vs_alpha_beta_w_win', w_win)
-glue('mcts_vs_alpha_beta_draw', draw)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: mcts_vs_alpha_beta_b_win
+print(b_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: mcts_vs_alpha_beta_w_win
+print(w_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: mcts_vs_alpha_beta_draw
+print(draw)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -1573,9 +1750,9 @@ glue('mcts_vs_alpha_beta_draw', draw)
 :::{admonition} 対局結果: モンテカルロ木探索 (#1) vs アルファベータ探索 (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** {glue:}`mcts_vs_alpha_beta_b_win`
-- **プレイヤー#2 勝ち:** {glue:}`mcts_vs_alpha_beta_w_win`
-- **両者引き分け:** {glue:}`mcts_vs_alpha_beta_draw`
+- **プレイヤー#1 勝ち:** [](#mcts_vs_alpha_beta_b_win)
+- **プレイヤー#2 勝ち:** [](#mcts_vs_alpha_beta_w_win)
+- **両者引き分け:** [](#mcts_vs_alpha_beta_draw)
 
 :::
 
@@ -1591,17 +1768,47 @@ glue('mcts_vs_alpha_beta_draw', draw)
 :tags: [remove-cell]
 
 check(action_by_mcts, action_by_monte_carlo)
-glue('mcts_vs_mc_b_win', b_win)
-glue('mcts_vs_mc_w_win', w_win)
-glue('mcts_vs_mc_draw', draw)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: mcts_vs_mc_b_win
+print(b_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: mcts_vs_mc_w_win
+print(w_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: mcts_vs_mc_draw
+print(draw)
 ```
 
 :::{admonition} 対局結果: モンテカルロ木探索 (#1) vs 原始モンテカルロ (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** {glue:}`mcts_vs_mc_b_win`
-- **プレイヤー#2 勝ち:** {glue:}`mcts_vs_mc_w_win`
-- **両者引き分け:** {glue:}`mcts_vs_mc_draw`
+- **プレイヤー#1 勝ち:** [](#mcts_vs_mc_b_win)
+- **プレイヤー#2 勝ち:** [](#mcts_vs_mc_w_win)
+- **両者引き分け:** [](#mcts_vs_mc_draw)
 
 :::
 
