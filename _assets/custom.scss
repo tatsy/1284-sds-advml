@@ -33,8 +33,15 @@ body {
 
 @media (min-width: 1280px) {
   .myst-primary-sidebar-pointer {
+    grid-column: screen-start / body-start;
     background: var(--myst-color-bg-secondary);
     border-right: 1px solid var(--myst-color-border);
+  }
+
+  .myst-primary-sidebar-nav,
+  .myst-primary-sidebar-footer {
+    width: 19.5rem;
+    margin-left: auto;
   }
 }
 
@@ -196,6 +203,37 @@ div[data-name="output-decoration-notebook-output"] {
   line-height: 1.0;
   font-size: inherit;
   font-family: inherit;
+}
+
+/* Normal notebook outputs */
+div[data-name="output-decoration-notebook-output"] {
+  display: block;
+}
+
+div[data-name="output-decoration-notebook-output"]
+  [data-name="safe-output-stream"],
+div[data-name="output-decoration-notebook-output"]
+  [data-name="safe-output-text"] {
+  margin: 0.2rem 0 1.25rem;
+  padding: 0.6rem 0.8rem;
+
+  background: var(--myst-color-bg-secondary);
+  border-left: 3px solid var(--myst-color-border-strong);
+  border-radius: 0 0.35rem 0.35rem 0;
+}
+
+/* Embedded outputs such as [](#label) */
+a.hover-link {
+  div[data-name="output-decoration-notebook-output"],
+  div[data-name="outputs-container"],
+  [data-name="safe-output-stream"],
+  [data-name="safe-output-text"] {
+    display: inline;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none;
+    background: transparent;
+  }
 }
 
 /* Code output */
