@@ -839,7 +839,7 @@ print(f'Uniform LBP has range from {lbp.min()} to {lbp.max()}.')
 editable: true
 slideshow:
   slide_type: ''
-tags: [hide-input, remove-input]
+tags: [remove-input]
 ---
 from matplotlib.gridspec import GridSpec
 

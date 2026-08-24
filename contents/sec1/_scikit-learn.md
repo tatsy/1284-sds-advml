@@ -155,13 +155,13 @@ X, X_test, y, y_test = model_selection.train_test_split(X_org, y_org, train_size
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-# | label: n_samples
+# | label: scikit_learn_n_samples
 print(f'{n_samples}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}, "tags": ["remove-input"]}
 
-なお、今回は計算時間の短縮のために、先頭 ![](#n_samples) 個のデータだけを使って、以下の実験を行う。
+なお、今回は計算時間の短縮のために、先頭 ![](#scikit_learn_n_samples) 個のデータだけを使って、以下の実験を行う。
 
 ```{code-cell} ipython3
 ---

@@ -31,7 +31,7 @@ repos:
         entry: ruff format --force-exclude
         language: python
         types_or: [jupyter]
-        files: \.ipynb$
+        files: '^contents/.*\.ipynb$'
         args: []
         require_serial: true
         additional_dependencies: []
