@@ -38,11 +38,6 @@ import seaborn as sns
 from sklearn.exceptions import ConvergenceWarning
 from tqdm.notebook import tqdm
 
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
-
 # 実験に用いるデータ数
 n_images_per_char = 200
 
@@ -630,12 +625,13 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
-glue('lbp_val', np.sum(b * p))
+# | label: lpb_val
+print(np.sum(b * p))
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-すると、上記の3x3の領域に対しては、LBPの値として **{glue}`lbp_val`** が求まる。
+すると、上記の3x3の領域に対しては、LBPの値として **[](#lpb_val)** が求まる。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
