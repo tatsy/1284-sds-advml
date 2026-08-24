@@ -77,11 +77,6 @@ from joblib import Parallel, delayed
 from tqdm.notebook import tqdm
 from matplotlib.animation import ArtistAnimation
 
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
-
 rc = {'figure.dpi': 150}
 sns.set_theme(style='white', rc=rc)
 
@@ -91,7 +86,6 @@ np.random.seed(12345)
 
 # 実験に用いるエピソード数
 n_episodes = 100
-glue('n_episodes', n_episodes)
 
 # 並列化スレッド数
 n_jobs = min(4, mp.cpu_count())
@@ -457,9 +451,20 @@ print(f'#black: {env.count(Player.BLACK):d}')
 print(f'#white: {env.count(Player.WHITE):d}')
 ```
 
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: n_episodes
+print(n_episodes)
+```
+
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-最後に、両者ランダムに着手する場合に{glue:}`n_episodes`回対戦すると、どの程度の勝敗になるのかを調べてみる。この際、手番はランダムに黒番と白番 (先攻と後攻)を入れ替えている。
+最後に、両者ランダムに着手する場合に[](#n_episodes)回対戦すると、どの程度の勝敗になるのかを調べてみる。この際、手番はランダムに黒番と白番 (先攻と後攻)を入れ替えている。
 
 また、ランダム対戦には少々時間がかかるため、以下のコードでは、`joblib`を用いて、並列実行により同時に複数の対局を行なっている。
 
@@ -490,14 +495,47 @@ glue('rand_w_win', w_win)
 glue('rand_draw', draw)
 ```
 
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: rand_b_win
+print(b_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: rand_w_win
+print(w_win)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [remove-cell]
+---
+# | label: rand_draw
+print(draw)
+```
+
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 :::{admonition} 対局結果: ランダム (#1) vs ランダム (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** {glue:}`rand_b_win`
-- **プレイヤー#2 勝ち:** {glue:}`rand_w_win`
-- **両者引き分け:** {glue:}`rand_draw`
+- **プレイヤー#1 勝ち:** [](#rand_b_win)
+- **プレイヤー#2 勝ち:** [](#rand_w_win)
+- **両者引き分け:** [](#rand_draw)
 
 :::
 
