@@ -29,11 +29,6 @@ import japanize_matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
-
 rc = {'figure.dpi': 150}
 sns.set_theme(style='white', rc=rc)
 japanize_matplotlib.japanize()
@@ -50,6 +45,7 @@ japanize_matplotlib.japanize()
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
+# | label: fuda-images
 yomi = cv2.imread('../../data/ogura/yomifuda.jpg', cv2.IMREAD_COLOR)
 tori = cv2.imread('../../data/ogura/torifuda.jpg', cv2.IMREAD_COLOR)
 
@@ -65,12 +61,10 @@ ax.imshow(tori[:, :, ::-1])
 ax.set(xticks=[], yticks=[], title='取り札')
 
 fig.tight_layout()
-glue('fuda-images', fig)
-
-plt.close()
+plt.show()
 ```
 
-:::{glue:figure} fuda-images
+:::{figure} #fuda-images
 :figwidth: 80%
 :::
 
