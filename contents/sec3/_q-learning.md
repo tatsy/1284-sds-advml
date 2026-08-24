@@ -72,14 +72,8 @@ import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 from matplotlib.animation import ArtistAnimation
 
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
-
 # パラメータ
 n_episodes = 10000
-glue('n_episodes', n_episodes)
 
 # 乱数のシードを固定
 random.seed(31415)
@@ -102,6 +96,13 @@ rc = {
     'legend.framealpha': 1.0,
 }
 sns.set_theme(style='whitegrid', palette='colorblind', rc=rc)
+```
+
+```{code-cell} ipython3
+:tags: [remove-cell]
+
+# | label: q-learning-n-episodes
+print(f'{n_episodes}')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -273,16 +274,15 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
+# | label: q-learning-cartpole-init-state
 fig, ax = plt.subplots()
 ax.imshow(img)
 ax.set(xticks=[], yticks=[])
-
-glue('cartpole_init_state', fig)
-plt.close()
+plt.show()
 ```
 
-:::{glue:figure} cartpole_init_state
-:figclass: image-stylish
+:::{figure} #q-learning-cartpole-init-state
+:class: image-stylish
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -601,7 +601,7 @@ def boltzmann(x, tau=1.0):
     return e / np.sum(e)
 ```
 
-Qテーブルは0から1の間の乱数で初期化し、{glue:}`n_episodes`エピソード分のプレイを行ないながらSARSAによりQテーブルを更新する。
+Qテーブルは0から1の間の乱数で初期化し、![](#q-learning-n-episodes)エピソード分のプレイを行ないながらSARSAによりQテーブルを更新する。
 
 ```{code-cell} ipython3
 :tags: [remove-output]
