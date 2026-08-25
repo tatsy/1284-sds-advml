@@ -19,7 +19,6 @@ kernelspec:
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 (sec:figure-detection)=
-
 # 図形の検出
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}

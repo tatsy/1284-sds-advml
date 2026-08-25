@@ -13,7 +13,6 @@ permissions:
 
 env:
   BASE_URL: /${{ github.event.repository.name }}
-  MYST_VERSION: "1.10.1"
 
 concurrency:
   group: pages
@@ -38,11 +37,11 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install MyST
-        run: npm install -g mystmd@${{ env.MYST_VERSION }}
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build
-        run: myst build --html
+        run: npm run build
 
       - name: Upload artifacts
         uses: actions/upload-pages-artifact@v5

@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "mystmd": "^1.10.1",
+    "sass": "^1.103.1"
+  },
+  "scripts": {
+    "css": "sass _assets/scss/custom.scss:_assets/custom.css --no-source-map",
+    "css:watch": "sass --watch _assets/scss/custom.scss:_assets/custom.css --no-source-map",
+    "myst:start": "myst start",
+    "myst:build": "myst build --html",
+    "dev": "npm run css && concurrently --kill-others --names sass,myst \"npm run css:watch\" \"npm run myst:start\"",
+    "build": "npm run css && npm run myst:build"
+  }
+}

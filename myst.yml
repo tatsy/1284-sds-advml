@@ -67,9 +67,5 @@ site:
   options:
     logo_text: "機械学習発展 (実践)"
     hide_authors: true
-    style: ./_assets/custom.scss
+    style: ./_assets/custom.css
     outline_maxdepth: 2
-
-  actions:
-    - title: GitHub
-      url: "https://github.com/tatsy/1284-sds-advml"

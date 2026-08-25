@@ -1,18 +1,19 @@
 {
   "config": {
+    "blanks-around-headings": false,
     "ul-style": {
-      "style": "dash"
+      "style": "dash",
     },
     "hr-style": {
-      "style": "---"
+      "style": "---",
     },
     "code-block-style": {
-      "style": "fenced"
+      "style": "fenced",
     },
     "code-fence-style": {
-      "style": "backtick"
+      "style": "backtick",
     },
     "line-length": false,
-    "no-inline-html": false
-  }
+    "no-inline-html": false,
+  },
 }

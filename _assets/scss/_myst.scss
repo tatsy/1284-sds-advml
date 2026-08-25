@@ -1,0 +1,142 @@
+/* navbar */
+.myst-top-nav {
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--myst-color-border);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
+
+  .dark & {
+    background: rgb(24 24 27 / 0.96);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  }
+}
+
+/* light/dark mode switch */
+.myst-theme-button {
+  width: 2rem !important;
+  height: 2rem !important;
+
+  border: none !important;
+  border-radius: 0.35rem !important;
+  background: transparent !important;
+
+  color: var(--myst-color-text-secondary);
+
+  &:hover {
+    background: var(--myst-color-bg-secondary) !important;
+    color: var(--myst-color-text);
+  }
+
+  svg {
+    padding: 0.25rem !important;
+  }
+}
+
+.myst-toc-item,
+.myst-primary-sidebar-item {
+  border-radius: 0.35rem;
+}
+
+.myst-toc-item-exact {
+  font-weight: 700;
+}
+
+.myst-primary-sidebar-toc {
+  font-size: 0.9rem;
+  line-height: 1.2;
+
+  .myst-toc-item {
+    margin-top: 0.1rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .myst-toc-item > a,
+  .myst-toc-item > div {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+}
+
+.myst-fm-block-title {
+  font-size: 2rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.myst-fm-block-enumerator {
+  font-weight: 700;
+}
+
+.myst-code {
+  margin: 1.25rem 0;
+  border: 1px solid var(--myst-color-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+
+  &:hover {
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+  }
+}
+
+/* admonition */
+.myst-admonition-header {
+  font-family: var(--default-font-family);
+  font-weight: bold;
+}
+
+.myst-admonition.question {
+  border-left-color: var(--myst-color-primary);
+
+  .myst-admonition-header {
+    color: var(--myst-color-primary);
+  }
+}
+
+
+
+/*
+ * Normal notebook output
+ */
+.article
+  .myst-jp-nb-block:has(> .myst-code)
+  > [data-name="outputs-container"]:not(.hidden):not(:empty) {
+  display: block;
+  margin: 1.25rem 0 !important;
+  padding: 0.75rem 0.9rem;
+
+  background: var(--myst-color-bg-secondary);
+  border: 1px solid var(--myst-color-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
+}
+
+/*
+ * Hide genuinely empty output containers.
+ */
+.article
+  .myst-jp-nb-block
+  > [data-name="outputs-container"]:empty {
+  display: none !important;
+}
+
+/*
+ * If both input and output are visible, visually connect them.
+ */
+.article
+  .myst-jp-nb-block:has(
+    > [data-name="outputs-container"]:not(.hidden):not(:empty)
+  )
+  > .myst-code:not(.hidden) {
+  margin-bottom: 0;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.article
+  .myst-jp-nb-block:has(> .myst-code:not(.hidden))
+  > [data-name="outputs-container"]:not(.hidden):not(:empty) {
+  margin-top: 0 !important;
+
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+}

@@ -1,0 +1,64 @@
+@charset "UTF-8";
+
+/* Figure caption */
+.caption-number {
+  font-style: normal !important;
+  font-weight: bold;
+  font-family: var(--default-font-family);
+}
+
+.caption-text {
+  font-family: var(--default-font-family);
+}
+
+.pasted-text {
+  font-weight: normal !important;
+}
+
+/* Code block */
+div.cell_output th,
+div.cell_output td {
+  text-align: left !important;
+}
+
+/*
+ * Jupyter notebook outputs
+ */
+.lm-Widget {
+  overflow: clip !important;
+}
+
+.jp-RenderedHTMLCommon {
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+/*
+ * Inline scalar output embedded inside prose
+ */
+.article p > div[data-name="output-decoration-notebook-output"],
+.article li > div[data-name="output-decoration-notebook-output"] {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.article p > div[data-name="output-decoration-notebook-output"] *,
+.article li > div[data-name="output-decoration-notebook-output"] * {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  white-space: normal !important;
+}
