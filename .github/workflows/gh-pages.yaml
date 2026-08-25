@@ -24,14 +24,14 @@ jobs:
 
       - name: Checkout submodules
         run: |
-          git config --global url."https://x-access-token:${{ secrets.CLASSES_PAT }}@github.com/tatsy-classes/".insteadOf "https://github.com/tatsy-classes/"
+          git config --global url."https://x-access-token:${{ secrets.CLASSES_PAT }}@github.com/tatsy/".insteadOf "https://github.com/tatsy/"
           git submodule sync --recursive
           git submodule update --init --recursive
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
 
       - name: Install FFmpeg
         run: |
