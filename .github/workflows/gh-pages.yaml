@@ -12,7 +12,12 @@ permissions:
   id-token: write
 
 env:
-  PYTHON_VERSION: "3.10"
+  BASE_URL: /${{ github.event.repository.name }}
+  MYST_VERSION: "1.10.1"
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -24,41 +29,23 @@ jobs:
 
       - name: Checkout submodules
         run: |
-          git config --global url."https://x-access-token:${{ secrets.CLASSES_PAT }}@github.com/tatsy/".insteadOf "https://github.com/tatsy/"
+          git config --global url."https://x-access-token:${{ secrets.CLASSES_PAT }}@github.com/tatsy-classes/".insteadOf "https://github.com/tatsy-classes/"
           git submodule sync --recursive
           git submodule update --init --recursive
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
-      - name: Install FFmpeg
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y ffmpeg
-
-      - name: Cache Jupyter execution
-        uses: actions/cache@v4
-        with:
-          path: .jupyter_cache
-          key: ${{ matrix.os }}-jupyter-${{ hashFiles('**/*.ipynb') }}
-          restore-keys: |
-            ${{ matrix.os }}-jupyter-
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install packages with UV
-        uses: astral-sh/setup-uv@v7
+      - name: Install MyST
+        run: npm install -g mystmd@${{ env.MYST_VERSION }}
 
       - name: Build
-        run: uv run jb build --all .
+        run: myst build --html
 
       - name: Upload artifacts
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./_build/html/
 
@@ -73,5 +60,5 @@ jobs:
     steps:
       - name: Github Pages deployment
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
         if: github.ref == 'refs/heads/main'

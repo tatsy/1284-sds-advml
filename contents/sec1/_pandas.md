@@ -1,4 +1,8 @@
 ---
+downloads:
+- static: false
+  title: Open in Google Colab
+  url: https://colab.research.google.com/github/tatsy/1284-sds-advml/blob/main/contents/sec1/pandas.ipynb
 jupytext:
   formats: ipynb,_/md:myst
   text_representation:

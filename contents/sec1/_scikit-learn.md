@@ -2,7 +2,7 @@
 downloads:
 - static: false
   title: Open in Google Colab
-  url: https://colab.research.google.com/github/tatsy/1284-sds-advml/blob/jb2-wip/contents/sec1/scikit-learn.ipynb
+  url: https://colab.research.google.com/github/tatsy/1284-sds-advml/blob/main/contents/sec1/scikit-learn.ipynb
 jupytext:
   formats: ipynb,_/md:myst
   text_representation:
@@ -11,7 +11,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.1
 kernelspec:
-  display_name: sdsadvml
+  display_name: sdsadvml (3.11.13)
   language: python
   name: python3
 ---
@@ -43,13 +43,13 @@ import random
 import warnings
 from itertools import product
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.exceptions import ConvergenceWarning
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 from tqdm.notebook import tqdm
+from sklearn.exceptions import ConvergenceWarning
 
 # グラフの設定
 rc = mpl.rc_params_from_file('matplotlibrc')
@@ -239,8 +239,8 @@ slideshow:
   slide_type: ''
 tags: [remove-output]
 ---
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import make_pipeline
+from sklearn.neighbors import KNeighborsClassifier
 
 # 識別モデルの構築
 n_neighbors = 20
