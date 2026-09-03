@@ -11,7 +11,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.1
 kernelspec:
-  display_name: sdsadvml
+  display_name: sdsadvml (3.11.13)
   language: python
   name: python3
 ---
@@ -53,15 +53,11 @@ kernelspec:
 """
 
 import re
+import time
 import warnings
 from copy import deepcopy
 
 import seaborn as sns
-
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
 
 try:
     from advml.sudoku import solver
@@ -69,7 +65,8 @@ try:
     has_advml = True
 except ImportError:
     has_advml = False
-    pass
+    solver = lambda *args, **kwargs: None
+
 
 # 警告の非表示
 warnings.simplefilter('ignore', FutureWarning)
@@ -328,7 +325,7 @@ from matplotlib.animation import ArtistAnimation
 if has_advml:
     fig, ax = plt.subplots()
     frames = []
-    solution = solver.backtrack(problem, ax=ax, frames=frames)
+    solution = solver.backtrack(problem.copy(), ax=ax, frames=frames)
 
     ani = ArtistAnimation(fig, frames, interval=100, blit=True)
     html = display.HTML(ani.to_jshtml())
@@ -353,27 +350,18 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
-%%capture perf
-%%timeit -n 1 -r 10
-solver.backtrack(problem)
-```
-
-```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
 # | label: avg_time_bt_simple
-
-avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-print(avg_time)
+_start = time.perf_counter()
+for _ in range(10):
+    solver.backtrack(problem.copy())
+_end = time.perf_counter()
+avg_time = (_end - _start) / 10
+print(f'{avg_time * 1000:.1f} ms')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-上記は、素直にバックトラック法を実装した場合の実行時間であるが、一回の問題を解くのに平均[](#avg_time_bt_simple)となっており、十分高速であることが分かる
+上記は、素直にバックトラック法を実装した場合の実行時間であるが、一回の問題を解くのに平均![](#avg_time_bt_simple)となっており、十分高速であることが分かる
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -434,21 +422,13 @@ slideshow:
   slide_type: ''
 tags: [remove-cell]
 ---
-%%capture perf
-%%timeit -n 1 -r 10
-solver.backtrack(problem)
-```
-
-```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
 # | label: avg_time_bt_hard
-avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-glue('avg_time_bt_hard', avg_time)
+_start = time.perf_counter()
+for _ in range(10):
+    solver.backtrack(problem.copy())
+_end = time.perf_counter()
+avg_time = (_end - _start) / 10
+print(f'{avg_time * 1000:.1f} ms')
 ```
 
 ```{code-cell} ipython3
@@ -456,22 +436,24 @@ print('Solution (recursive backtrack):\n' + str(solver.recursive(problem.copy())
 ```
 
 ```{code-cell} ipython3
-%%capture perf
-%%timeit -n 1 -r 10
-solver.recursive(problem.copy())
-```
+:tags: [remove-cell]
 
-```{code-cell} ipython3
 # | label: avg_time_recursive
-avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-print(avg_time)
+_start = time.perf_counter()
+for _ in range(10):
+    solver.recursive(problem.copy())
+_end = time.perf_counter()
+avg_time = (_end - _start) / 10
+print(f'{avg_time * 1000:.1f} ms')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-この問題だと、上記の通り[](#avg_time_bt_hard)ほどの時間がかかる。
+この問題だと、単純なバックトラック法では![](#avg_time_bt_hard)ほどの時間がかかる。
 
-バックトラック法を高速化する手法には、候補の数が少ないものから埋めていく、などの様々な方法が考えられるので、各自、プログラムを書いて試してみてほしい。参考までに再帰関数を用いた実装に要する計算時間は[](#avg_time_recursive)であったので多少の高速化には成功しているだろうか。
+バックトラック法を高速化する手法には、候補の数が少ないものから埋めていく、などの様々な方法が考えられるので、各自、プログラムを書いて試してみてほしい。
+
+参考までに再帰関数を用いた実装に要する計算時間は![](#avg_time_recursive)であったので多少の高速化には成功しているだろうか。
 
 +++
 
@@ -568,13 +550,13 @@ problem = """
 
 ここまでの内容を利用して、写真から数独の問題を読み取り、答えを返すプログラムを作成してみよう。
 
-本番では、以下のレベル1からレベル3の内容で10問ずつ画像を与える。採点は、元の問題をどれだけ正しく読み取れたかを評価する **Recognition 60点** と、読み取った問題から正しい完成盤面を求められたかを評価する **Final 60点** の合計 **120点** で行う。各レベルの画像は以下のような性質を持つ。
+本番では、以下のレベル1からレベル3の内容で10問ずつ画像を与える。採点は、元の問題をどれだけ正しく読み取れたかを評価する **認識 60点** と、読み取った問題から正しい完成盤面を求められたかを評価する **最終結果 60点** の **合計 120点** で行う。各レベルの画像は以下のような性質を持つ。
 
 - **レベル 1:** 画像は写真ではなくデジタル画像で、問題は常に同じ位置にある。
 - **レベル 2:** 画像は写真で、問題は概ね真上から撮影されている。
 - **レベル 3:** 画像は写真で、問題は斜めから撮影されており、なおかつページが多少湾曲している可能性がある。
 
-レベル2まで十分に処理できれば、この課題としては良好な達成度である。レベル3は発展的なchallenge levelとして考えてよい。
+レベル2まで十分に解ければ、この課題の達成度としては十分で、レベル3は発展的なチャレンジ問題として考えてよい。
 
 ```{code-cell} ipython3
 ---
@@ -632,7 +614,7 @@ plt.show()
 
 **出力の形式**
 
-課題では、処理を次の2段階に分ける。
+課題では、処理を認識 (`recognize`) と数独を解く処理 (`solve`) の2段階に分ける。
 
 ```text
 image
@@ -646,7 +628,7 @@ solve(problem)
 answer
 ```
 
-`recognize(image, level)`は、元の数独問題を表す`dtype=np.int32`, `shape=(9, 9)`のNumPy配列を返す。認識した数字には`1`〜`9`を用い、空欄または数字はあるものの認識に自信がないセルには`0`を用いる。
+`recognize(image, level)`は、元の数独問題を表す`dtype=np.int32`, `shape=(9, 9)`のNumPy配列を返す。認識した数字には`1`から`9`を用い、空欄には`0`を用いる。ただし、`solve`の処理で使用する目的で、認識に自信のないセルに`0`を割り当てるという運用もありうる。
 
 `solve(problem)`は、`recognize()`の返り値を入力として、完成盤面を表す`dtype=np.int32`, `shape=(9, 9)`のNumPy配列を返す。完成盤面の全セルは`1`〜`9`である必要がある。採点時、`solve()`には元画像は引数として渡されず、`recognize()`の返り値がそのまま入力される。
 
@@ -654,7 +636,7 @@ answer
 
 課題用レポジトリの`sudoku.py`に、`recognize(image, level)`と`solve(problem)`の2関数を実装する。採点時には各画像について`recognize()`、`solve()`の順に実行される。
 
-各画像は独立したプロセスで評価され、1画像あたりの実行時間は最大15秒とする。ある画像でタイムアウト、例外、または不正な形式の出力が発生しても、他の画像の評価は継続される。
+各画像は独立したプロセスで評価され、1画像あたりの実行時間は最大15秒となっている。ある画像でタイムアウト、例外、または不正な形式の出力が発生しても、他の画像の評価には影響がないようになっている。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -703,29 +685,29 @@ def solve(problem: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
 
 **採点方法**
 
-採点は **Recognition 60点 + Final 60点 = 合計120点** で行う。
+採点は **認識 60点 + 最終結果 60点 = 合計 120点** で行う。
 
-Recognitionでは、各レベルのhidden画像10枚について、元の問題をどれだけ正しく認識したかをmicro F1で評価する。各セルについて、
+認識の評価では、各レベルの評価用画像10枚について、元の問題をどれだけ正しく認識したかをmicro F1で評価する。各セルについて、
 
 - **TP:** 元の問題に数字があり、同じ非0の数字を認識した
 - **FP:** 非0を出力したが、元の問題と異なっていた
 - **FN:** 元の問題に数字があるが、認識結果が一致しなかった
 
-と数える。別の数字へ誤認した場合にはFP=1かつFN=1となる。一方、数字があるセルを`0`とした場合にはFN=1のみとなる。
+と数える。別の数字へ誤認した場合にはFP=1かつFN=1となる。一方、数字があるセルを`0`とした場合にはFN=1として扱われる。
 
 $$
 \mathrm{F1} = \frac{2\mathrm{TP}}{2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}}
 $$
 
-各レベルで、F1が0.2, 0.4, 0.6, 0.8, 1.0以上になるたびに加点する。
+各レベルで、F1が0.2, 0.4, 0.6, 0.8, 1.0の各閾値以上となるたびに加点する。
 
-| Level | 1 thresholdあたり | 最大 |
+| Level | 1 閾値ごと | 最大 |
 |---|---:|---:|
 | 1 | 2点 | 10点 |
 | 2 | 4点 | 20点 |
 | 3 | 6点 | 30点 |
 
-Finalでは、Recognitionの出力を`solve()`へ渡して得られた完成盤面をhidden画像ごとに採点する。
+最終結果の表はは、数字の認識結果を`solve()`へ渡して得られた完成盤面を画像ごとに採点する。
 
 | Level | 1問あたり | 10問合計 |
 |---|---:|---:|
@@ -737,7 +719,7 @@ Finalでは、Recognitionの出力を`solve()`へ渡して得られた完成盤�
 
 **使用可能なライブラリ**
 
-課題用テンプレートの`requirements.txt`に記載されたライブラリを利用できる。現在のテンプレートには以下が含まれている。追加のライブラリを利用する場合は、講義中の指示に従うこと。
+課題用テンプレートの`pyproject.toml`に記載されたライブラリを利用できる。現在のテンプレートには以下が含まれている。
 
 - numpy
 - tqdm
@@ -749,6 +731,8 @@ Finalでは、Recognitionの出力を`solve()`へ渡して得られた完成盤�
 - opencv-python
 - pytest
 
+**これ以外のライブラリの使用は認められず**、仮にローカル環境で追加ライブラリをインストールしたとしても、採点時には反映されないので注意すること。
+
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **テスト方法**
@@ -759,13 +743,13 @@ Finalでは、Recognitionの出力を`solve()`へ渡して得られた完成盤�
 pytest
 ```
 
-RecognitionのF1を表示したい場合は、標準出力を表示して実行する。
+認識部分のF1を表示したい場合は、標準出力を表示して実行する。
 
 ```shell
 pytest -s -k recognition
 ```
 
-Finalのみ確認したい場合は、
+最終結果だけ確認したい場合は、
 
 ```shell
 pytest -k final
@@ -773,9 +757,9 @@ pytest -k final
 
 とする。
 
-講義中に各自へ割り当てられたprivateレポジトリへコードをpushすると、GitHub Actionsによるhidden画像での自動評価が実行される。ActionsのログとJob Summaryには、各画像の実行結果、レベルごとのRecognition F1とFinal成功数、および合計120点での集計結果が表示される。hidden画像そのものは公開しない。
+講義中に各自へ割り当てられたprivateレポジトリへコードをpushすると、GitHub Actions上で評価用画像での自動評価が実行される。ActionsのログとJob Summaryには、各画像の実行結果、レベルごとのRecognition F1とFinal成功数、および合計120点での集計結果が表示される。ただし、評価用画像そのものは公開しない。
 
-GitHub Actions上の結果は、開発中に性能を確認するためのフィードバックとして用いる。**最終成績は、提出されたコミットSHAのコードを教員側の環境で同じhiddenデータと採点プログラムを用いて再実行した結果により決定する。**
+GitHub Actions上の結果は、開発中に性能を確認するためのフィードバックとして用いる。**最終成績は、提出されたコミットSHAに対応するコードを教員側の環境で同じ評価用データと採点プログラムを用いて再実行した結果により決定する。**
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1295,7 +1279,7 @@ else:
     print('Not available')
 ```
 
-Exact coverに基づく解法を用いると、先ほどまで1秒以上かかっていた問題が、**たったの[](#avg_time_ec)で解けている**ことが分かる。このように、数独の問題を Exact Cover の問題と捉えることが、通常のバックトラック法よりも遙かに高速に問題を解けることが確認できた。
+Exact coverに基づく解法を用いると、先ほどまで1秒以上かかっていた問題が、**たったの![](#avg_time_ec)で解けている**ことが分かる。このように、数独の問題を Exact Cover の問題と捉えることが、通常のバックトラック法よりも遙かに高速に問題を解けることが確認できた。
 
 +++
 
