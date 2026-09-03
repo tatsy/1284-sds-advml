@@ -340,7 +340,7 @@ slideshow:
   slide_type: ''
 tags: [remove-input]
 ---
-print('Solution is:\n' + str(solution))
+print('Solution is:\n' + str(solver.backtrack(problem.copy())))
 ```
 
 ```{code-cell} ipython3

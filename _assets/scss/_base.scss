@@ -67,9 +67,11 @@ h6 {
   font-family: var(--default-font-family);
 }
 
-main {
-  padding-left: 7rem !important;
-  padding-right: 7rem !important;
+@media (min-width: 1024px) {
+  main {
+    padding-left: 7rem;
+    padding-right: 7rem;
+  }
 }
 
 .article {
