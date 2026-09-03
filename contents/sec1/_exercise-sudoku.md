@@ -339,7 +339,10 @@ slideshow:
   slide_type: ''
 tags: [remove-input]
 ---
-print('Solution is:\n' + str(solver.backtrack(problem.copy())))
+if has_advml:
+    print('Solution is:\n' + str(solver.backtrack(problem.copy())))
+else:
+    print('Not available')
 ```
 
 ```{code-cell} ipython3
@@ -428,12 +431,15 @@ slideshow:
 tags: [remove-cell]
 ---
 # | label: avg_time_bt_hard
-_start = time.perf_counter()
-for _ in range(10):
-    solver.backtrack(problem.copy())
-_end = time.perf_counter()
-avg_time = (_end - _start) / 10
-print(f'{avg_time * 1000:.1f} ms')
+if has_advml:
+    _start = time.perf_counter()
+    for _ in range(10):
+        solver.backtrack(problem.copy())
+    _end = time.perf_counter()
+    avg_time = (_end - _start) / 10
+    print(f'{avg_time * 1000:.1f} ms')
+else:
+    print('Not available')
 ```
 
 ```{code-cell} ipython3
