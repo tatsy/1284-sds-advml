@@ -65,7 +65,6 @@ try:
     has_advml = True
 except ImportError:
     has_advml = False
-    solver = lambda *args, **kwargs: None
 
 
 # 警告の非表示
@@ -351,12 +350,15 @@ slideshow:
 tags: [remove-cell]
 ---
 # | label: avg_time_bt_simple
-_start = time.perf_counter()
-for _ in range(10):
-    solver.backtrack(problem.copy())
-_end = time.perf_counter()
-avg_time = (_end - _start) / 10
-print(f'{avg_time * 1000:.1f} ms')
+if has_advml:
+    _start = time.perf_counter()
+    for _ in range(10):
+        solver.backtrack(problem.copy())
+    _end = time.perf_counter()
+    avg_time = (_end - _start) / 10
+    print(f'{avg_time * 1000:.1f} ms')
+else:
+    print('Not available')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -412,7 +414,10 @@ slideshow:
   slide_type: ''
 tags: [remove-input]
 ---
-print('Solution (simple backtrack):\n' + str(solver.backtrack(problem)))
+if has_advml:
+    print('Solution (simple backtrack):\n' + str(solver.backtrack(problem)))
+else:
+    print('Not available')
 ```
 
 ```{code-cell} ipython3
@@ -432,19 +437,25 @@ print(f'{avg_time * 1000:.1f} ms')
 ```
 
 ```{code-cell} ipython3
-print('Solution (recursive backtrack):\n' + str(solver.recursive(problem.copy())))
+if has_advml:
+    print('Solution (recursive backtrack):\n' + str(solver.recursive(problem.copy())))
+else:
+    print('Not available')
 ```
 
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
 # | label: avg_time_recursive
-_start = time.perf_counter()
-for _ in range(10):
-    solver.recursive(problem.copy())
-_end = time.perf_counter()
-avg_time = (_end - _start) / 10
-print(f'{avg_time * 1000:.1f} ms')
+if has_advml:
+    _start = time.perf_counter()
+    for _ in range(10):
+        solver.recursive(problem.copy())
+    _end = time.perf_counter()
+    avg_time = (_end - _start) / 10
+    print(f'{avg_time * 1000:.1f} ms')
+else:
+    print('Not available')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
