@@ -31,6 +31,7 @@
   }
 }
 
+/* toc and sidebar */
 .myst-toc-item,
 .myst-primary-sidebar-item {
   border-radius: 0.35rem;
@@ -67,6 +68,7 @@
   font-weight: 700;
 }
 
+/* code block */
 .myst-code {
   margin: 1.25rem 0;
   border: 1px solid var(--myst-color-border);
@@ -93,11 +95,11 @@
   }
 }
 
+/************************************************
+ * Notebook outputs
+ ***********************************************/
 
-
-/*
- * Normal notebook output
- */
+/* Normal notebook outputs */
 .article
   .myst-jp-nb-block:has(> .myst-code)
   > [data-name="outputs-container"]:not(.hidden):not(:empty) {
@@ -111,18 +113,14 @@
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
 }
 
-/*
- * Hide genuinely empty output containers.
- */
+/* Hide genuinely empty output containers */
 .article
   .myst-jp-nb-block
   > [data-name="outputs-container"]:empty {
   display: none !important;
 }
 
-/*
- * If both input and output are visible, visually connect them.
- */
+/* If both input and output are visible, visually connect them */
 .article
   .myst-jp-nb-block:has(
     > [data-name="outputs-container"]:not(.hidden):not(:empty)

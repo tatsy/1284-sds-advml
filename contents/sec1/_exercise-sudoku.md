@@ -11,7 +11,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.1
 kernelspec:
-  display_name: sdsadvml
+  display_name: sdsadvml (3.11.13)
   language: python
   name: python3
 ---
@@ -53,15 +53,11 @@ kernelspec:
 """
 
 import re
+import time
 import warnings
 from copy import deepcopy
 
 import seaborn as sns
-
-try:
-    from myst_nb import glue
-except ImportError:
-    glue = lambda *args, **kwargs: None
 
 try:
     from advml.sudoku import solver
@@ -69,7 +65,7 @@ try:
     has_advml = True
 except ImportError:
     has_advml = False
-    pass
+
 
 # 警告の非表示
 warnings.simplefilter('ignore', FutureWarning)
@@ -328,7 +324,7 @@ from matplotlib.animation import ArtistAnimation
 if has_advml:
     fig, ax = plt.subplots()
     frames = []
-    solution = solver.backtrack(problem, ax=ax, frames=frames)
+    solution = solver.backtrack(problem.copy(), ax=ax, frames=frames)
 
     ani = ArtistAnimation(fig, frames, interval=100, blit=True)
     html = display.HTML(ani.to_jshtml())
@@ -343,19 +339,10 @@ slideshow:
   slide_type: ''
 tags: [remove-input]
 ---
-print('Solution is:\n' + str(solution))
-```
-
-```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
-%%capture perf
-%%timeit -n 1 -r 10
-solver.backtrack(problem)
+if has_advml:
+    print('Solution is:\n' + str(solver.backtrack(problem.copy())))
+else:
+    print('Not available')
 ```
 
 ```{code-cell} ipython3
@@ -366,14 +353,20 @@ slideshow:
 tags: [remove-cell]
 ---
 # | label: avg_time_bt_simple
-
-avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-print(avg_time)
+if has_advml:
+    _start = time.perf_counter()
+    for _ in range(10):
+        solver.backtrack(problem.copy())
+    _end = time.perf_counter()
+    avg_time = (_end - _start) / 10
+    print(f'{avg_time * 1000:.1f} ms')
+else:
+    print('Not available')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-上記は、素直にバックトラック法を実装した場合の実行時間であるが、一回の問題を解くのに平均[](#avg_time_bt_simple)となっており、十分高速であることが分かる
+上記は、素直にバックトラック法を実装した場合の実行時間であるが、一回の問題を解くのに平均![](#avg_time_bt_simple)となっており、十分高速であることが分かる
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -424,19 +417,10 @@ slideshow:
   slide_type: ''
 tags: [remove-input]
 ---
-print('Solution (simple backtrack):\n' + str(solver.backtrack(problem)))
-```
-
-```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
-%%capture perf
-%%timeit -n 1 -r 10
-solver.backtrack(problem)
+if has_advml:
+    print('Solution (simple backtrack):\n' + str(solver.backtrack(problem)))
+else:
+    print('Not available')
 ```
 
 ```{code-cell} ipython3
@@ -447,31 +431,46 @@ slideshow:
 tags: [remove-cell]
 ---
 # | label: avg_time_bt_hard
-avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-glue('avg_time_bt_hard', avg_time)
+if has_advml:
+    _start = time.perf_counter()
+    for _ in range(10):
+        solver.backtrack(problem.copy())
+    _end = time.perf_counter()
+    avg_time = (_end - _start) / 10
+    print(f'{avg_time * 1000:.1f} ms')
+else:
+    print('Not available')
 ```
 
 ```{code-cell} ipython3
-print('Solution (recursive backtrack):\n' + str(solver.recursive(problem.copy())))
+if has_advml:
+    print('Solution (recursive backtrack):\n' + str(solver.recursive(problem.copy())))
+else:
+    print('Not available')
 ```
 
 ```{code-cell} ipython3
-%%capture perf
-%%timeit -n 1 -r 10
-solver.recursive(problem.copy())
-```
+:tags: [remove-cell]
 
-```{code-cell} ipython3
 # | label: avg_time_recursive
-avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-print(avg_time)
+if has_advml:
+    _start = time.perf_counter()
+    for _ in range(10):
+        solver.recursive(problem.copy())
+    _end = time.perf_counter()
+    avg_time = (_end - _start) / 10
+    print(f'{avg_time * 1000:.1f} ms')
+else:
+    print('Not available')
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-この問題だと、上記の通り[](#avg_time_bt_hard)ほどの時間がかかる。
+この問題だと、単純なバックトラック法では![](#avg_time_bt_hard)ほどの時間がかかる。
 
-バックトラック法を高速化する手法には、候補の数が少ないものから埋めていく、などの様々な方法が考えられるので、各自、プログラムを書いて試してみてほしい。参考までに再帰関数を用いた実装に要する計算時間は[](#avg_time_recursive)であったので多少の高速化には成功しているだろうか。
+バックトラック法を高速化する手法には、候補の数が少ないものから埋めていく、などの様々な方法が考えられるので、各自、プログラムを書いて試してみてほしい。
+
+参考までに再帰関数を用いた実装に要する計算時間は![](#avg_time_recursive)であったので多少の高速化には成功しているだろうか。
 
 +++
 
@@ -568,11 +567,13 @@ problem = """
 
 ここまでの内容を利用して、写真から数独の問題を読み取り、答えを返すプログラムを作成してみよう。
 
-本番では、以下のレベル1からレベル3の内容で10問ずつ画像を与える。レベル1が1点、レベル2が2点、レベル3が3点の合計60点を総得点とする。各レベルの画像は以下のような性質を持つ。
+本番では、以下のレベル1からレベル3の内容で10問ずつ画像を与える。採点は、元の問題をどれだけ正しく読み取れたかを評価する **認識 60点** と、読み取った問題から正しい完成盤面を求められたかを評価する **最終結果 60点** の **合計 120点** で行う。各レベルの画像は以下のような性質を持つ。
 
 - **レベル 1:** 画像は写真ではなくデジタル画像で、問題は常に同じ位置にある。
 - **レベル 2:** 画像は写真で、問題は概ね真上から撮影されている。
 - **レベル 3:** 画像は写真で、問題は斜めから撮影されており、なおかつページが多少湾曲している可能性がある。
+
+レベル2まで十分に解ければ、この課題の達成度としては十分で、レベル3は発展的なチャレンジ問題として考えてよい。
 
 ```{code-cell} ipython3
 ---
@@ -620,21 +621,39 @@ plt.show()
 
 **入力の形式**
 
-入力としては、NumPy の配列として`(H, W, 3)`の大きさ(H は画像の高さ、W は画像の幅)のカラー画像。また、写真に写り込む問題には以下のような制約がある。
+`recognize()`には、`dtype=np.uint8`, `shape=(H, W, 3)`のRGBカラー画像と、問題の難易度を表す`level`が与えられる。また、写真に写り込む問題には以下のような制約がある。
 
-- 画像中には「数独の問題」が 1 問だけ写っている
-- 問題以外に余計な物が写っている可能性はあるが、問題が 2 問以上写っていることはない
+- 画像中には「数独の問題」が1問だけ写っている
+- 問題以外に余計な物が写っている可能性はあるが、問題が2問以上写っていることはない
 - 問題は入力された画像の向きとおおよそ揃っており、問題が横を向いていたり、上下が逆であることはない
 - 問題中の数字は必ず何らかの印刷用フォントを使って書かれており、手書きであることはない
-- 画像中に映り込んでいる問題は必ず解が 1 つに定まる
+- 画像中に写っている問題は必ず解が1つに定まる
 
 **出力の形式**
 
-数独の答えを表わす`(9, 9)`の大きさを持つ NumPy の配列。
+課題では、処理を認識 (`recognize`) と数独を解く処理 (`solve`) の2段階に分ける。
+
+```text
+image
+  ↓
+recognize(image, level)
+  ↓
+problem
+  ↓
+solve(problem)
+  ↓
+answer
+```
+
+`recognize(image, level)`は、元の数独問題を表す`dtype=np.int32`, `shape=(9, 9)`のNumPy配列を返す。認識した数字には`1`から`9`を用い、空欄には`0`を用いる。ただし、`solve`の処理で使用する目的で、認識に自信のないセルに`0`を割り当てるという運用もありうる。
+
+`solve(problem)`は、`recognize()`の返り値を入力として、完成盤面を表す`dtype=np.int32`, `shape=(9, 9)`のNumPy配列を返す。完成盤面の全セルは`1`〜`9`である必要がある。採点時、`solve()`には元画像は引数として渡されず、`recognize()`の返り値がそのまま入力される。
 
 **プログラムの作成方法**
 
-これを入力とするような関数 `solve(image)` を作成し、テストサーバーにプログラムをアップロードすると、自動で点数が計算される。ただし、全体の実行時間が 3 秒を超えると、自動的にプログラムが終了し、0 点であると見なされる。
+課題用レポジトリの`sudoku.py`に、`recognize(image, level)`と`solve(problem)`の2関数を実装する。採点時には各画像について`recognize()`、`solve()`の順に実行される。
+
+各画像は独立したプロセスで評価され、1画像あたりの実行時間は最大15秒となっている。ある画像でタイムアウト、例外、または不正な形式の出力が発生しても、他の画像の評価には影響がないようになっている。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -646,44 +665,118 @@ import numpy as np
 import numpy.typing as npt
 
 
-def solve(image: npt.NDArray[np.uint8], level: int) -> npt.NDArray[np.int32]:
+def recognize(
+    image: npt.NDArray[np.uint8], level: int
+) -> npt.NDArray[np.int32]:
     """
+    Recognize the original Sudoku problem from an RGB image.
+
     Inputs:
       image: NumPy array with (H, W, 3) shape. The color channels are in RGB order.
-      level: The difficulty level of the problem
+      level: The difficulty level of the problem.
+
     Output:
-      9x9 NumPy array with 32-bit signed integer
+      9x9 NumPy array with 32-bit signed integers.
+      Use 1-9 for recognized digits and 0 for blank or uncertain cells.
     """
-    # 以下、数独の問題を解く処理
+    # 以下、画像から元の数独問題を認識する処理
     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-    return np.zeros((9, 9), dtype='int32')
+    return np.zeros((9, 9), dtype=np.int32)
+
+
+def solve(problem: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
+    """
+    Solve a Sudoku problem recognized by recognize().
+
+    Input:
+      problem: 9x9 NumPy array with 32-bit signed integers.
+
+    Output:
+      Completed 9x9 NumPy array with 32-bit signed integers.
+    """
+    # 以下、認識した問題から数独の完成盤面を求める処理
+    return np.zeros((9, 9), dtype=np.int32)
 ```
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+**採点方法**
+
+採点は **認識 60点 + 最終結果 60点 = 合計 120点** で行う。
+
+認識の評価では、各レベルの評価用画像10枚について、元の問題をどれだけ正しく認識したかをmicro F1で評価する。各セルについて、
+
+- **TP:** 元の問題に数字があり、同じ非0の数字を認識した
+- **FP:** 非0を出力したが、元の問題と異なっていた
+- **FN:** 元の問題に数字があるが、認識結果が一致しなかった
+
+と数える。別の数字へ誤認した場合にはFP=1かつFN=1となる。一方、数字があるセルを`0`とした場合にはFN=1として扱われる。
+
+$$
+\mathrm{F1} = \frac{2\mathrm{TP}}{2\mathrm{TP}+\mathrm{FP}+\mathrm{FN}}
+$$
+
+各レベルで、F1が0.2, 0.4, 0.6, 0.8, 1.0の各閾値以上となるたびに加点する。
+
+| Level | 1 閾値ごと | 最大 |
+|---|---:|---:|
+| 1 | 2点 | 10点 |
+| 2 | 4点 | 20点 |
+| 3 | 6点 | 30点 |
+
+最終結果の評価は、数字の認識結果を`solve()`へ渡して得られた完成盤面を画像ごとに採点する。
+
+| Level | 1問あたり | 10問合計 |
+|---|---:|---:|
+| 1 | 1点 | 10点 |
+| 2 | 2点 | 20点 |
+| 3 | 3点 | 30点 |
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **使用可能なライブラリ**
 
-今回の実行環境では、以下のライブラリが使用可能となっている (Pip を使ってインストールされる)。これ以外のライブラリは使用できないので注意すること。
+課題用テンプレートの`pyproject.toml`に記載されたライブラリを利用できる。現在のテンプレートには以下が含まれている。
 
 - numpy
-- scikit-learn
-- matplotlib
-- pillow
+- tqdm
 - pandas
-- opencv-python
 - joblib
+- pillow
+- matplotlib
+- scikit-learn
+- opencv-python
+- pytest
+
+**これ以外のライブラリの使用は認められず**、仮にローカル環境で追加ライブラリをインストールしたとしても、採点時には反映されないので注意すること。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **テスト方法**
 
-まずは、各レベル 5 問ずつ練習データを提供するので、それを用いてテストを行うと良い。以下の URL から ZIP ファイルをダウンロードして、講義中に伝えるパスワードで展開して使うこと。
+課題用レポジトリの`data`ディレクトリには各レベルのサンプル画像が含まれている。ローカルでは、以下のコマンドでサンプルに対するテストを実行できる。
 
-- [数独演習 - 練習用データ](https://github.com/tatsy-classes/sudoku-solver-template/raw/master/data/samples.zip)
+```shell
+pytest
+```
 
-本番の採点は GitHub Classroom を使って行う。講義中で課題用の Classroom の URL を指示するので、その URL をブラウザで開き、テンプレートレポジトリを自分の GitHub アカウントと紐付ける。以後、課題用のレポジトリにコードを push する度にテストが走る。
+認識部分のF1を表示したい場合は、標準出力を表示して実行する。
 
-本講義では、実際の問題として与えている画像を公開することはしないが、どの程度の画像に対してプログラムが正しく動いているかは、Github Actions のログを見ることで確認できる。
+```shell
+pytest -s -k recognition
+```
+
+最終結果だけ確認したい場合は、
+
+```shell
+pytest -k final
+```
+
+とする。
+
+講義中に各自へ割り当てられたprivateレポジトリへコードをpushすると、GitHub Actions上で評価用画像での自動評価が実行される。ActionsのログとJob Summaryには、各画像の実行結果、レベルごとのRecognition F1とFinal成功数、および合計120点での集計結果が表示される。ただし、評価用画像そのものは公開しない。
+
+GitHub Actions上の結果は、開発中に性能を確認するためのフィードバックとして用いる。**最終成績は、提出されたコミットSHAに対応するコードを教員側の環境で同じ評価用データと採点プログラムを用いて再実行した結果により決定する。**
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -697,7 +790,7 @@ def solve(image: npt.NDArray[np.uint8], level: int) -> npt.NDArray[np.int32]:
 - 画像から機械分類により数字を識別する
 - 読み取った問題から数独の解法を得る
 
-という3つのタスクを解く必要がある。
+という3つのタスクを解く必要がある。前二つが主に`recognize()`に、最後の一つが`solve()`に対応する。
 
 そのそれぞれについて、上手く問題を解くための考え方の一端を紹介する。
 
@@ -722,6 +815,8 @@ def solve(image: npt.NDArray[np.uint8], level: int) -> npt.NDArray[np.int32]:
 ここまで、数字の認識には MNIST を訓練データとして用いてきた。しかし、手書き文字と数独の問題に用いられているフォントとは大きな乖離があるため、MNIST で訓練した分類器ではフォントで書かれた文字を十分に識別できないだろう。
 
 そこで、フォントで書かれた数字により構成されるデータセットを自分で作ることを考えてみてほしい。手書き文字と異なり、フォントで書かれた数字にはそれほどバラエティはないと考えられるので、そこまで多くの訓練データを用意しなくても、それなりの識別結果が得られるだろう。
+
+新しい課題形式では、数字が存在するものの認識に自信がないセルを`recognize()`で`0`として返してよい。誤った数字を確定するとRecognitionではFPとFNの両方が発生し、さらに`solve()`にも誤った制約を与える。一方、`0`として未知のまま残せば、`solve()`側で数独の制約を使って補える可能性がある。したがって、分類器の最大スコアだけで常に数字を確定するのではなく、必要に応じて認識を保留することも検討するとよい。
 
 +++
 
@@ -775,11 +870,11 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-数独の問題を解くアルゴリズムは冒頭で説明したバックトラック法で概ね問題ない。それよりも問題は機械識別の結果、数字を誤って読み取っている可能性がある、ということだろう。例えば、数字を読み取って時点で、各行や各列に同じ数字が含まれている場合があるかもしれないし、実際に解いてみると答えがなかったり、答えとなり得るものが複数になる場合もあるかもしれない (今回、画像に含まれている数独の問題は必ず解が 1 つに定まるものである)。
+数独の問題を解くアルゴリズムは冒頭で説明したバックトラック法で概ね問題ない。今回の課題では、`solve()`には`recognize()`が返した9×9の配列だけが渡される。認識に自信がないセルが`0`になっている場合には、それを通常の空きマスとして扱い、数独の行・列・ブロックの制約を使って補うことができる。
 
-そこで、より多くの問題を解くために、誤った読み取りがあった場合にも、正解を導けるような工夫を検討してみてほしい。最初に識別器を学習したら、混同行列を用いて、どの数字をどの数字と勘違いしやすいのかを予め確認しておくことが大切である。その結果を用いて、例えば、あるセルが 7 で上手く解けなかったら、そのセルの数字を 1 に置き換えて解いてみるなどすると、正しく答えが求まるかもしれない。
+一方、`recognize()`が非0の数字を誤認した場合には、その数字が制約として残るため、そのままでは解が存在しなかったり、行・列・ブロックに矛盾が生じたりする可能性がある。より多くの問題を解くには、このような矛盾や解の存在性を利用して誤認識を検出・補正する工夫も考えられる。
 
-実際の数独の問題は 9×9=81 のセルのうち、3-4割程度で30個前後の数字が含まれることになる。仮に識別器の識別精度が 90%であるとして、そのうち3個は読み間違えることになるので、識別器の精度を上げることはもちろん重要であるが、それ以上に、誤りを含む問題を上手く解く工夫が必要である。
+例えば、識別器を学習した後に混同行列を調べ、どの数字をどの数字と間違えやすいかを確認しておけば、矛盾が生じた場合に候補となる数字を限定できる。認識精度を高めることはもちろん重要だが、画像認識と数独の制約を組み合わせて最終的な解を求めることも、この演習の重要なポイントである。
 
 +++
 
@@ -1062,8 +1157,9 @@ cond3 = [f'C{j:d}#{n:d}' for j in range(1, 10) for n in range(1, 10)]
 cond4 = [f'B{b:d}#{n:d}' for b in range(1, 10) for n in range(1, 10)]
 conds = cond1 + cond2 + cond3 + cond4
 
-df = pd.DataFrame(index=index, columns=conds, dtype='bool')
+df = pd.DataFrame(index=index, columns=conds)
 df.iloc[:] = 0
+df = df.astype('int')
 display.display(df)
 ```
 
@@ -1180,28 +1276,22 @@ if has_advml:
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-%%capture perf
-%%timeit -n 1 -r 10
-
-if has_advml:
-    rows = deepcopy(ops)
-    cols = deepcopy(cds)
-    solver.exact_cover(rows, cols)
-```
-
-```{code-cell} ipython3
-:tags: [remove-cell]
-
 # | label: avg_time_ec
 
 if has_advml:
-    avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-    print(avg_time)
+    _start = time.perf_counter()
+    for _ in range(10):
+        rows = deepcopy(ops)
+        cols = deepcopy(cds)
+        solver.exact_cover(rows, cols)
+    _end = time.perf_counter()
+    avg_time = (_end - _start) / 10
+    print(f'{avg_time * 1000:.2f} ms')
 else:
     print('Not available')
 ```
 
-Exact coverに基づく解法を用いると、先ほどまで1秒以上かかっていた問題が、**たったの[](#avg_time_ec)で解けている**ことが分かる。このように、数独の問題を Exact Cover の問題と捉えることが、通常のバックトラック法よりも遙かに高速に問題を解けることが確認できた。
+Exact coverに基づく解法を用いると、先ほどまで1秒以上かかっていた問題が、**たったの![](#avg_time_ec)で解けている**ことが分かる。このように、数独の問題を Exact Cover の問題と捉えることが、通常のバックトラック法よりも遙かに高速に問題を解けることが確認できた。
 
 +++
 

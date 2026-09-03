@@ -5,17 +5,19 @@ on:
     branches:
       - main
       - dev
+  pull_request:
+    branches:
+      - main
+      - dev
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 env:
   BASE_URL: /${{ github.event.repository.name }}
 
 concurrency:
-  group: pages
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -27,6 +29,7 @@ jobs:
           submodules: false
 
       - name: Checkout submodules
+        if: github.event_name != 'pull_request'
         run: |
           git config --global url."https://x-access-token:${{ secrets.CLASSES_PAT }}@github.com/tatsy-classes/".insteadOf "https://github.com/tatsy-classes/"
           git submodule sync --recursive
@@ -49,7 +52,13 @@ jobs:
           path: ./_build/html/
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
     environment:
       name: github-pages
