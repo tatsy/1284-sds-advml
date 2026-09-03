@@ -1140,8 +1140,9 @@ cond3 = [f'C{j:d}#{n:d}' for j in range(1, 10) for n in range(1, 10)]
 cond4 = [f'B{b:d}#{n:d}' for b in range(1, 10) for n in range(1, 10)]
 conds = cond1 + cond2 + cond3 + cond4
 
-df = pd.DataFrame(index=index, columns=conds, dtype='bool')
+df = pd.DataFrame(index=index, columns=conds)
 df.iloc[:] = 0
+df = df.astype('int')
 display.display(df)
 ```
 
@@ -1258,23 +1259,17 @@ if has_advml:
 ```{code-cell} ipython3
 :tags: [remove-cell]
 
-%%capture perf
-%%timeit -n 1 -r 10
-
-if has_advml:
-    rows = deepcopy(ops)
-    cols = deepcopy(cds)
-    solver.exact_cover(rows, cols)
-```
-
-```{code-cell} ipython3
-:tags: [remove-cell]
-
 # | label: avg_time_ec
 
 if has_advml:
-    avg_time = ' '.join(perf.stdout.split(' ')[0:2])
-    print(avg_time)
+    _start = time.perf_counter()
+    for _ in range(10):
+        rows = deepcopy(ops)
+        cols = deepcopy(cds)
+        solver.exact_cover(rows, cols)
+    _end = time.perf_counter()
+    avg_time = (_end - _start) / 10
+    print(f'{avg_time * 1000:.2f} ms')
 else:
     print('Not available')
 ```
