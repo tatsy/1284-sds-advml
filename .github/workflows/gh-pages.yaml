@@ -17,7 +17,7 @@ env:
   BASE_URL: /${{ github.event.repository.name }}
 
 concurrency:
-  group: pages
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
