@@ -53,6 +53,7 @@ jobs:
           path: ./_build/html/
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
 
     environment:
@@ -64,4 +65,4 @@ jobs:
       - name: Github Pages deployment
         id: deployment
         uses: actions/deploy-pages@v5
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main'
