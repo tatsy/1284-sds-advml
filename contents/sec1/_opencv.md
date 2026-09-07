@@ -159,12 +159,22 @@ plt.yticks([])
 plt.show()
 ```
 
-::::{admonition} 練習問題
+:::{admonition} 練習問題
 :class: question
 
 `cv2.imread`の第2引数に`cv2.IMREAD_GRAYSCALE`を指定して、読み込まれた画像の`shape`を確認し、`plt.imshow`で表示して、その内容を確認せよ。
 
-::::
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+読み込んだ画像`img`の`dtype`と、画素値が取りうる値の範囲を確認せよ。
+
+また、画像を明るくするつもりで`img * 2`として全画素の値を 2 倍にすると、明るくなるだけでは説明のつかない画素が現れる。実際に確かめた上で、なぜそうなるのかを説明せよ。
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -195,15 +205,15 @@ if not succ:
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{admonition} 練習問題
+:::{admonition} 練習問題
 :class: question
 
 画像の圧縮方式には様々なものがあり、JPEG や PNG などが広く知られている。これらの圧縮方式について、非可逆圧縮と可逆圧縮の違いについて、JPEG と PNG に用いられる圧縮アルゴリズムを例にとって説明せよ。
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{admonition} 画像の色表現
+:::{admonition} 画像の色表現
 :class: tip
 
 上記のプログラムでは OpenCV を用いてカラー画像を読み込んだが、各画素の色は赤・緑・青の三要素を用いて表わされていた。これは、**光の三原色と呼ばれる色で、人間の目が捉える様々な波長の光のうち、特徴的な三つの成分を取りだして表現している** (厳密には各波長の感度には幅がある)。デジタル画像の表現形式は、この光の三原色を基本とした RGB 表色に従っていることが一般的である (例えば JPEG や PNG など)。
@@ -211,7 +221,7 @@ if not succ:
 光の三原色は色を混ぜると白に近づくことで、例えば RGB の各値が一般的なデジタル画像における最大値である(255, 255, 255)を取ると、それは白色に対応する。このような**色の重ね合わせで明るくなっていく表色系のことを加法混色系**という。逆に、絵の具を混ぜた時のように、**色を重ねるごとに黒に近づいていく表色系のことを減法混色系**という。
 
 デジタル画像の保存に RGB 形式が広く用いられる一方で、実際の応用に画像(や動画)を用いる際には、別の表色系が好まれることがある。例えば、**テレビ映像を伝送する際には、帯域を削減する目的で YUV や YCbCr といった異なる表色が用いられる**。また、プリンタに対して色情報を送るときには加法混色に従う RGB 表色系ではなく、**プリンタのインクが従う減法混色系の一種である CMYK 表色系** (C=シアン、M=マゼンタ、Y=イエロー、K=キープレート=黒)が用いられるのが一般的である。
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -341,88 +351,9 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-続いて`cv2.warpAffine`を用いる方法だが、この関数は名前の通り、アフィン変換に基づいて画像を変形する関数だ。ここでは、アフィン変換について詳細に解説することは避けるが、アフィン変換は 2x3 の行列を使って、画素の座標を変換することで画像のリサンプリングを行う。
+より細かな角度で画像を回転させたい場合には、回転を表わすアフィン変換の行列を求め、それを`cv2.warpAffine`に渡せば良い。回転のための行列は`cv2.getRotationMatrix2D`によって得られ、この関数は回転の中心`center`、回転角`angle` (度数法で、反時計回りが正)、拡大率`scale`を引数に取り、対応する 2x3 のアフィン変換行列を返す。
 
-2x3 の行列は一般には、
-\begin{equation*}
-\begin{pmatrix}
-a & b & c \\
-d & e & f
-\end{pmatrix}
-\end{equation*}
-のように表わされるが、アフィン変換では左側の 2x2 の成分(a, b, d, e を成分に持つ箇所)が回転や拡大縮小などの成分、右側の 2x1 の成分(c, f を成分に持つ箇所)が平行移動量を表わす。
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
-一例として、反時計回りに 90° 回転させたいのであれば、それに相当するアフィン変換の行列は「画像の中心を回転中心」として「反時計回りに 90°」回転させる操作を表わすものである必要がある。このような行列は
-
-1. 画像の中心を原点に移動する平行移動
-1. 原点を中心として反時計回りに 90° 回転
-1. 原点にある画像の中心を元の位置に戻すための平行移動
-   という 3 つの基本操作を組み合わせる必要がある。
-
-ここでは、上記の三つの操作に対応する行列をそれぞれ$M_1$, $M_2$, $M_3$とすることにしよう。すると、そのそれぞれは以下のように表せる。
-
-$$
-\begin{align}
-M_1 &= \begin{pmatrix}
-  1 & 0 & - W / 2 \\
-  0 & 1 & - H / 2
-\end{pmatrix}, \\
-M_2 &= \begin{pmatrix}
-  \cos (-90^\circ) & -\sin (-90^\circ) & 0 \\
-  \sin (-90^\circ) & \cos (-90^\circ) & 0
-\end{pmatrix}, \\
-M_3 &= \begin{pmatrix}
-  1 & 0 & W / 2 \\
-  0 & 1 & H / 2
-\end{pmatrix}
-\end{align}
-$$
-
-のようになる。一般に上記のような回転行列の表現は x 軸が右向き正、y 軸が上向き正の時には反時計回りの回転を表わすのだが、**画像の座標系は y 軸下向きが正に取られている**ため、時計回りが回転方向正になることに注意してほしい。
-
-そこで、これらの行列と`cv2.warpAffine`を使って画像を回転してみる。なお、上記のアフィン変換(2x3 行列)の合成変換を求めるために、各変換を 3x3 の行列として定義していることに注意すること。
-
-```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
-H, W, _ = img.shape
-M1 = np.array([[1.0, 0.0, -W / 2], [0.0, 1.0, -H / 2], [0.0, 0.0, 1.0]])
-M2 = np.array(
-    [
-        [np.cos(-0.5 * np.pi), -np.sin(-0.5 * np.pi), 0.0],
-        [np.sin(-0.5 * np.pi), np.cos(-0.5 * np.pi), 0.0],
-        [0.0, 0.0, 1.0],
-    ]
-)
-M3 = np.array([[1.0, 0.0, W / 2], [0.0, 1.0, H / 2], [0.0, 0.0, 1.0]])
-
-M = M3 @ M2 @ M1
-img_rot = cv2.warpAffine(img, M[:2, :], (W, H))
-```
-
-```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
-fig, ax = plt.subplots()
-ax.imshow(img_rot)
-ax.set(xticks=[], yticks=[])
-plt.show()
-```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
-`cv2.warpAffine`は画像領域自体は変形しないため、`cv2.rotate`とは違い両端に黒い領域が現れてしまっているが、回転のされ方としては正しい回転となっていることが分かる。
-
-なお、ここまでアフィン変換の仕組みを説明するために回りくどい方法を用いたが、OpenCV には画像を回転させる行列を得るための関数として`cv2.getRotationMatrix2D`が用意されており、上記のプログラムと同じ出力なら以下のように得られる。
+以下は`cv2.rotate`のときと同様に、画像の中心を軸として反時計回りに 90° 回転させる例である。
 
 ```{code-cell} ipython3
 ---
@@ -449,11 +380,15 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+`cv2.warpAffine`は出力画像の大きさを変えないため、`cv2.rotate`とは違って、回転によって画像の外にはみ出した部分は失われ、代わりに両端に黒い領域が現れることに注意してほしい。
+
+なお、`cv2.getRotationMatrix2D`が返すアフィン変換の行列がどのように組み立てられているのかについては、「発展: アフィン変換による画像の回転・反転」で改めて取り上げる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
 ### 画像の反転
 
-+++
-
-画像の反転を行う方法にも `cv2.flip` を用いる方法と `cv2.warpAffine` を用いる方法の二種類がある。それぞれ見ていこう。
+画像の反転を行うには `cv2.flip` を用いる。
 
 `cv2.flip`を用いる場合は、第 1 引数に画像を、第 2 引数に反転の種類を表わす数字を入力する。この数字(`flipcode`)は 0、正、負の三種類で挙動が変わるようになっており、
 
@@ -552,82 +487,31 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-また、最後に `cv2.warpAffine` を用いる方法についてだが、こちらは、X 軸対称、Y 軸対称、X-Y 両軸対称の反転を意味する行列 $M_1$、$M_2$、$M_3$ がそれぞれ
-
-$$
-M_1= \begin{pmatrix}
-1 & 0 & 0 \\
-0 & -1 & H
-\end{pmatrix}, \quad
-M_2= \begin{pmatrix}
--1 & 0 & W \\
-0 & 1 & 0
-\end{pmatrix}, \quad
-M_3= \begin{pmatrix}
--1 & 0 & W \\
-0 & -1 & H
-\end{pmatrix}
-$$
-
-のように表せることから、以下のようなコードにより、`cv2.flip`等と同様の効果を得ることができる。なお、上記の行列で単に対角成分を`-1`にするだけだと、画像の表示領域から画素がはみ出してしまうため、反転した後に反転した方向の画素数分だけ正の方向に平行移動する成分が第 3 列に入っていることに注意してほしい。
-
-```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
-H, W = img.shape[:2]
-
-# 上下反転
-M_1 = np.array([[1, 0, 0], [0, -1, H]], dtype='float32')
-img_flip_x = cv2.warpAffine(img, M_1, (W, H))
-
-# 左右反転
-M_2 = np.array([[-1, 0, W], [0, 1, 0]], dtype='float32')
-img_flip_y = cv2.warpAffine(img, M_2, (W, H))
-
-# 上下左右反転
-M_3 = np.array([[-1, 0, W], [0, -1, H]], dtype='float32')
-img_flip_both = cv2.warpAffine(img, M_3, (W, H))
-```
-
-```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
-fig, axs = plt.subplots(1, 3)
-
-# 上下反転
-ax = axs[0]
-ax.imshow(img_flip_x)
-ax.set_title('vertical flip')
-ax.set(xticks=[], yticks=[])
-
-# 左右反転
-ax = axs[1]
-ax.imshow(img_flip_y)
-ax.set_title('horizontal flip')
-ax.set(xticks=[], yticks=[])
-
-# 上下左右反転
-ax = axs[2]
-ax.imshow(img_flip_both)
-ax.set_title('both-side flip')
-ax.set(xticks=[], yticks=[])
-
-plt.tight_layout()
-plt.show()
-```
-
-::::{admonition} 問題
+:::{admonition} 練習問題
 :class: question
 
 本項で述べた画像の幾何変換における画像補間の方式について、バイリニア補間、バイキュービック補間は、それぞれ1次式、3次式による画素値の補間である。これらの補間に用いられる1次式、3次式はどのようなものであるか。
-::::
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+`cv2.resize`を用いて画像を 1/16 の大きさに縮小し、`INTER_NEAREST`、`INTER_LINEAR`、`INTER_AREA`の 3 通りの結果を並べて比較せよ。
+
+また、縮小の際に`INTER_AREA`が他の方式より良い結果を与えるのはなぜか、縮小後の 1 画素が縮小前のどれだけの領域に対応するかを考えて説明せよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+`cv2.getRotationMatrix2D`と`cv2.warpAffine`を用いて、画像を反時計回りに 30° 回転させよ。
+
+このとき、出力画像の大きさを元の画像と同じにすると、回転した画像の四隅が欠けてしまう。欠けが生じないようにするためには、出力画像の大きさをいくつに設定し、アフィン変換の行列をどのように修正すれば良いかを考えよ。
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1042,7 +926,428 @@ Canny フィルタは主につの処理からなる。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-##### Sobel フィルタによる勾配強度の計算
+OpenCV で Canny フィルタを適用するには`cv2.Canny`を用いる。この関数は第 1 引数に画像を取り、第 2 引数と第 3 引数に、上記のヒステリシス閾値処理で用いる 2 つの閾値 (小さい方、大きい方の順)を取る。また、`apertureSize`は内部で用いる Sobel フィルタのカーネルサイズを、`L2gradient`は勾配の強さを $\sqrt{(\nabla_x I)^2 + (\nabla_y I)^2}$ として計算するか、$|\nabla_x I| + |\nabla_y I|$ として近似するかを指定する。
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+img_canny = cv2.Canny(img, 100, 200, apertureSize=3, L2gradient=True)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [hide-input]
+---
+fig, ax = plt.subplots()
+ax.imshow(img_canny, cmap='gray')
+ax.set(title='Canny filter', xticks=[], yticks=[])
+plt.show()
+```
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+Sobel フィルタの結果と比べると、エッジが 1 ピクセル程度の細い線として得られていることが分かる。上記の 3 つの処理を実際に自分で実装して、`cv2.Canny`と同等の結果が得られることを確かめる方法については、「発展: Canny フィルタの実装」で取り上げる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+Gaussian フィルタは画像の高周波信号を取り除く「ローパスフィルタ」であると考えられる。フィルタカーネルの畳み込みの式をフーリエ変換することによって、この性質を調べよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+`cv2.GaussianBlur`について、$\sigma$ を固定したままフィルタカーネルの大きさを変えたときに、結果がどのように変化するかを調べよ。
+
+また、$\sigma$ に対してカーネルの大きさをどの程度確保すれば十分と言えるだろうか。Gauss 関数の値が実質的に 0 と見なせる範囲がどこまでかを考えて答えよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+バイラテラルフィルタの`sigmaColor` ($= \sigma_r$)を大きくしていくと、その結果が Gaussian フィルタの結果に近づいていくことを確かめよ。また、そうなる理由をバイラテラルフィルタのフィルタカーネルの定義式から説明せよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+## 二値化とモルフォロジー演算
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+ここまでに紹介した処理は、いずれも濃淡を持つ画像から濃淡を持つ画像を作るものであった。一方、画像から物体の形そのものを取りだしたい場合には、各画素が「物体である」か「そうでないか」の 2 通りの値だけを持つ**二値画像**を経由することが多い。次章の[図形の検出](#sec:figure-detection)でも、この二値画像が処理の出発点となる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### 二値化
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+グレースケール画像の各画素の値を、ある閾値と比較して 2 通りの値に変換する処理を**二値化** (binarization)と呼ぶ。OpenCV では`cv2.threshold`を用いる。この関数は、第 1 引数にグレースケール画像、第 2 引数に閾値、第 3 引数に閾値を超えた画素に与える値、第 4 引数に二値化の方式を取り、実際に使われた閾値と、二値化された画像の 2 つを返す。
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+img_gray_u8 = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+thresh, img_bin = cv2.threshold(img_gray_u8, 180, 255, cv2.THRESH_BINARY)
+print(f'threshold = {thresh}')
+```
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+この例では閾値を 180 と人手で決めたが、結果を見ると、ひまわりの花の部分まで背景と同じ扱いになってしまっていることが分かる。このように、適切な閾値は画像ごとに異なるため、画像の輝度の分布から閾値を自動的に決める方法が広く用いられる。中でも代表的なものが**大津の手法** (Otsu の二値化)である。
+
+大津の手法は、閾値によって分けられる 2 つの画素の集合について、**それぞれの集合の内部での輝度の分散 (クラス内分散)が小さく、2 つの集合の間での輝度の分散 (クラス間分散)が大きくなる**ような閾値を選ぶ。OpenCV では、二値化の方式を表わすフラグに`cv2.THRESH_OTSU`を加えることで利用でき、このとき第 2 引数に与えた閾値は無視される。
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+thresh_otsu, img_otsu = cv2.threshold(img_gray_u8, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+print(f'threshold (Otsu) = {thresh_otsu}')
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [hide-input]
+---
+fig, axs = plt.subplots(1, 2)
+
+ax = axs[0]
+ax.imshow(img_bin, cmap='gray')
+ax.set(title=f'Fixed ($\\tau={thresh:.0f}$)', xticks=[], yticks=[])
+
+ax = axs[1]
+ax.imshow(img_otsu, cmap='gray')
+ax.set(title=f'Otsu ($\\tau={thresh_otsu:.0f}$)', xticks=[], yticks=[])
+
+plt.tight_layout()
+plt.show()
+```
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+輝度のヒストグラムと、2 つの閾値の位置を並べてみると、大津の手法がどのような位置に閾値を定めているのかが分かりやすい。
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [hide-input]
+---
+fig, ax = plt.subplots(figsize=(5, 2.5))
+ax.hist(img_gray_u8.reshape(-1), bins=64, range=(0, 255), color='gray')
+ax.axvline(thresh, color='C0', linestyle='--', label=f'Fixed ({thresh:.0f})')
+ax.axvline(thresh_otsu, color='C1', linestyle='-', label=f'Otsu ({thresh_otsu:.0f})')
+ax.set(xlabel='Intensity', ylabel='#pixels')
+ax.legend()
+plt.tight_layout()
+plt.show()
+```
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### モルフォロジー演算
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+二値化によって得られた画像には、細かなノイズが点状に残ったり、物体の内部に小さな穴が空いたりすることがよくある。このような形の乱れを整えるための処理が**モルフォロジー演算** (morphological operation)である。
+
+基本となるのは**収縮** (erosion)と**膨張** (dilation)の 2 つで、いずれも**構造要素** (structuring element)と呼ばれる小さな窓を画像上で動かしながら、
+
+- 収縮: 窓の中の最小値を取る (= 窓の中が全て前景のときにのみ前景として残す)
+- 膨張: 窓の中の最大値を取る (= 窓の中に 1 つでも前景があれば前景にする)
+
+という処理を行う。フィルタと同じように窓を動かしながら計算する点は共通しているが、畳み込みのような重み付き和ではなく、最小値・最大値を取る点が異なっている。
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+kernel = np.ones((5, 5), dtype='uint8')  # 5x5の構造要素
+img_erode = cv2.erode(img_otsu, kernel, iterations=1)
+img_dilate = cv2.dilate(img_otsu, kernel, iterations=1)
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [hide-input]
+---
+fig, axs = plt.subplots(1, 3)
+
+for ax, im, title in zip(axs, [img_otsu, img_erode, img_dilate], ['Original', 'Erosion', 'Dilation']):
+    ax.imshow(im, cmap='gray')
+    ax.set(title=title, xticks=[], yticks=[])
+
+plt.tight_layout()
+plt.show()
+```
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+収縮と膨張は、組み合わせて使うことでより有用になる。収縮の後に膨張を行う処理を**オープニング** (opening)と呼び、これは物体の大きさをおよそ保ったまま、小さな点状のノイズを取り除く。逆に、膨張の後に収縮を行う処理を**クロージング** (closing)と呼び、こちらは物体の内部にある小さな穴を埋める。
+
+OpenCV では、いずれも`cv2.morphologyEx`に処理の種類を表わすフラグを与えることで実行できる。
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+img_open = cv2.morphologyEx(img_otsu, cv2.MORPH_OPEN, kernel)  # 収縮 → 膨張
+img_close = cv2.morphologyEx(img_otsu, cv2.MORPH_CLOSE, kernel)  # 膨張 → 収縮
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [hide-input]
+---
+fig, axs = plt.subplots(1, 3)
+
+for ax, im, title in zip(axs, [img_otsu, img_open, img_close], ['Original', 'Opening', 'Closing']):
+    ax.imshow(im, cmap='gray')
+    ax.set(title=title, xticks=[], yticks=[])
+
+plt.tight_layout()
+plt.show()
+```
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+固定の閾値による二値化と、大津の手法による二値化の結果を比較せよ。
+
+また、画像の一部だけが暗くなっている (照明にムラがある)ような画像では、画像全体で 1 つの閾値を決める方法はうまく機能しないことがある。このような場合に用いられる`cv2.adaptiveThreshold`について調べ、何が異なるのかを説明せよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+二値化した画像に対してオープニングとクロージングを適用し、それぞれ画像の何が変化するのかを確かめよ。
+
+また、同じ構造要素を用いても、収縮 → 膨張の順で行った結果と、膨張 → 収縮の順で行った結果が一致しないのはなぜかを説明せよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+## 発展的な内容
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+ここから先の各節は、講義の中では扱わない発展的な内容である。OpenCV の関数が内部で何をしているのかに興味がある場合に、各自で読み進めてほしい。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### 発展: アフィン変換による画像の回転・反転
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+本編では、回転を表わすアフィン変換の行列を`cv2.getRotationMatrix2D`によって得たが、ここでは、その行列がどのように組み立てられるのかを見ていく。また、`cv2.flip`による反転も、同様にアフィン変換として表わすことができる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+#### 行列による画像の回転
+
+`cv2.warpAffine`は、その名前の通り、アフィン変換に基づいて画像を変形する関数である。ここでは、アフィン変換について詳細に解説することは避けるが、アフィン変換は 2x3 の行列を使って、画素の座標を変換することで画像のリサンプリングを行う。
+
+2x3 の行列は一般には、
+\begin{equation*}
+\begin{pmatrix}
+a & b & c \\
+d & e & f
+\end{pmatrix}
+\end{equation*}
+のように表わされるが、アフィン変換では左側の 2x2 の成分(a, b, d, e を成分に持つ箇所)が回転や拡大縮小などの成分、右側の 2x1 の成分(c, f を成分に持つ箇所)が平行移動量を表わす。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+一例として、反時計回りに 90° 回転させたいのであれば、それに相当するアフィン変換の行列は「画像の中心を回転中心」として「反時計回りに 90°」回転させる操作を表わすものである必要がある。このような行列は
+
+1. 画像の中心を原点に移動する平行移動
+1. 原点を中心として反時計回りに 90° 回転
+1. 原点にある画像の中心を元の位置に戻すための平行移動
+   という 3 つの基本操作を組み合わせる必要がある。
+
+ここでは、上記の三つの操作に対応する行列をそれぞれ$M_1$, $M_2$, $M_3$とすることにしよう。すると、そのそれぞれは以下のように表せる。
+
+$$
+\begin{align}
+M_1 &= \begin{pmatrix}
+  1 & 0 & - W / 2 \\
+  0 & 1 & - H / 2
+\end{pmatrix}, \\
+M_2 &= \begin{pmatrix}
+  \cos (-90^\circ) & -\sin (-90^\circ) & 0 \\
+  \sin (-90^\circ) & \cos (-90^\circ) & 0
+\end{pmatrix}, \\
+M_3 &= \begin{pmatrix}
+  1 & 0 & W / 2 \\
+  0 & 1 & H / 2
+\end{pmatrix}
+\end{align}
+$$
+
+のようになる。一般に上記のような回転行列の表現は x 軸が右向き正、y 軸が上向き正の時には反時計回りの回転を表わすのだが、**画像の座標系は y 軸下向きが正に取られている**ため、時計回りが回転方向正になることに注意してほしい。
+
+そこで、これらの行列と`cv2.warpAffine`を使って画像を回転してみる。なお、上記のアフィン変換(2x3 行列)の合成変換を求めるために、各変換を 3x3 の行列として定義していることに注意すること。
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+H, W, _ = img.shape
+M1 = np.array([[1.0, 0.0, -W / 2], [0.0, 1.0, -H / 2], [0.0, 0.0, 1.0]])
+M2 = np.array(
+    [
+        [np.cos(-0.5 * np.pi), -np.sin(-0.5 * np.pi), 0.0],
+        [np.sin(-0.5 * np.pi), np.cos(-0.5 * np.pi), 0.0],
+        [0.0, 0.0, 1.0],
+    ]
+)
+M3 = np.array([[1.0, 0.0, W / 2], [0.0, 1.0, H / 2], [0.0, 0.0, 1.0]])
+
+M = M3 @ M2 @ M1
+img_rot = cv2.warpAffine(img, M[:2, :], (W, H))
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [hide-input]
+---
+fig, ax = plt.subplots()
+ax.imshow(img_rot)
+ax.set(xticks=[], yticks=[])
+plt.show()
+```
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+`cv2.warpAffine`は画像領域自体は変形しないため、`cv2.rotate`とは違い両端に黒い領域が現れてしまっているが、回転のされ方としては正しい回転となっていることが分かる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+#### 行列による画像の反転
+
+`cv2.warpAffine` を用いて画像を反転させることもできる。こちらは、X 軸対称、Y 軸対称、X-Y 両軸対称の反転を意味する行列 $M_1$、$M_2$、$M_3$ がそれぞれ
+
+$$
+M_1= \begin{pmatrix}
+1 & 0 & 0 \\
+0 & -1 & H
+\end{pmatrix}, \quad
+M_2= \begin{pmatrix}
+-1 & 0 & W \\
+0 & 1 & 0
+\end{pmatrix}, \quad
+M_3= \begin{pmatrix}
+-1 & 0 & W \\
+0 & -1 & H
+\end{pmatrix}
+$$
+
+のように表せることから、以下のようなコードにより、`cv2.flip`等と同様の効果を得ることができる。なお、上記の行列で単に対角成分を`-1`にするだけだと、画像の表示領域から画素がはみ出してしまうため、反転した後に反転した方向の画素数分だけ正の方向に平行移動する成分が第 3 列に入っていることに注意してほしい。
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+H, W = img.shape[:2]
+
+# 上下反転
+M_1 = np.array([[1, 0, 0], [0, -1, H]], dtype='float32')
+img_flip_x = cv2.warpAffine(img, M_1, (W, H))
+
+# 左右反転
+M_2 = np.array([[-1, 0, W], [0, 1, 0]], dtype='float32')
+img_flip_y = cv2.warpAffine(img, M_2, (W, H))
+
+# 上下左右反転
+M_3 = np.array([[-1, 0, W], [0, -1, H]], dtype='float32')
+img_flip_both = cv2.warpAffine(img, M_3, (W, H))
+```
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+tags: [hide-input]
+---
+fig, axs = plt.subplots(1, 3)
+
+# 上下反転
+ax = axs[0]
+ax.imshow(img_flip_x)
+ax.set_title('vertical flip')
+ax.set(xticks=[], yticks=[])
+
+# 左右反転
+ax = axs[1]
+ax.imshow(img_flip_y)
+ax.set_title('horizontal flip')
+ax.set(xticks=[], yticks=[])
+
+# 上下左右反転
+ax = axs[2]
+ax.imshow(img_flip_both)
+ax.set_title('both-side flip')
+ax.set(xticks=[], yticks=[])
+
+plt.tight_layout()
+plt.show()
+```
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### 発展: Canny フィルタの実装
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+ここでは、本編で紹介した Canny フィルタの 3 つの処理を実際に実装し、`cv2.Canny`と同等の結果が得られることを確かめる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+#### Sobel フィルタによる勾配強度の計算
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1079,7 +1384,7 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-##### 勾配が極大の画素の検出
+#### 勾配が極大の画素の検出
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1164,7 +1469,7 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-##### ヒステリシス閾値処理
+#### ヒステリシス閾値処理
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1259,14 +1564,6 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{admonition} 練習問題
-:class: question
-
-Gaussian フィルタは画像の高周波信号を取り除く「ローパスフィルタ」であると考えられる。フィルタカーネルの畳み込みの式をフーリエ変換することによって、この性質を調べよ。
-::::
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## 参考文献
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -1274,12 +1571,3 @@ Gaussian フィルタは画像の高周波信号を取り除く「ローパス�
 :::{bibliography}
 :filter: docname in docnames
 :::
-
-```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
-
-```
