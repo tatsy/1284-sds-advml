@@ -125,7 +125,7 @@ color_palette = sns.color_palette('colorblind')
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-本項では、数ある深層学習のフレームワークのうち、研究開発目的に最も一般的に使用されていると思われるPyTorchを扱う。
+本章では、数ある深層学習のフレームワークのうち、研究開発目的に最も一般的に使用されていると思われるPyTorchを扱う。
 
 PyTorchには、いくつかのモジュールが用意されており、代表的なものが、
 
@@ -314,6 +314,26 @@ x = torch.tensor([1.0], dtype=torch.float32)
 print(x.item())
 ```
 
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+同じNumPyの配列から`torch.tensor`と`torch.from_numpy`のそれぞれで`torch.Tensor`を作り、元のNumPyの配列を書き換えたときに、両者がどう変化するかを確かめよ。
+
+また、この違いを[NumPyの基本](#sec:numpy)で扱ったビューとコピーの違いと対応付けて説明せよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+要素を2つ以上持つ`torch.Tensor`に対して`item`関数を呼び出すとどうなるかを確かめよ。
+
+また、`requires_grad=True`を指定して作った`torch.Tensor`に対して`numpy`関数を呼び出すと例外が発生する。実際に試して、その例外メッセージが何を要求しているのかを確かめよ (この点については、後述の「勾配計算の制御」で改めて扱う)。
+:::
+
 ## 自動微分
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -459,72 +479,107 @@ dzdx = torch.autograd.grad(z, inputs=x)
 print(f'autograd.grad: dz/dz = {dzdx[0].item():.5f}')
 ```
 
-::::{admonition} 計算グラフ
+:::{admonition} 計算グラフ
 :class: important
 
 上記の計算では、 $y = x^2$, $z = \cos(y)$ として、連鎖律を用いて微分の計算を行った。このように、「ある計算の結果」を「次の計算で用いる」というような、計算の繋がりによって作られるグラフ構造のことを**計算グラフ**と呼ぶ。通常、四則演算や関数の計算などの多くの計算は単項演算 (変数1つに対して行われる演算、 $x^2$ や $\cos(x)$ など)と二項演算 (変数2つに対して行われる演算、 $x + y$ や $x^y$ など)に分けられ、3つ以上の変数が絡む演算も基本的には単項演算と二項演算の組み合わせによって表現できる。
 
 自動微分においては、計算の過程でこのような計算グラフをライブラリが内部的に構築しており、グラフを遡っていくことで、「最終的な出力」の「グラフ中に現れた変数」に関する微分を計算している。PyTorchの`backward`等の関数に渡せるパラメータの中にも`retain_graph`や`create_graph`など、「グラフ」という言葉を含むものがあるのはこのためである。
-::::
+:::
 
-+++
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-### 自動微分可能な演算の定義
+### 勾配計算の制御
 
-+++
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-PyTorchを使うと、自分で微分可能な演算を定義することもできる。関数を定義するための一般的な方法は、`torch.autograd.Function`を継承したクラスを定義し、そこに静的メソッドとして`forward`と`backward`の二つの関数を実装するというものである。
+自動微分を実際に使う上では、勾配の計算を制御するための仕組みを3つ知っておく必要がある。いずれも、この後のニュートン法やオプティマイザの実装、そして次章の学習ループで実際に使うものである。
 
-`forward`内で計算済みの変数で、`backward`の計算でも使うものは`ctx.save_for_backward(...)`を用いて`backward`関数に渡すことができる。変数の取り出しには`ctx.saved_tensors`を用いる。以下の例では、$\cos(x)$を例にとって、実際に微分可能な演算を定義してみる。
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-```{code-cell} ipython3
-from torch.autograd import Function
+**勾配の累積**
 
-
-class MyCosine(Function):
-    @staticmethod
-    def forward(ctx, x):
-        y = torch.cos(x)
-        ctx.save_for_backward(x, y)
-        return y
-
-    @staticmethod
-    def backward(ctx, grad_output):
-        x, y = ctx.saved_tensors
-        return grad_output * (-torch.sin(x))
-```
-
-この実装では、`forward`の中で、$y = \cos(x)$として、戻り値を計算した後に、入力の$x$と出力の$y$の値を`save_for_backward(x, y)`として`backward`側でも使えるようにしている。今回の計算では、$\cos(x)$の微分が$-\sin(x)$であるため、必ずしも$y$を`backward`側で使えるようにしておく必要はない。しかし、例えば$\exp(x)$やシグモイド関数$1 / (1 + \exp(x))$のように、導関数のなかに自分自身を含むようなものも多く、計算量の観点から、`forward`での出力を`backward`側で使えるようにしておくことが多い。
-
-+++
-
-この`Function`型のサブクラスは`MyCosine.apply`のように呼び出すことで関数の`forward`が呼び出されて、その計算結果が使われた出力において`backward`が呼び出されると、自動的に`MyCosine`の`backward`のその計算の中で呼び出されるようになる。
-
-PyTorch内部の実装においては、上記のような`Function`のサブクラスを内部で呼び出すような関数を定義している場合が多く、それに従って`my_cos`関数を定義しておく。
+`backward`によって計算された勾配は、`grad`に**代入されるのではなく加算される**。そのため、同じ変数に対して`backward`を複数回呼び出すと、勾配が足し合わされていく。
 
 ```{code-cell} ipython3
-def my_cos(x):
-    return MyCosine.apply(x)
-```
-
-これを用いて、再度 $\cos(x^2)$の微分を計算してみると、以下のように正しく計算が行えていることが分かる。
-
-```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
 x = torch.tensor([2.0], requires_grad=True)
-y = x * x
-z = my_cos(y)
-z.backward()
-print(f'my cosine: dzdx = {x.grad.item():.5f}')
+for i in range(3):
+    z = torch.cos(x * x)
+    z.backward()
+    print(f'{i + 1}回目のbackward後: x.grad = {x.grad.item():.5f}')
 ```
 
-::::{admonition} 問
-:class: question
+これは、複数の損失関数から得られる勾配を足し合わせたい場合などには便利な仕様である。一方、通常の最適化では、各ステップで勾配を計算し直したいので、その都度、勾配をゼロに戻す必要がある。
 
-`torch.autograd.Function`のサブクラスとしてシグモイド関数を扱うクラスを実装してみよ。シグモイド関数の導関数は自分自身の値を用いて表せることに注意すること。
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+x = torch.tensor([2.0], requires_grad=True)
+for i in range(3):
+    if x.grad is not None:
+        x.grad.zero_()  # 勾配をゼロに戻す
 
-::::
+    z = torch.cos(x * x)
+    z.backward()
+    print(f'{i + 1}回目のbackward後: x.grad = {x.grad.item():.5f}')
+```
 
-+++
+後述するオプティマイザを使う場合には、この処理が`optim.zero_grad()`として用意されている。深層学習の学習ループで、毎回`zero_grad`が呼ばれているのは、このためである。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+**計算グラフからの切り離し**
+
+`requires_grad=True`である変数から計算された値は、自動微分のための計算グラフを保持している。この計算グラフが不要な場合、例えば、計算結果をNumPyの配列に変換して図に描きたい場合などには、`detach`を用いて計算グラフから切り離す。
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+x = torch.tensor([2.0], requires_grad=True)
+z = torch.cos(x * x)
+
+try:
+    z.numpy()
+except Exception as e:
+    print('Exception:', e)
+
+print('detachしてから:', z.detach().numpy())
+```
+
+`detach`は、元の`torch.Tensor`とメモリを共有しつつ、計算グラフを持たない新しい`torch.Tensor`を返す。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+**勾配計算の無効化**
+
+学習済みのモデルを使って予測をするときのように、そもそも勾配が必要ない場合には、`torch.no_grad()`のブロックの中で計算を行うことで、計算グラフの構築自体を省略できる。これにより、計算に必要なメモリが削減され、計算も多少高速になる。
+
+```{code-cell} ipython3
+---
+editable: true
+slideshow:
+  slide_type: ''
+---
+x = torch.tensor([2.0], requires_grad=True)
+
+z = torch.cos(x * x)
+print('通常     :', z.requires_grad)
+
+with torch.no_grad():
+    z = torch.cos(x * x)
+    print('no_grad内:', z.requires_grad)
+```
 
 ### 二階微分の計算
 
@@ -688,7 +743,23 @@ $$
 
 となり、自動微分の結果が解析的な微分結果と一致していることが分かる。
 
-+++
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+$f(x) = \exp(-x^2)$ について、自動微分によって求めた $f'(2)$ の値と、解析的に求めた導関数に $x = 2$ を代入した値が一致することを確かめよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+$f(x, y) = x^2 y + \sin(xy)$ の勾配を自動微分によって求め、解析的に求めた偏微分の値と一致することを確かめよ。
+
+なお、$x$ と $y$ を要素数2の`torch.Tensor`の各要素として扱っても、別々の`torch.Tensor`として扱っても良い。後者の場合、`torch.autograd.grad`の`inputs`にはタプルとして複数の変数を渡すことができる。
+:::
 
 ## ニュートン法の実装
 
@@ -813,14 +884,23 @@ plt.show()
 
 Rosenbrock関数の最小化については、解の初期値やニュートン法のステップ幅を変化させることで、収束が不安定になって最小解からはずれて・近づいてを繰り返すような軌跡を描くこともある。ぜひ、いろいろなパラメータで軌跡を描画して、その性質の理解に努めて欲しい。
 
-+++
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
 上記のニュートン法により得られた関数最小化の軌跡を、単純な[最急降下法](https://en.wikipedia.org/wiki/Gradient_descent)ならびに一階導関数だけを用いてHesse行列を近似する[準ニュートン法](https://en.wikipedia.org/wiki/Quasi-Newton_method)と比較せよ。
+:::
 
-::::
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+上記のコードにおいて、更新幅を決める係数 (コード中では`0.5`)を 0.1、0.5、1.0 と変化させたときに、最小値に至るまでの軌跡がどのように変わるかを調べよ。
+
+また、初期値`initial_x`をいろいろに変えてみて、最小値に収束しない場合があることを確かめよ。
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -832,9 +912,9 @@ Rosenbrock関数の最小化については、解の初期値やニュートン�
 ニューラルネットのパラメータ最適化(=訓練)には、ニュートン法や準ニュートン法のような損失関数の二階微分を考慮するような方法を用いることは少なく (ただしAdaSecant{cite}`gulcehre2014adasecant`のような二階微分を考慮する方法もある)、多くの場合は単純な確率的最急降下法やRMSprop, Adamのようなアルゴリズムが使われることが多い。これは、パラメータ数が多くなると、Hesse行列を求めるのに多くの計算量が必要になるためで、そうであれば、一階微分だけが求まれば実行できる最急降下法を安定化させるように工夫する方が良い、という発想である。
 :::
 
-+++
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-### オプティマイザを利用した最適化
+## オプティマイザによる最適化
 
 +++
 
@@ -842,7 +922,7 @@ PyTorchには**オプティマイザ**というモジュールが用意されて
 
 +++
 
-#### 確率的最急降下法
+### 確率的最急降下法
 
 +++
 
@@ -865,7 +945,7 @@ $$
 
 +++
 
-#### RMSprop
+### RMSprop
 
 +++
 
@@ -887,7 +967,7 @@ $$
 
 +++
 
-#### Adam
+### Adam
 
 +++
 
@@ -899,21 +979,13 @@ Adamには更新率$\gamma$と合わせて、二つのパラメータ$\beta_1$�
 
 +++
 
-#### オプティマイザを使用した最適化
+### オプティマイザを使用した最適化
 
 +++
 
 深層学習では、上記のSGDやAdam等のオプティマイザを用いてニューラルネットワークのパラメータを最適化するのだが、この仕組みは最急降下法等の一階微分を用いる最適化問題にも使用することができる。
 
 そこで、深層学習に進む前に、まずは前述のRosenbrock関数を上記のオプティマイザを使って最適化し、その違いについて見てみよう。
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
-データローダとは、PyTorchを用いたニューラルネットワークの学習において、ミニバッチ学習を簡単にするための仕組みである。通常、深層学習には大量の訓練データが必要であり、それら全てを考慮したパラメータの更新方向(=勾配)を求めることは現実的ではない。
-
-そこで、大量の訓練データから少数のデータ、すなわちミニバッチをサンプルし、そのミニバッチ内のデータによって与えられる勾配が、データ全体から求まる勾配の近似として十分に正しく動作することを仮定する。データから収集してくるミニバッチの数は`torch.utils.data.Dataset`型のサブクラスとして用意されたデータセット・クラスを引数にとる`torch.data.utils.data.DataLoader`によって制御できる。
-
-では、上記のひらがな73文字データセットについて、まずはデータの読み出しを行う役割を持つデータセット・クラスを作成してみよう。データセット・クラスは`torch.utils.data.Dataset`型のサブクラスとして実装する。この際、コンストラクタと合わせて、データの総数を返す`__len__`関数と、データ1つをサンプルする`__getitem__`関数の二つを実装する。
 
 ```{code-cell} ipython3
 # 比較するオプティマイザのリスト
@@ -993,9 +1065,92 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+:::{admonition} 練習問題
+:class: question
+
+上記の4つのオプティマイザについて、学習率`lr`を10倍、ならびに1/10にしたときに、軌跡がどのように変化するかを調べよ。
+
+また、SGDが発散してしまうような大きな学習率であっても、Adamでは解が収束する場合がある。これがなぜかを、それぞれの更新式から説明せよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+Adamのパラメータ $\beta_1$ (PyTorchでは`betas`引数の第1要素)を 0 に設定すると、どのアルゴリズムに近い挙動になると考えられるか。更新式から予想した上で、実際に軌跡を描いて確かめよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
 以上で、PyTorchにおけるテンソルの扱い方、自動微分の仕組み、そして自動微分を利用した最適化について一通り見てきた。
 
 次章の[深層学習による画像識別](#sec:deep-learning)では、ここで学んだ内容を土台として、実際にニューラルネットワークを構築し、平仮名の画像を識別するモデルを学習させる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+## 発展的な内容
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+ここから先の節は、講義の中では扱わない発展的な内容である。PyTorchの自動微分に、自分で定義した演算を組み込みたい場合に読んでほしい。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### 発展: 自動微分可能な演算の定義
+
++++
+
+PyTorchを使うと、自分で微分可能な演算を定義することもできる。関数を定義するための一般的な方法は、`torch.autograd.Function`を継承したクラスを定義し、そこに静的メソッドとして`forward`と`backward`の二つの関数を実装するというものである。
+
+`forward`内で計算済みの変数で、`backward`の計算でも使うものは`ctx.save_for_backward(...)`を用いて`backward`関数に渡すことができる。変数の取り出しには`ctx.saved_tensors`を用いる。以下の例では、$\cos(x)$を例にとって、実際に微分可能な演算を定義してみる。
+
+```{code-cell} ipython3
+from torch.autograd import Function
+
+
+class MyCosine(Function):
+    @staticmethod
+    def forward(ctx, x):
+        y = torch.cos(x)
+        ctx.save_for_backward(x, y)
+        return y
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        x, y = ctx.saved_tensors
+        return grad_output * (-torch.sin(x))
+```
+
+この実装では、`forward`の中で、$y = \cos(x)$として、戻り値を計算した後に、入力の$x$と出力の$y$の値を`save_for_backward(x, y)`として`backward`側でも使えるようにしている。今回の計算では、$\cos(x)$の微分が$-\sin(x)$であるため、必ずしも$y$を`backward`側で使えるようにしておく必要はない。しかし、例えば$\exp(x)$やシグモイド関数$1 / (1 + \exp(x))$のように、導関数のなかに自分自身を含むようなものも多く、計算量の観点から、`forward`での出力を`backward`側で使えるようにしておくことが多い。
+
++++
+
+この`Function`型のサブクラスは`MyCosine.apply`のように呼び出すことで関数の`forward`が呼び出されて、その計算結果が使われた出力において`backward`が呼び出されると、自動的に`MyCosine`の`backward`のその計算の中で呼び出されるようになる。
+
+PyTorch内部の実装においては、上記のような`Function`のサブクラスを内部で呼び出すような関数を定義している場合が多く、それに従って`my_cos`関数を定義しておく。
+
+```{code-cell} ipython3
+def my_cos(x):
+    return MyCosine.apply(x)
+```
+
+これを用いて、再度 $\cos(x^2)$の微分を計算してみると、以下のように正しく計算が行えていることが分かる。
+
+```{code-cell} ipython3
+x = torch.tensor([2.0], requires_grad=True)
+y = x * x
+z = my_cos(y)
+z.backward()
+print(f'my cosine: dzdx = {x.grad.item():.5f}')
+```
+
+:::{admonition} 練習問題
+:class: question
+
+`torch.autograd.Function`のサブクラスとしてシグモイド関数を扱うクラスを実装してみよ。シグモイド関数の導関数は自分自身の値を用いて表せることに注意すること。
+
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
