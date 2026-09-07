@@ -76,6 +76,7 @@ numbering: false
 
 - **第7回**
   - {ref}`sec:feature-extraction`
+  - {ref}`sec:pytorch` (自習)
   - {ref}`sec:deep-learning` (自習)
 
 - **第8回**
