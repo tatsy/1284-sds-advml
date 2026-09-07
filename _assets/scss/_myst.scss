@@ -68,6 +68,18 @@
   font-weight: 700;
 }
 
+/* outline */
+.myst-outline-list {
+  .myst-outline-item {
+    &:has(.pl-2) {
+      font-weight: 700;
+    }
+    &:has(.pl-4) {
+      padding-left: 0.5rem;
+    }
+  }
+}
+
 /* code block */
 .myst-code {
   margin: 1.25rem 0;
@@ -114,9 +126,7 @@
 }
 
 /* Hide genuinely empty output containers */
-.article
-  .myst-jp-nb-block
-  > [data-name="outputs-container"]:empty {
+.article .myst-jp-nb-block > [data-name="outputs-container"]:empty {
   display: none !important;
 }
 

@@ -8,7 +8,7 @@
 :root {
   --default-font-family: "Roboto", "M PLUS 1p", "Noto Color Emoji", sans-serif;
   --code-font-family: "Roboto Mono", sans-serif;
-  
+
   --myst-color-primary: #3157a4;
   --myst-color-link: #3157a4;
   --myst-color-link-hover: #24417c;
@@ -40,7 +40,7 @@
 
 body {
   font-family: var(--default-font-family);
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.2;
 }
 
@@ -104,7 +104,7 @@ h6 {
     color: var(--myst-color-text);
   }
 
-  code:not(:where([class~=not-prose],[class~=not-prose] *)) {
+  code:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     padding: 0.1rem 0.2rem;
     margin: 0 0.1rem;
     border-radius: 0.2rem;
@@ -151,6 +151,6 @@ figure {
   img {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
-    display: inline-block;    
+    display: inline-block;
   }
 }
