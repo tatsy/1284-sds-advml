@@ -17,7 +17,9 @@ project:
     title:
       enabled: true
       offset: 0
-    headings: true
+    headings: false
+    heading_1: true
+    heading_2: true
   toc:
     - file: index.md
       hidden: true
