@@ -51,7 +51,7 @@ sns.set_theme(style='white', palette='colorblind', rc=rc)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-まずは講義の[GitHub](https://github.com/tatsy-classes/1284-sds-advml/tree/master/data)にアクセスして、3 枚ある画像から好きなものを一つダウンロードしよう。その画像 (以下は`sunflower.jpg`とする)を IPython を起動しているディレクトリと同じディレクトリに配置して、画像を読み込んでみよう。
+まずは講義の[GitHub](https://github.com/tatsy/1284-sds-advml/tree/main/data)にアクセスして、置かれている画像から好きなものを一つダウンロードしよう。その画像 (以下は`sunflower.jpg`とする)を IPython を起動しているディレクトリと同じディレクトリに配置して、画像を読み込んでみよう。
 
 なお、Jupyter Lab 等で現在の作業ディレクトリが分からなくなった場合には、
 
@@ -75,7 +75,7 @@ os.getcwd()
 
 さて、画像の用意ができたら、以下のコードを実行して、画像を読み込んでみる。
 
-画像の読み込みには`cv2.imread`関数を用いる。第一引数にはファイル名、第二引数にはデータをどのような形式で読み込みかを指定する。例えば`cv2.IMREAD_COLOR`を指定するとRGB形式で色が表されたカラー画像として読み込まれ、`cv2.IMREAD_GRAYSCALE`なら、指定したファイルがカラーか否かに関係なく、グレースケール画像としてファイルが読み込まれる。
+画像の読み込みには`cv2.imread`関数を用いる。第一引数にはファイル名、第二引数にはデータをどのような形式で読み込みかを指定する。例えば`cv2.IMREAD_COLOR`を指定するとカラー画像として読み込まれ (このとき、後述の通り色は BGR の順で並ぶ)、`cv2.IMREAD_GRAYSCALE`なら、指定したファイルがカラーか否かに関係なく、グレースケール画像としてファイルが読み込まれる。
 
 ```{code-cell} ipython3
 ---
@@ -101,7 +101,7 @@ if img is None:
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-画像が読み込めたら`shape`メソッドで大きさを確認してみましょう。正しく読み込めていれば、サイズは 2048x1360 となっているはずだ。
+画像が読み込めたら`shape`属性で大きさを確認してみよう。正しく読み込めていれば、サイズは 2048x1360 (幅 x 高さ)となっているはずだ。
 
 ただし、**OpenCV は画像の大きさを「高さ」×「幅」で表現している**ため、高さが最初に来ること、そしてカラー画像として読み込んでいるので、赤・緑・青の色の強さを表わすチャネル数である 3 が末尾に追加されて以下のように出力される。
 
@@ -274,8 +274,8 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-img_bilinear = cv2.resize(img, (128, 85), interpolation=cv2.INTER_LINEAR)  # ニアレスト補間
-img_bicubic = cv2.resize(img, (128, 85), interpolation=cv2.INTER_CUBIC)  # バイリニア補間
+img_bilinear = cv2.resize(img, (128, 85), interpolation=cv2.INTER_LINEAR)  # バイリニア補間
+img_bicubic = cv2.resize(img, (128, 85), interpolation=cv2.INTER_CUBIC)  # バイキュービック補間
 img_area = cv2.resize(img, (128, 85), interpolation=cv2.INTER_AREA)  # エリア補間
 ```
 
@@ -531,6 +531,22 @@ $$ (eq:filter-convolution)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+:::{admonition} 畳み込みと相関
+:class: note
+
+厳密には、{eq}`eq:filter-convolution`の演算は**相関** (correlation)と呼ばれるものである。数学的な意味での**畳み込み** (convolution)は
+
+$$
+\iint I(x - \xi, y - \eta) f(\xi, \eta) {\rm d}\xi {\rm d}\eta
+$$
+
+のように、フィルタカーネルを原点について反転させた上で重ね合わせる演算を指す。
+
+ただし、後述の Gaussian フィルタのように、フィルタカーネルが原点について対称 ($f(\xi, \eta) = f(-\xi, -\eta)$)である場合には、両者は一致する。画像処理の分野では、この 2 つを区別せずに「畳み込み」と呼ぶことも多いが、Sobel フィルタのように対称でないカーネルを扱う場合には、符号の向きに注意が必要である。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
 ### ぼかしフィルタ
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -545,7 +561,6 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-img_noisy = cv2.resize(img, None, fx=0.1, fy=0.1, interpolation=cv2.INTER_AREA)
 img_noisy = (img / 255.0).astype('float32')
 noise = np.random.normal(size=img.shape[:2]) * 0.2
 img_noisy += noise[:, :, None]
@@ -673,7 +688,7 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-このように、Gaussian フィルタと比べると、元の信号のぼけが少なく、また高周波のノイズも低減できていることが分かる。バイラテラルフィルタは繰り返し書けることで、その効果を調整することができる。一例として弱いバイラテラルフィルタを 10 回程度適用すると、以下のような画像が得られる。
+このように、Gaussian フィルタと比べると、元の信号のぼけが少なく、また高周波のノイズも低減できていることが分かる。バイラテラルフィルタは繰り返しかけることで、その効果を調整することができる。一例として弱いバイラテラルフィルタを 10 回程度適用すると、以下のような画像が得られる。
 
 ```{code-cell} ipython3
 ---
@@ -735,7 +750,7 @@ plt.show()
 
 +++
 
-:::{admonition} Futher Reading: ぼかしフィルタ
+:::{admonition} Further Reading: ぼかしフィルタ
 :class: note
 
 上記の通り、単純なぼかしフィルタのノイズ除去性能には限界があり、ノイズレベルによっては、完全にノイズを取り去ることは難しい。ノイズ除去は、非常に古くから研究されているにも関わらず、現在でも多くの手法が提案されている。
@@ -918,7 +933,7 @@ Sobel フィルタと並んで、よく用いられるエッジ検出フィル�
 
 Canny フィルタは Sobel フィルタの結果から、「物体の輪郭線としてのエッジ」をおよそ 1 ピクセル幅で検出するアルゴリズムである。
 
-Canny フィルタは主につの処理からなる。
+Canny フィルタは主に次の 3 つの処理からなる。
 
 1. Sobel フィルタ (3x3 のフィルタカーネル)による勾配強度の計算
 2. 勾配が極大となる画素の検出
@@ -1359,13 +1374,11 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-img_ = img.astype('float32')
-
 # ノイズの低減
-img = cv2.GaussianBlur(img, (5, 5), sigmaX=1.0, sigmaY=1.0)
+img_blur = cv2.GaussianBlur(img, (5, 5), sigmaX=1.0, sigmaY=1.0)
 
-dx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=3)
-dy = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=3)
+dx = cv2.Sobel(img_blur, cv2.CV_32F, 1, 0, ksize=3)
+dy = cv2.Sobel(img_blur, cv2.CV_32F, 0, 1, ksize=3)
 grad = np.sqrt(np.sum(dx**2 + dy**2, axis=2))
 ```
 
@@ -1390,7 +1403,11 @@ plt.show()
 
 次に、各画素について、勾配方向を計算し、その勾配方向に沿った方向に中心画素の輝度値が極大になっている画素だけを取り出す。
 
-まずは、先ほどの x 方向勾配と y 方向勾配から、`arctan`を用いて勾配方向を計算する。その角度を、0°、45°、90°、135° のいずれかに分類する。今回は「向きを無視した方向」が分かれば良いので、`arctan`の戻り値が負の場合には$\pi$を足し算しておく。
+まずは、x 方向勾配と y 方向勾配から勾配方向を計算し、その角度を 0°、45°、90°、135° のいずれかに分類する。
+
+ここで注意が必要なのは、**勾配の向きは勾配の符号によって決まる**という点である。上で計算した`dx`、`dy`は色ごとの勾配であり、そこからチャネル方向のノルムを取ってしまうと符号が失われるため、勾配方向を求めることができない (常に第 1 象限の角度しか得られなくなる)。そこで、ここではグレースケール画像に対する符号付きの勾配を改めて計算し、`np.arctan2`によって角度を求める。
+
+`np.arctan2`の戻り値は $(-\pi, \pi]$ の範囲を取るが、今回は「向きを無視した方向」が分かれば良いので、戻り値が負の場合には $\pi$ を足して $[0, \pi]$ の範囲に畳んでおく。
 
 ```{code-cell} ipython3
 ---
@@ -1398,10 +1415,11 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-mag_dx = np.sqrt(np.sum(dx**2.0, axis=2))
-mag_dy = np.sqrt(np.sum(dy**2.0, axis=2))
+gray_blur = cv2.cvtColor(img_blur, cv2.COLOR_RGB2GRAY).astype('float32')
+gx = cv2.Sobel(gray_blur, cv2.CV_32F, 1, 0, ksize=3)
+gy = cv2.Sobel(gray_blur, cv2.CV_32F, 0, 1, ksize=3)
 
-angle = np.arctan(mag_dy / (mag_dx + 1.0e-6))
+angle = np.arctan2(gy, gx)
 angle = np.where(angle < 0.0, angle + np.pi, angle)
 angle += np.pi / 8.0
 angle = np.where(angle > np.pi, angle - np.pi, angle)
@@ -1479,7 +1497,7 @@ plt.show()
 
 最後に残った極大勾配が$[ \tau_1, \tau_2 ]$の区間に入る画素については、その周囲の 8 画素をみて、少なくとも 1 つの画素が$\tau_2$以上の極大勾配を持っているなら、その画素も輪郭線と見なす。
 
-ここでは、画素値が$[0, 255]$の場合を基準として$\tau_1 = 50$, $\tau_2 = 100$としてヒステリシス閾値処理を実行する。なお、ここまでの処理では画像を 32bit 浮動小数で表わしているため、$\tau_1$と$\tau_2$はそのスケールに合うように大きさを調整する。
+ここでは $\tau_1 = 100$、$\tau_2 = 200$ としてヒステリシス閾値処理を実行する。ここまでの処理では画素値を $[0, 255]$ のスケールで扱っているため、閾値もそのスケールに合わせて指定していることに注意すること。
 
 ```{code-cell} ipython3
 ---
@@ -1528,13 +1546,13 @@ tags: [remove-input]
 ---
 fig, ax = plt.subplots()
 ax.imshow(img_canny, cmap='gray')
-ax.set(title='Step 3: Hysterisis thresholding', xticks=[], yticks=[])
+ax.set(title='Step 3: Hysteresis thresholding', xticks=[], yticks=[])
 plt.show()
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-OpenCV の`cv2.Canny`には上記と同様のコードが、以下のようなパラメータによって得られる。
+上記と同様の結果は、OpenCV の`cv2.Canny`によって以下のように得られる。ここでは、自前の実装と条件を揃えるために、Gaussian フィルタをかけた後の画像を入力としていることに注意すること。
 
 ```{code-cell} ipython3
 ---
@@ -1542,7 +1560,7 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-img_canny = cv2.Canny(img, 100, 200, apertureSize=3, L2gradient=True)
+img_canny = cv2.Canny(img_blur, 100, 200, apertureSize=3, L2gradient=True)
 ```
 
 ```{code-cell} ipython3
