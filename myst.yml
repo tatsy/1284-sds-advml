@@ -44,6 +44,7 @@ project:
       children:
         - file: contents/sec2/data-visualization.ipynb
         - file: contents/sec2/feature-extraction.ipynb
+        - file: contents/sec2/pytorch.ipynb
         - file: contents/sec2/deep-learning.ipynb
         - file: contents/sec2/exercise-ogura.ipynb
     - title: 第3部 強化学習の基礎とオセロプレイヤーの作成
