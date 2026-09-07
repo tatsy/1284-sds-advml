@@ -54,7 +54,7 @@ ImageNetと呼ばれる大規模画像データセットの識別チャレンジ
 - Dropout
 - Batch Normalization
 - Skip Connection (Residual Block)
-- Adaptive Momentum Estimation (Adam)
+- Adaptive Moment Estimation (Adam)
 
 などの技術が、一通り出そろう。
 
@@ -196,7 +196,7 @@ x = torch.Tensor(x_npy)
 print("Torch's dtype:", x.dtype)
 ```
 
-このように、NumPyの配列としての型は`int64`型であるにも関わらず、`torch.Tensor`を用いることで、型が`float32`に変更されていることが分かる。なお、この初期の型は`torch.set_default_dtyoe`で変更することもできる。
+このように、NumPyの配列としての型は`int64`型であるにも関わらず、`torch.Tensor`を用いることで、型が`float32`に変更されていることが分かる。なお、この初期の型は`torch.set_default_dtype`で変更することもできる。
 
 ```{code-cell} ipython3
 # 初期の型を64bit浮動小数に変更
@@ -214,7 +214,7 @@ torch.set_default_dtype(torch.float32)
 
 次に`torch.Tensor`型のインスタンスを作成する関数である`torch.tensor`を用いる場合を見ていく。
 
-本関数は`torch.Tensor`と関数が似ており、非常に紛らわしいが、`torch.Tensor`はコンストラクタであり、`torch.tensor`は初期化用のユーティリティ関数である。
+本関数は`torch.Tensor`と名前が似ており、非常に紛らわしいが、`torch.Tensor`はコンストラクタであり、`torch.tensor`は初期化用のユーティリティ関数である。
 
 使い方も非常に似ており、`torch.tensor`にも、PythonやNumPyの配列を指定して`torch.Tensor`型の多次元配列を作ることができる。
 
@@ -376,10 +376,10 @@ $$
 2. $y = x^2$の値を計算する
 3. $z = \cos(y)$の値を計算する
 
-となっているということである。導関数$f$の微分を計算するときには、この逆順に、
+となっているということである。$f$の微分を計算するときには、この逆順に、
 
 1. $z$の$z$に関する微分として$\text{d}z/\text{d}z=1$が与えられる
-2. 既知の$y$から$\text{d}z/\text{d}y = (\text{d}z/\text{d}z) \cdot (\text{d}z/\text{d}y) = 1 \cdot (-\sin(y)) = -\sin(y)$を計算する
+2. 既知の$y$から$\text{d}z/\text{d}y = (\text{d}z/\text{d}z) \cdot h'(y) = 1 \cdot (-\sin(y)) = -\sin(y)$を計算する
 3. 既知の$x$から$\text{d}z/\text{d}x = (\text{d}z/\text{d}y) \cdot (\text{d}y/ \text{d}x) = (-\sin(y)) \cdot (2 x) = -2x \sin(x^2)$を計算する
 
 という流れになっている。従って、各演算$y=f(x)$において、
@@ -476,7 +476,7 @@ print(f'analytic: dz/dx = {dzdx_analytic.item():.5f}')
 x = torch.tensor([2.0], requires_grad=True)
 z = torch.cos(x * x)
 dzdx = torch.autograd.grad(z, inputs=x)
-print(f'autograd.grad: dz/dz = {dzdx[0].item():.5f}')
+print(f'autograd.grad: dz/dx = {dzdx[0].item():.5f}')
 ```
 
 :::{admonition} 計算グラフ
@@ -614,7 +614,7 @@ print(f'analytic: ddz_ddx = {ddz_ddx_analy.item():.5f}')
 
 +++
 
-続いては、変数が2つ以上の場合の微分 (勾配)について見てみる。今回は例としてReosenbrock関数と呼ばれる、以下の関数について微分を計算してみる。
+続いては、変数が2つ以上の場合の微分 (勾配)について見てみる。今回は例としてRosenbrock関数と呼ばれる、以下の関数について微分を計算してみる。
 
 $$
 f(x, y) = a (x - 1)^2 + b(y - x^2)^2
@@ -692,7 +692,7 @@ f = (x[0] - 1.0) ** 2.0 + 100.0 * (x[1] - x[0] ** 2.0) ** 2.0
 grad = torch.autograd.grad(f, inputs=x, create_graph=True)
 ```
 
-安直には、この`grad`に対して、もう一度`torch.autograd.grad`関数を適用すれば良さそうだが、前述の通り`backward`関数や`torch.autograd.grad`関数は、出力がスカラー出ない場合には使うことができない。
+安直には、この`grad`に対して、もう一度`torch.autograd.grad`関数を適用すれば良さそうだが、前述の通り`backward`関数や`torch.autograd.grad`関数は、出力がスカラーでない場合には使うことができない。
 
 ```{code-cell} ipython3
 try:
@@ -707,12 +707,11 @@ except Exception as e:
 
 $$
 \begin{align}
-\left( \frac{\partial x}{\partial x}, \frac{\partial y}{\partial x} \right) = (1, 0)
-\left( \frac{\partial x}{\partial y}, \frac{\partial y}{\partial y} \right) = (0, 1)
+(1, 0) \quad \text{と} \quad (0, 1)
 \end{align}
 $$
 
-の2つとなることに気づく。そこで、このそれぞれを連鎖律のスタートとして`grad_outputs`パラメータに指定して`torch.autograd.grad`を呼び出してみる。
+の2つとなることに気づく。前者を指定すれば勾配ベクトルの第1成分 $\partial f / \partial x$ の微分が、後者を指定すれば第2成分 $\partial f / \partial y$ の微分が計算され、それぞれがHesse行列の第1行、第2行に対応する。そこで、このそれぞれを連鎖律のスタートとして`grad_outputs`パラメータに指定して`torch.autograd.grad`を呼び出してみる。
 
 ```{code-cell} ipython3
 ddf_dxx = torch.autograd.grad(grad, inputs=x, grad_outputs=torch.tensor([1.0, 0.0]), retain_graph=True)[0]
@@ -780,18 +779,18 @@ $$
 となることから説明できる。この式を変形すると、
 
 $$
-\frac{\text{d} f}{\text{d} \boldsymbol\delta}(\mathbf{x}) = \nabla f(\mathbf{x}) + \frac{1}{2} \mathbf{H}\boldsymbol\delta
+\frac{\text{d} f}{\text{d} \boldsymbol\delta}(\mathbf{x}) = \nabla f(\mathbf{x}) + \mathbf{H}\boldsymbol\delta
 $$
 
-という式が得られる。従って、Taylor展開の第2項までで元の関数を近似した範囲においては、$\text{d} f / \text{d}\boldsymbol\delta = \mathbf{0}$となるような場所に移動することで、関数の最小値に近づくことができる (これは、関数を局所的に二次関数で近似して、その二次関数の「底」に移動することに対応する)。
+という式が得られる。従って、Taylor展開の第2項までで元の関数を近似した範囲においては、$\text{d} f / \text{d}\boldsymbol\delta = \mathbf{0}$となるような場所、すなわち $\boldsymbol\delta = -\mathbf{H}^{-1} \nabla f(\mathbf{x})$ だけ移動した場所に移ることで、関数の最小値に近づくことができる (これは、関数を局所的に二次関数で近似して、その二次関数の「底」に移動することに対応する)。
 
-実際には、最小化すべき関数が局所的に二次関数で近似できることばかりではないので、通常は{eq}`eq:newton-step`で求まった更新方向に小さな定数$\alpha$を乗じて$\mathbf{x}$の値を
+実際には、最小化すべき関数が局所的に二次関数で近似できることばかりではないので、通常は{eq}`eq:newton-step`で求まった $\boldsymbol\delta$ に小さな定数$\alpha$を乗じて$\mathbf{x}$の値を
 
 $$
-\mathbf{x}^{t+1} = \mathbf{x}^t + \alpha \boldsymbol\delta
+\mathbf{x}^{t+1} = \mathbf{x}^t - \alpha \boldsymbol\delta
 $$
 
-のように更新することが多い。
+のように更新することが多い。{eq}`eq:newton-step`の $\boldsymbol\delta$ は符号を除いた更新幅であるため、上式では**引き算**になっていることに注意してほしい (この後のコードで`x = x - 0.5 * dx`としているのは、このためである)。
 
 +++
 
@@ -880,7 +879,7 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-この図では、$(0.0, 0.0)$の初期値から$(1.0, 1.0)$の最小値に至るまでの最適化の過程をマーカー付きの曲線で示している。各マーカーの位置を見てみると、徐々に最小値に至るスピードが遅くなりつつも、正しく関数の最小値を取る箇所に収束していることが分かる。
+この図では、$(-1.0, 1.5)$の初期値から$(1.0, 1.0)$の最小値に至るまでの最適化の過程をマーカー付きの曲線で示している。各マーカーの位置を見てみると、徐々に最小値に至るスピードが遅くなりつつも、正しく関数の最小値を取る箇所に収束していることが分かる。
 
 Rosenbrock関数の最小化については、解の初期値やニュートン法のステップ幅を変化させることで、収束が不安定になって最小解からはずれて・近づいてを繰り返すような軌跡を描くこともある。ぜひ、いろいろなパラメータで軌跡を描画して、その性質の理解に努めて欲しい。
 
@@ -957,7 +956,7 @@ RMSpropのパラメータ更新式は以下の通り ([参考](https://pytorch.o
 
 $$
 \begin{align}
-\theta_{t+1} &= \theta_t + \gamma \frac{g_{t+1}}{\sqrt{v_{t+1} + \epsilon}} \\
+\theta_{t+1} &= \theta_t - \gamma \frac{g_{t+1}}{\sqrt{v_{t+1}} + \epsilon} \\
 v_{t+1} &= \alpha v_{t} + (1 - \alpha) g_{t+1}^2 \\
 g_{t+1} &= \frac{\partial\mathcal{L}}{\partial\theta_{t}}
 \end{align}
@@ -971,11 +970,24 @@ $$
 
 +++
 
-**Adam** (adaptive momentum method)は、前述のMomentum SGDとRMSpropを組み合わせたアルゴリズムで、確率的最急降下法の勾配方向の不安定性と振動の問題を両方解決するように設計されている。
+**Adam** (adaptive moment estimation)は、前述のMomentum SGDとRMSpropを組み合わせたアルゴリズムで、確率的最急降下法の勾配方向の不安定性と振動の問題を両方解決するように設計されている。
 
 Adamには更新率$\gamma$と合わせて、二つのパラメータ$\beta_1$と$\beta_2$を設定する。これらのうち$\beta_1$は、勾配方向に慣性を調整するパラメータで1に近い値を取るほど、強く慣性が働き、過去の勾配の影響を強く残す。一方、$\beta_2$は、振動の抑制に働くパラメータで、1に近い値が取るほど、過去の勾配の大きさを考慮して更新量を抑制するようになる。
 
-また、これに加えて、$\beta_1$, $\beta_2$を用いて、最適化の始めは大きなステップサイズで更新を行い、徐々にその効果を弱めていくという計算もなされている。
+実際の更新式は以下の通りである ([参考](https://pytorch.org/docs/stable/generated/torch.optim.Adam.html))。ただし $g_{t+1} = \partial \mathcal{L} / \partial \theta_t$ とする。
+
+$$
+\begin{align}
+m_{t+1} &= \beta_1 m_{t} + (1 - \beta_1) g_{t+1} \\
+v_{t+1} &= \beta_2 v_{t} + (1 - \beta_2) g_{t+1}^2 \\
+\hat{m}_{t+1} &= \frac{m_{t+1}}{1 - \beta_1^{t+1}}, \qquad \hat{v}_{t+1} = \frac{v_{t+1}}{1 - \beta_2^{t+1}} \\
+\theta_{t+1} &= \theta_t - \gamma \frac{\hat{m}_{t+1}}{\sqrt{\hat{v}_{t+1}} + \epsilon}
+\end{align}
+$$
+
+$m_t$ がMomentum SGDにおける慣性に、$v_t$ がRMSpropにおける勾配の二乗の時間平均に対応していることが分かるだろう。
+
+なお、$m_t$ と $v_t$ はいずれも $0$ で初期化されるため、最適化の開始直後には、本来あるべき値よりも $0$ に偏った値を取ってしまう。$1 - \beta^{t+1}$ で割ることによって、この偏りを打ち消す操作を**バイアス補正**と呼ぶ。$t$ が大きくなると $1 - \beta^{t+1}$ は $1$ に近づくので、この補正の効果は最適化が進むにつれて弱まっていく。
 
 +++
 
