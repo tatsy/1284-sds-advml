@@ -11,7 +11,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.1
 kernelspec:
-  display_name: sdsadvml
+  display_name: sdsadvml (3.12.10.final.0)
   language: python
   name: python3
 ---
@@ -1589,3 +1589,7 @@ plt.show()
 :::{bibliography}
 :filter: docname in docnames
 :::
+
+```{code-cell} ipython3
+
+```
