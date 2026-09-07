@@ -43,7 +43,7 @@ try:
     import google.colab
 
     print('You are running the code in Google Colab.')
-except:
+except ImportError:
     IN_COLAB = False
     print('You are running the code in the local computer.')
 
@@ -147,7 +147,7 @@ PyTorchを使った深層学習をするために準備すべきことはいく�
 
 データローダとは、PyTorchを用いたニューラルネットワークの学習において、ミニバッチ学習を簡単にするための仕組みである。通常、深層学習には大量の訓練データが必要であり、それら全てを考慮したパラメータの更新方向(=勾配)を求めることは現実的ではない。
 
-そこで、大量の訓練データから少数のデータ、すなわちミニバッチをサンプルし、そのミニバッチ内のデータによって与えられる勾配が、データ全体から求まる勾配の近似として十分に正しく動作することを仮定する。データから収集してくるミニバッチの数は`torch.utils.data.Dataset`型のサブクラスとして用意されたデータセット・クラスを引数にとる`torch.data.utils.data.DataLoader`によって制御できる。
+そこで、大量の訓練データから少数のデータ、すなわちミニバッチをサンプルし、そのミニバッチ内のデータによって与えられる勾配が、データ全体から求まる勾配の近似として十分に正しく動作することを仮定する。データから収集してくるミニバッチの数は`torch.utils.data.Dataset`型のサブクラスとして用意されたデータセット・クラスを引数にとる`torch.utils.data.DataLoader`によって制御できる。
 
 では、上記のひらがなデータセットについて、まずはデータの読み出しを行う役割を持つデータセット・クラスを作成してみよう。なお、このデータセットには濁音・半濁音を含む73種類の文字が収録されているが、[特徴量抽出](#sec:feature-extraction)のときと同様に、ここでも濁音・半濁音・小文字を含まないひらがな46文字だけを扱うことにする。データセット・クラスは`torch.utils.data.Dataset`型のサブクラスとして実装する。この際、コンストラクタと合わせて、データの総数を返す`__len__`関数と、データ1つをサンプルする`__getitem__`関数の二つを実装する。
 
@@ -204,9 +204,10 @@ class HiraganaDataset(Dataset):
     def __getitem__(self, idx):
         """データ1つをサンプルする"""
         image_file, num = self.data[idx]
-        image = Image.open(image_file)
-        if image is None:
-            raise OSError(f'Failed to load image: {image_file:s}')
+        try:
+            image = Image.open(image_file)
+        except OSError as e:
+            raise OSError(f'Failed to load image: {image_file:s}') from e
 
         if self.transform is not None:
             image = self.transform(image)
