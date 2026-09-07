@@ -149,7 +149,7 @@ PyTorchを使った深層学習をするために準備すべきことはいく�
 
 そこで、大量の訓練データから少数のデータ、すなわちミニバッチをサンプルし、そのミニバッチ内のデータによって与えられる勾配が、データ全体から求まる勾配の近似として十分に正しく動作することを仮定する。データから収集してくるミニバッチの数は`torch.utils.data.Dataset`型のサブクラスとして用意されたデータセット・クラスを引数にとる`torch.data.utils.data.DataLoader`によって制御できる。
 
-では、上記のひらがな73文字データセットについて、まずはデータの読み出しを行う役割を持つデータセット・クラスを作成してみよう。データセット・クラスは`torch.utils.data.Dataset`型のサブクラスとして実装する。この際、コンストラクタと合わせて、データの総数を返す`__len__`関数と、データ1つをサンプルする`__getitem__`関数の二つを実装する。
+では、上記のひらがなデータセットについて、まずはデータの読み出しを行う役割を持つデータセット・クラスを作成してみよう。なお、このデータセットには濁音・半濁音を含む73種類の文字が収録されているが、[特徴量抽出](#sec:feature-extraction)のときと同様に、ここでも濁音・半濁音・小文字を含まないひらがな46文字だけを扱うことにする。データセット・クラスは`torch.utils.data.Dataset`型のサブクラスとして実装する。この際、コンストラクタと合わせて、データの総数を返す`__len__`関数と、データ1つをサンプルする`__getitem__`関数の二つを実装する。
 
 ```{code-cell} ipython3
 ---
@@ -206,10 +206,10 @@ class HiraganaDataset(Dataset):
         image_file, num = self.data[idx]
         image = Image.open(image_file)
         if image is None:
-            raise OSError(f'Failed to load image: {f:s}')
+            raise OSError(f'Failed to load image: {image_file:s}')
 
         if self.transform is not None:
-            image = transform(image)
+            image = self.transform(image)
 
         return image, num
 ```
@@ -287,6 +287,26 @@ test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+:::{admonition} 練習問題
+:class: question
+
+`train_loader`から1つ目のミニバッチを取り出し、そこに含まれる画像のテンソルとラベルのテンソルの`shape`と`dtype`を確かめよ。
+
+また、画像のテンソルの各次元が何を表わしているのかを説明せよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+`DataLoader`の引数`shuffle`について、訓練データではシャッフルを行い、テストデータでは行わないのが一般的である。
+
+訓練データをシャッフルしないで学習を行うと、何が問題になるだろうか。データセット・クラスが画像を文字の順に並べていることを踏まえて考えよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
 (ssec:network-architecture)=
 ### ネットワークの構築
 
@@ -294,7 +314,7 @@ test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 
 学習可能なニューラルネットワークは`nn.Module`クラスを継承することで作成できる。まずは、単純な実装として、ひらがなの画像 (48×48画素)を2304次元ベクトルとして扱う場合について見てみる。
 
-今回は、ひらがなの種類が73次元であるので、ネットワークが出力するべきものは73次元のベクトルで、それぞれの要素が、画像がどのひらがならしいかを表わす確率であるようなものである。
+今回は、扱うひらがなの種類が46種類であるので、ネットワークが出力するべきものは46次元のベクトルで、それぞれの要素が、画像がどのひらがならしいかを表わす確率であるようなものである。
 
 このようなベクトルからベクトルへの変換をいわゆる全結合層の連結によって表わすようなネットワークを特に**マルチレイヤ・パーセプトロン**(multilayer perceptron)やMLPと呼ぶ。
 
@@ -361,7 +381,7 @@ plt.title('sigmoid function')
 plt.show()
 ```
 
-このように、シグモイド関数は入力が0以上の時に1に近い値を、入力が0以下の時に0に近い値を返すようなものであり、これが人間のニューロン同士の結びつきをうまく表わしていると考えられていた。
+このように、シグモイド関数は入力が大きい時に1に近い値を、入力が小さい時に0に近い値を返すようなものであり、これが人間のニューロン同士の結びつきをうまく表わしていると考えられていた。
 
 しかし、実際にニューラルネットの学習を数値計算によって実現しようとする場合、シグモイド関数による活性化は**勾配消失**の問題を引き起こすことが分かった。
 
@@ -500,6 +520,25 @@ model = Network(48 * 48, n_classes)
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 (ssec:optimizer-preparation)=
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+上記の`Network`について、`model.parameters()`から学習可能なパラメータの総数を求めよ。
+
+また、その内訳を全結合層ごとに求め、どの層が最も多くのパラメータを持っているかを確かめよ ($n$ 次元から $m$ 次元への全結合層のパラメータ数が $mn + m$ であることを思い出すこと)。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+活性化関数のReLUを、シグモイド関数 (`torch.sigmoid`)に置き換えて学習を行い、損失関数の下がり方がどのように変わるかを比べよ。また、その違いを勾配消失の観点から説明せよ。
+:::
+
 ### オプティマイザの準備
 
 +++
@@ -512,7 +551,7 @@ editable: true
 slideshow:
   slide_type: ''
 ---
-optim = torch.optim.Adam(model.parameters(), lr=1.0e-4)
+optim = torch.optim.Adam(model.parameters(), lr=1.0e-3)
 ```
 
 (ssec:loss-function)=
@@ -535,105 +574,17 @@ $$
 
 交差エントロピーには、回帰問題で一般的に用いられる最小二乗誤差などと比べて、ラベルが正解から外れている時に、大きなペナルティが与えられる、という特徴があるため、より分類問題に向いた誤差指標と言える。
 
-+++
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-#### Softmax関数の計算
-
-+++
-
-さて、ここで一つ重要な問題がある。多クラス分類の場合、予測ラベルは、その値が0から1の範囲に収まるようにソフトマックス関数によって活性化されることが一般的である。活性化前の特徴ベクトルを$\mathbf{x}$とすると、活性化後のラベル$\mathbf{y}$の各次元$y_d$は、以下の式で与えられる。
+多クラス分類では、ネットワークの出力を確率のように扱うために、最終層を**ソフトマックス関数**によって活性化するのが一般的である。活性化前の特徴ベクトルを$\mathbf{x}$とすると、活性化後のラベル$\mathbf{y}$の各次元$y_d$は、以下の式で与えられる。
 
 $$
-y_d = \frac{e^{x_d}}{\sum_{d} e^{x_d}}
+y_d = \frac{e^{x_d}}{\sum_{j} e^{x_j}}
 $$
 
-この式を見て分かる通り、ソフトマックス関数は分母と分子に指数関数を含むため、$\mathbf{x}$のようそが少し大きな値を取るだけで、ニューラルネットワークの学習に一般的に用いられる単精度浮動小数で表せる範囲を超えてしまう。
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-そのため、実際のソフトマックス関数の計算においては、予め分母と分子を$\mathbf{x}$のうち最大の要素を$\max_j x_j$として、$e^{\max_j x_j}$で割り算をしておく、ということをする。
-
-より具体的には、以下の式によりソフトマックス関数を計算する。
-
-$$
-y_d = \frac{e^{x_d - \max_j x_j}}{\sum_{d} e^{x_d - \max_j x_j}}
-$$
-
-この違いを実際に計算して確かめてみよう。
-
-```{code-cell} ipython3
-# 0-100の間の乱数
-np.random.seed(3)
-x = torch.tensor(np.random.uniform(0, 100, size=(10)), dtype=torch.float32)
-
-# 単純な計算
-softmax0 = torch.exp(x) / torch.exp(x).sum()
-
-# 工夫した計算
-max_x = torch.max(x)
-softmax1 = torch.exp(x - max_x) / torch.exp(x - max_x).sum()
-
-# 結果の表示
-print(' Input:', x)
-print('Simple:', softmax0)
-print('Better:', softmax1)
-```
-
-いかがだろうか。このように、単純にソフトマックス関数を計算してしまうと、入力の$\mathbf{x}$に一つ、大きな値が含まれるだけで、計算に失敗してしまうことが分かる。自分でソフトマックス関数を書く場合には注意されたい (特にNumPyには標準のソフトマックス関数が実装されていない)。
-
-+++
-
-#### SoftmaxとLogSoftmax
-
-+++
-
-さて、続いてはソフトマックス関数(softmax)と、対数ソフトマックス関数(log-softmax)の違いについて見ていきたい。前述のニューラルネットワークでは、最終層の活性化関数に対してソフトマックス関数ではなく対数ソフトマックス関数を用いていたが、もちろんこれにも意味がある。
-
-例えば、次の例を見てみてほしい。
-
-```{code-cell} ipython3
-np.random.seed(3)
-x = torch.tensor(np.random.uniform(-100, 100, size=(10)), dtype=torch.float32)
-softmax = F.softmax(x, dim=0)
-print('Softmax:', softmax)
-```
-
-この例では、ソフトマックス関数の出力で、単精度浮動小数では表せないような微小な値が出てきてしまい、アンダーフローが起こって、一部の値が0になっていることが分かる。このような出力に対して対数を取ってしまえば、$-\infty$のような好ましくない値が得られてしまう。
-
-これは、交差エントロピー誤差の計算に影響を与える。前述の通り、交差エントロピーの計算には対数が含まれるので、$-\infty$のような不正な値が入ってくると、誤差関数の計算に失敗してしまうのである。そこで、より数値計算的に安定なやり方で、ソフトマックス関数の対数、即ち対数ソフトマックス関数を求めてしまおう、というのが、最終出力層を対数ソフトマックス関数で活性化している理由である。
-
-+++
-
-ソフトマックス関数に対して対数を取ると、以下のような式になる。
-
-$$
-\log y_d = x_d - \log\left( \sum_{d} e^{x_d}  \right)
-$$
-
-この式において、$x_d$に大きさのばらつきがあると、$e^{x_d}$の値はさらに大小差が大きくなり、数値計算においては、その和を取ったときに**桁落ち誤差**が起こって、相対的に小さな値が無視されてしまう。
-
-```{code-cell} ipython3
-# 桁落ち誤差の例
-a = np.array([0.00001], dtype='float32')
-b = np.array([10000.0], dtype='float32')
-print(a + b)
-```
-
-このような桁落ち誤差を防ぐために、ある数列の「指数の和」の「対数」を計算するときには、一工夫必要になる。具体的には、先ほどのソフトマックス関数の計算の時と同様に、各$x_d$から、要素の最大値$\max_j x_j$を引き算しておく、ということをする。すなわち、
-
-$$
-\begin{align}
-\log y_d &= x_d - \log\left( \sum_{d} e^{x_d - \max_j x_j}  \right) + \log e^{\max_j x_j} \\
-&= x_d - \log\left( \sum_{d} e^{x_d - \max_j x_j}  \right) + \max_j x_j
-\end{align}
-$$
-
-のように計算を行なう。すると、各$e^{x_d - \max_j x_j}$は0から1の間の値を取るため、桁落ち誤差の影響を抑えることができる。このような計算が`F.softmax`や`nn.Softmax`の中では行なわれており、計算結果を比較すると、以下のように$-\infty$のような不正な値を影響を受けることなく計算が行なわれていることが分かる。
-
-```{code-cell} ipython3
-logsoftmax0 = torch.log(F.softmax(x, dim=0))
-logsoftmax1 = F.log_softmax(x, dim=0)
-print('Simple:', logsoftmax0)
-print('Better:', logsoftmax1)
-```
+ただし、前述のネットワークでは、最終層の活性化関数にソフトマックス関数ではなく**対数ソフトマックス関数**を用いていた。これは、ソフトマックス関数をそのまま計算すると、指数関数によるオーバーフローやアンダーフローが起こり、その対数を取る交差エントロピーの計算にも影響が及ぶためである。この点の詳細については「[発展: ソフトマックス関数の数値計算](#ssec:softmax-numerics)」で扱う。
 
 さて、対数ソフトマックス関数の出力を$z$とすれば、交差エントロピーは
 
@@ -641,12 +592,12 @@ $$
 \mathcal{L}_{\rm CE} = -y z
 $$
 
-のように書き直せる。この関数こそが非負対数尤度誤差 (non-negative log-likelihood)であり、PyTorchでは`nn.NNLLoss`として用意されている。
+のように書き直せる。この関数こそが**負の対数尤度誤差** (negative log-likelihood)であり、PyTorchでは`nn.NLLLoss`として用意されている。
 
 以上の議論から、より高精度な識別結果を得るためには、
 
 - 最終層を対数ソフトマックス関数 (`nn.LogSoftmax` or `F.log_softmax`)で活性化する
-- 損失関数に非負対数尤度誤差 (`NNLLoss`)を用いる
+- 損失関数に負の対数尤度誤差 (`nn.NLLLoss`)を用いる
 
 という工夫を行なうのが良い。
 
@@ -673,6 +624,16 @@ criterion = nn.NLLLoss()
 
 従って、ソフトマックス関数の問題と各損失関数の仕組みを正しく理解しているなら`CrossEntropyLoss`を使っても良い。
 
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+`nn.NLLLoss`と`nn.CrossEntropyLoss`について、同じ入力に対して同じ損失の値が得られることを確かめよ。
+
+ただし、`nn.NLLLoss`には対数ソフトマックス関数を適用した後の値を、`nn.CrossEntropyLoss`には活性化する前の値を与える必要があることに注意すること。
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -767,6 +728,7 @@ editable: true
 slideshow:
   slide_type: ''
 ---
+model.eval()
 pbar = tqdm(test_loader)
 n_succ = 0
 
@@ -774,7 +736,6 @@ for data in pbar:
     X, y_true = data
     X = X.reshape((X.size(0), -1))
 
-    model.eval()
     with torch.no_grad():
         y_pred = model(X)
 
@@ -786,9 +747,27 @@ print(f'Acc: {total_acc:.3f}')
 
 このように、PyTorchを使ってニューラルネットワークを構築することで、一定の識別精度を得ることができた。
 
-しなしながら、MLPにおいては画像を単純なベクトルとして扱うため、画像の空間的な情報を活かすことが出来ず、その結果はFisherベクトルを用いた場合の精度等には及ばない。
+しかしながら、MLPにおいては画像を単純なベクトルとして扱うため、画像の空間的な情報を活かすことが出来ず、その結果はFisherベクトルを用いた場合の精度等には及ばない。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+学習ループの中で`optim.zero_grad()`を呼び出さないとどうなるかを、実際に試して確かめよ。
+
+また、そうなる理由を[PyTorchと自動微分](#sec:pytorch)の「勾配計算の制御」で述べた勾配の累積の観点から説明せよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+上記の学習ループでは、損失と精度をミニバッチごとに記録し、後から移動平均を取って滑らかにしている。
+
+移動平均の窓幅`box_size`を変えたときに、グラフの見え方がどのように変わるかを確かめよ。また、窓幅を大きくしすぎると何が失われるかを考えよ。
+:::
 
 ## 畳み込みニューラルネットによる学習
 
@@ -802,7 +781,7 @@ print(f'Acc: {total_acc:.3f}')
 
 今、入力が画像であり、それが画素ごとに特徴化されて$(H, W, D)$という大きさを持つデータであるとしよう。なお、$H$は画像 (特徴マップ)の高さ、$W$は幅、$D$は各画素が持つ特徴の次元である。
 
-このデータを畳み込み層によって$(W', H', D')$に変換することを考える。畳み込み層が学習可能な重みが畳み込みカーネルを表わす二次元のマップであり、これが$D \times D'$個用意される。カーネルのサイズを$K\times K$とする場合、畳み込み前後の特徴マップのサイズには、
+このデータを畳み込み層によって$(H', W', D')$に変換することを考える。畳み込み層が持つ学習可能な重みは、畳み込みカーネルを表わす二次元のマップであり、これが入力と出力のチャネルの組み合わせの数だけ、すなわち$D \times D'$個用意される。カーネルのサイズを$K\times K$とする場合、畳み込み前後の特徴マップのサイズには、
 
 $$
 \begin{align}
@@ -815,8 +794,8 @@ $$
 
 $$
 \begin{align}
-W' = \frac{H - K + 2P}{S} + 1 \\
-H' = \frac{H - K + 2P}{S} + 1
+W' &= \frac{W - K + 2P}{S} + 1 \\
+H' &= \frac{H - K + 2P}{S} + 1
 \end{align}
 $$
 
@@ -848,13 +827,13 @@ class CNN(nn.Module):
         self.fc3 = nn.Linear(6 * 6 * 16, out_channels)
 
     def forward(self, x):
-        x = torch.relu(self.bn1(self.conv1(x)))  # (B, 48, 48 64)
-        x = F.max_pool2d(x, 2)  # (B, 24, 24, 64)
-        x = torch.relu(self.bn2(self.conv2(x)))  # (B, 24, 24, 32)
-        x = F.max_pool2d(x, 2)  # (B, 12, 12, 32)
-        x = torch.relu(self.bn3(self.conv3(x)))  # (B, 12, 12, 16)
-        x = F.max_pool2d(x, 2)  # (B, 6, 6, 16)
-        x = x.reshape((x.size(0), -1))  # (B, 6 * 6 * 16)
+        x = torch.relu(self.bn1(self.conv1(x)))  # (B, 64, 48, 48)
+        x = F.max_pool2d(x, 2)  # (B, 64, 24, 24)
+        x = torch.relu(self.bn2(self.conv2(x)))  # (B, 32, 24, 24)
+        x = F.max_pool2d(x, 2)  # (B, 32, 12, 12)
+        x = torch.relu(self.bn3(self.conv3(x)))  # (B, 16, 12, 12)
+        x = F.max_pool2d(x, 2)  # (B, 16, 6, 6)
+        x = x.reshape((x.size(0), -1))  # (B, 16 * 6 * 6)
         x = self.fc3(x)  # (B, out_channels)
         y = F.log_softmax(x, dim=1)
         return y
@@ -952,6 +931,7 @@ editable: true
 slideshow:
   slide_type: ''
 ---
+model.eval()
 pbar = tqdm(test_loader)
 n_succ = 0
 
@@ -960,7 +940,6 @@ for data in pbar:
     X = X.to(device)
     y_true = y_true.to(device)
 
-    model.eval()
     with torch.no_grad():
         y_pred = model(X)
 
@@ -972,16 +951,23 @@ print(f'Acc: {total_acc:.3f}')
 
 このようにCNNを用いて画像としての特徴をより意識するようなニューラルネットワークを用いたことで、識別の精度が大幅に向上したことが分かる。
 
-+++
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
 MLPとCNNを用いた画像識別の各例について、オプティマイザの種類によって、誤差関数の収束と識別精度の上昇がどのように変化するかを調査せよ。
+:::
 
-::::
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-+++
+:::{admonition} 練習問題
+:class: question
+
+上記の`CNN`と`Network` (MLP)について、それぞれの学習可能なパラメータの総数を比較せよ。
+
+CNNの方が識別精度が高いにもかかわらず、パラメータ数はどうなっているだろうか。畳み込み層のパラメータが、入力の画像サイズによらずカーネルの大きさとチャネル数だけで決まることを踏まえて考察せよ。
+:::
 
 ## 学習結果の保存
 
@@ -1016,6 +1002,7 @@ optim2.load_state_dict(ckpt2['optim'])
 再度、読み込んだパラメータを用いて性能を確認してみる。
 
 ```{code-cell} ipython3
+model2.eval()
 pbar = tqdm(test_loader)
 n_succ = 0
 
@@ -1024,7 +1011,6 @@ for data in pbar:
     X = X.to(device)
     y_true = y_true.to(device)
 
-    model2.eval()
     with torch.no_grad():
         y_pred = model2(X)
     n_succ += (torch.argmax(y_pred, dim=1) == y_true).float().sum()
@@ -1072,6 +1058,24 @@ ckpt = torch.load('ckpt.pth', map_location=torch.device('cpu'))
 
 故に、どのような問題に対しても、**無差別に深層学習を適用すれば良い結果が得られるわけではない**、という点には最大の注意を払ってほしい。やはり、深層学習が発展した今でも、問題に応じて適切な手法を選ばなければならないことに変わりはない。
 
++++
+
+次に、訓練データ数を増やすことも、過学習を抑えるための直接的な方法である。とはいえ、実際の問題では、データを新たに集めること自体に費用や時間がかかることが多い。
+
+そこで、手元にあるデータに対して、ラベルが変わらないような変換を加えることで、見かけ上のデータ数を増やす**データ拡張** (data augmentation)がよく用いられる。画像の場合であれば、平行移動、回転、拡大・縮小、左右反転、明るさの変更などが典型的な変換である。
+
+実は、本章のデータセット・クラスに与えている`transform`は、既にこのデータ拡張を行なっている。
+
+```python
+v2.RandomAffine(degrees=[-60, 60], scale=[0.8, 1.1])
+```
+
+という前処理は、画像を読み出すたびにランダムな回転と拡大・縮小を加えるので、同じ画像ファイルからでも、毎回わずかに異なる画像が得られることになる。これにより、ネットワークは「少し回転していても同じ文字である」ことを学習でき、特定の見え方に過度に適合しにくくなる。
+
+ただし、どのような変換を加えて良いかは問題によって決まる点に注意してほしい。例えば、数字の「6」と「9」を識別する問題で 180° の回転を加えてしまうと、ラベルが変わってしまい、学習が成立しなくなる。
+
+なお、データ拡張は本来、訓練時にのみ適用し、評価時には適用しないのが一般的である。本章の実装は、データセット・クラスの内部で`transform`を適用しているため、評価時にもランダムな回転等がかかっており、テスト時の精度が実行のたびに多少変動する原因になっている。
+
 また、正則化項の導入により過学習を防ぐことも可能である。正則化項とは、非常に大雑把な議論では、各パラメータの絶対値が大きくなりすぎないようにペナルティ項を追加することに対応する。このようなペナルティ項には様々な種類があるが、よく用いられるのはL1正則化、ならびにL2正則化である。L1正則化は学習可能パラメータの絶対値の和を使い、L2正則化は学習可能パラメータの二乗の和を用いる。
 
 PyTorchを用いる場合、L2正則化であれば、オプティマイザをインスタンス化する際に引数として`weight_decay=...`というパラメータを指定することで、正則化がかかる。例えば、
@@ -1091,7 +1095,7 @@ for p in model.parameters():
     l1_reg += p.abs().sum()
 ```
 
-最後に紹介するDropoutは、全結合層や畳み込み層中のチャネル間の結びつきをランダムに無効化しながら学習するという仕組みである。例えば、全結合層により、ベクトルの次元数を$D_1$から$D_2$に変える場合、Dropoutされる確率を$p \in (0, 1)$として、$p D_1 D_2$個の行列要素を**訓練時のみ**ランダムに0で埋めてしまう。
+最後に紹介するDropoutは、層の出力の一部をランダムに無効化しながら学習するという仕組みである。例えば、全結合層により、ベクトルの次元数を$D_1$から$D_2$に変える場合、Dropoutされる確率を$p \in (0, 1)$として、出力の$D_2$次元のうち、およそ$p D_2$個の要素を**訓練時のみ**ランダムに0で埋めてしまう (無効化されるのは重み行列の要素ではなく、層の出力である点に注意してほしい。重みの側を無効化するDropConnectという別の手法もある)。
 
 こうすることにより、機械学習モデルは、どのパラメータを使った場合にも、まんべんなく訓練データに対する予測ができるように学習が進み、結果として過学習を防ぐことができる。
 
@@ -1099,12 +1103,12 @@ PyTorchで実装する場合には、活性化関数の後に`nn.Dropout`ある�
 
 +++
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
 [過学習を防ぐための工夫](#ssec:avoid-overfit)に示した方法によって、どの程度、過学習が抑制できるかを実際に試してみよ。
 
-::::
+:::
 
 +++
 
@@ -1128,6 +1132,115 @@ PyTorchで実装する場合には、活性化関数の後に`nn.Dropout`ある�
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+## 発展的な内容
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+ここから先の節は、講義の中では扱わない発展的な内容である。ソフトマックス関数を自分で実装する場合や、学習が数値的に不安定になる原因を調べたい場合に読んでほしい。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+(ssec:softmax-numerics)=
+### 発展: ソフトマックス関数の数値計算
+
+#### Softmax関数の計算
+
++++
+
+さて、ここで一つ重要な問題がある。多クラス分類の場合、予測ラベルは、その値が0から1の範囲に収まるようにソフトマックス関数によって活性化されることが一般的である。活性化前の特徴ベクトルを$\mathbf{x}$とすると、活性化後のラベル$\mathbf{y}$の各次元$y_d$は、以下の式で与えられる。
+
+$$
+y_d = \frac{e^{x_d}}{\sum_{d} e^{x_d}}
+$$
+
+この式を見て分かる通り、ソフトマックス関数は分母と分子に指数関数を含むため、$\mathbf{x}$の要素が少し大きな値を取るだけで、ニューラルネットワークの学習に一般的に用いられる単精度浮動小数で表せる範囲を超えてしまう。
+
+そのため、実際のソフトマックス関数の計算においては、予め分母と分子を$\mathbf{x}$のうち最大の要素を$\max_j x_j$として、$e^{\max_j x_j}$で割り算をしておく、ということをする。
+
+より具体的には、以下の式によりソフトマックス関数を計算する。
+
+$$
+y_d = \frac{e^{x_d - \max_j x_j}}{\sum_{d} e^{x_d - \max_j x_j}}
+$$
+
+この違いを実際に計算して確かめてみよう。
+
+```{code-cell} ipython3
+# 0-100の間の乱数
+np.random.seed(3)
+x = torch.tensor(np.random.uniform(0, 100, size=(10)), dtype=torch.float32)
+
+# 単純な計算
+softmax0 = torch.exp(x) / torch.exp(x).sum()
+
+# 工夫した計算
+max_x = torch.max(x)
+softmax1 = torch.exp(x - max_x) / torch.exp(x - max_x).sum()
+
+# 結果の表示
+print(' Input:', x)
+print('Simple:', softmax0)
+print('Better:', softmax1)
+```
+
+いかがだろうか。このように、単純にソフトマックス関数を計算してしまうと、入力の$\mathbf{x}$に一つ、大きな値が含まれるだけで、計算に失敗してしまうことが分かる。自分でソフトマックス関数を書く場合には注意されたい (特にNumPyには標準のソフトマックス関数が実装されていない)。
+
++++
+
+#### SoftmaxとLogSoftmax
+
++++
+
+さて、続いてはソフトマックス関数(softmax)と、対数ソフトマックス関数(log-softmax)の違いについて見ていきたい。前述のニューラルネットワークでは、最終層の活性化関数に対してソフトマックス関数ではなく対数ソフトマックス関数を用いていたが、もちろんこれにも意味がある。
+
+例えば、次の例を見てみてほしい。
+
+```{code-cell} ipython3
+np.random.seed(3)
+x = torch.tensor(np.random.uniform(-100, 100, size=(10)), dtype=torch.float32)
+softmax = F.softmax(x, dim=0)
+print('Softmax:', softmax)
+```
+
+この例では、ソフトマックス関数の出力で、単精度浮動小数では表せないような微小な値が出てきてしまい、アンダーフローが起こって、一部の値が0になっていることが分かる。このような出力に対して対数を取ってしまえば、$-\infty$のような好ましくない値が得られてしまう。
+
+これは、交差エントロピー誤差の計算に影響を与える。前述の通り、交差エントロピーの計算には対数が含まれるので、$-\infty$のような不正な値が入ってくると、誤差関数の計算に失敗してしまうのである。そこで、より数値計算的に安定なやり方で、ソフトマックス関数の対数、即ち対数ソフトマックス関数を求めてしまおう、というのが、最終出力層を対数ソフトマックス関数で活性化している理由である。
+
++++
+
+ソフトマックス関数に対して対数を取ると、以下のような式になる。
+
+$$
+\log y_d = x_d - \log\left( \sum_{d} e^{x_d}  \right)
+$$
+
+この式において、$x_d$に大きさのばらつきがあると、$e^{x_d}$の値はさらに大小差が大きくなり、数値計算においては、その和を取ったときに**桁落ち誤差**が起こって、相対的に小さな値が無視されてしまう。
+
+```{code-cell} ipython3
+# 桁落ち誤差の例
+a = np.array([0.00001], dtype='float32')
+b = np.array([10000.0], dtype='float32')
+print(a + b)
+```
+
+このような桁落ち誤差を防ぐために、ある数列の「指数の和」の「対数」を計算するときには、一工夫必要になる。具体的には、先ほどのソフトマックス関数の計算の時と同様に、各$x_d$から、要素の最大値$\max_j x_j$を引き算しておく、ということをする。すなわち、
+
+$$
+\begin{align}
+\log y_d &= x_d - \log\left( \sum_{d} e^{x_d - \max_j x_j}  \right) + \log e^{\max_j x_j} \\
+&= x_d - \log\left( \sum_{d} e^{x_d - \max_j x_j}  \right) + \max_j x_j
+\end{align}
+$$
+
+のように計算を行なう。すると、各$e^{x_d - \max_j x_j}$は0から1の間の値を取るため、桁落ち誤差の影響を抑えることができる。このような計算が`F.softmax`や`nn.Softmax`の中では行なわれており、計算結果を比較すると、以下のように$-\infty$のような不正な値を影響を受けることなく計算が行なわれていることが分かる。
+
+```{code-cell} ipython3
+logsoftmax0 = torch.log(F.softmax(x, dim=0))
+logsoftmax1 = F.log_softmax(x, dim=0)
+print('Simple:', logsoftmax0)
+print('Better:', logsoftmax1)
+```
 
 ## 参考文献
 
