@@ -9,9 +9,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.19.1
+    jupytext_version: 1.19.5
 kernelspec:
-  display_name: sdsadvml (3.11.13)
+  display_name: sdsadvml (3.12.10)
   language: python
   name: python3
 ---
