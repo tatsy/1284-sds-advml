@@ -1684,7 +1684,7 @@ from sklearn.model_selection import GridSearchCV, PredefinedSplit
 # (-1は検証に使わない = 常に訓練に使うことを表わす)
 X_hold = np.concatenate([X, X_val], axis=0)
 y_hold = np.concatenate([y, y_val], axis=0)
-test_fold = np.concatenate([np.full(len(X), -1), np.zeros(len(X_val))])
+test_fold = np.concatenate([np.full(len(X), -1, dtype=np.int32), np.zeros(len(X_val), dtype=np.int32)])
 
 # グリッドサーチによる最適パラメータの探索
 kernel_types = ['linear', 'rbf', 'poly']
