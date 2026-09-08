@@ -971,39 +971,59 @@ $$
 &= \frac{1}{2} \| \mathbf{a} \|^2 - \boldsymbol{\lambda}^\top (\mathbf{y} \odot (\mathbf{X} \mathbf{a} + b \mathbf{1}) - \mathbf{1}) \\
 &= \frac{1}{2} \| \mathbf{a} \|^2 - \boldsymbol{\lambda}^\top (\mathbf{Y} \mathbf{X} \mathbf{a} + b \mathbf{y} - \mathbf{1})
 \end{aligned}
-$$
+$$ (eq:svm-lagrange-function)
 
 のように書ける。ただし、$\mathbf{Y}$は$\mathbf{y}$の要素を対角成分に持つ対角行列である。
 
-ここで注意が必要なのは、**制約が等式ではなく不等式である**という点である。等式制約であれば、Lagrange関数の勾配が$\mathbf{0}$になる点を求めれば良かったが、不等式制約の場合、最適解が満たすべき条件は**KKT条件** (Karush-Kuhn-Tucker条件)と呼ばれる次の4つになる。
+ここで注意が必要なのは、**制約が等式ではなく不等式である**という点である。等式制約であれば、Lagrange関数の勾配が$\mathbf{0}$になる点を求めれば良かったが、不等式制約の場合、最適解が満たすべき条件は**KKT条件** (Karush-Kuhn-Tucker条件)と呼ばれる次の4条件になる。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+**停留条件**
 $$
 \begin{aligned}
-\text{(停留条件)} \quad
-\frac{\partial \mathcal{L}}{\partial \mathbf{a}} &= \mathbf{a} - \mathbf{X}^\top \mathbf{Y}^\top \boldsymbol{\lambda} = \mathbf{0}, \qquad
-\frac{\partial \mathcal{L}}{\partial b} = -\boldsymbol{\lambda}^\top \mathbf{y} = 0 \\
-\text{(主問題の実行可能性)} \quad
-y_i (\mathbf{a} \cdot \mathbf{x}_i + b) - 1 &\geq 0 \qquad \text{for}~~i=1, \ldots, N \\
-\text{(双対問題の実行可能性)} \quad
-\lambda_i &\geq 0 \qquad \text{for}~~i=1, \ldots, N \\
-\text{(相補性条件)} \quad
-\lambda_i \left( y_i (\mathbf{a} \cdot \mathbf{x}_i + b) - 1 \right) &= 0 \qquad \text{for}~~i=1, \ldots, N
+\frac{\partial \mathcal{L}}{\partial \mathbf{a}} &= \mathbf{a} - \mathbf{X}^\top \mathbf{Y}^\top \boldsymbol{\lambda} = \mathbf{0}, \\
+\frac{\partial \mathcal{L}}{\partial b} &= -\boldsymbol{\lambda}^\top \mathbf{y} = 0
 \end{aligned}
 $$
 
++++
+
+**主問題の実行可能性**
+$$
+y_i (\mathbf{a} \cdot \mathbf{x}_i + b) - 1 \geq 0 \qquad \text{for}~~i=1, \ldots, N
+$$
+
++++
+
+**双対問題の実行可能性**
+$$
+\lambda_i \geq 0 \qquad \text{for}~~i=1, \ldots, N
+$$
+
++++
+
+**相補性条件**
+$$
+\lambda_i \left( y_i (\mathbf{a} \cdot \mathbf{x}_i + b) - 1 \right) = 0 \qquad \text{for}~~i=1, \ldots, N
+$$
+
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-このうち、最後の**相補性条件**が重要である。この条件は、各サンプルについて$\lambda_i = 0$であるか、$y_i (\mathbf{a} \cdot \mathbf{x}_i + b) = 1$すなわち**そのサンプルがちょうどマージン上にある**か、のいずれかであることを意味している。
+このうち、最後の**相補性条件**が重要である。この条件は、各サンプルについて $\lambda_i = 0$ であるか $y_i (\mathbf{a} \cdot \mathbf{x}_i + b) = 1$ すなわち**そのサンプルがちょうどマージン上にある**か、のいずれかであることを意味している。
 
-一方、停留条件の1つ目から$\mathbf{a} = \sum_{i=1}^{N} \lambda_i y_i \mathbf{x}_i$であるから、決定境界を決めているのは$\lambda_i > 0$であるサンプル、すなわち**マージン上にあるサンプルだけ**ということになる。これが、これらのサンプルをサポートベクトルと呼ぶ理由であり、通常、サポートベクトルの数は全サンプル数よりずっと少ない。
+1つ目の停留条件は $\mathbf{a} = \sum_{i=1}^{N} \lambda_i y_i \mathbf{x}_i$ であるから、決定境界を決めているのは $\lambda_i \neq 0$ すなわち、**マージン上にあるサンプルだけ**ということになる。
+これが、これらのサンプルをサポートベクトルと呼ぶ理由であり、通常、サポートベクトルの数は全サンプル数よりずっと少ない。
 
-なお、KKT条件を満たす$\boldsymbol{\lambda}$を求める問題は**二次計画問題**となり、線形の連立方程式のように一度で解くことはできない。scikit-learnの`SVC`は、この二次計画問題をSMO (sequential minimal optimization)と呼ばれるアルゴリズムによって数値的に解いている。
+なお、KKT条件を満たす $\boldsymbol{\lambda}$ を求める問題は**二次計画問題**となり、線形の連立方程式のように一度で解くことはできない。
+scikit-learnの`SVC`は、この二次計画問題をSMO (sequential minimal optimization)と呼ばれるアルゴリズムによって数値的に解いている。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-とはいえ、二次計画問題をここで実装するのは大変なので、以下では**全てのサンプルがちょうどマージン上にある**と仮定した緩和問題を考えてみる。すなわち、相補性条件と不等式制約を無視して、全ての$i$について$y_i (\mathbf{a} \cdot \mathbf{x}_i + b) = 1$が成り立つとすると、条件は$(\mathbf{a}, b, \boldsymbol{\lambda})$についての線形の連立方程式となり、以下のように書き直せる。
+とはいえ、二次計画問題をここで説明するのは大変なので、以下では**全てのサンプルがちょうどマージン上にある**と仮定した緩和問題を考えてみる。
+すなわち、相補性条件と不等式制約を無視し、全ての $i$ について $y_i (\mathbf{a} \cdot \mathbf{x}_i + b) = 1$ が成り立つとする。
+
+この場合 {eq}`eq:svm-lagrange-function` を $\mathbf{a}$, $b$, $\boldsymbol{\lambda}$ で偏微分して $\mathbf{0}$ に等しい点を求めると、以下の連立方程式が得られる。
 
 $$
 \begin{pmatrix}
@@ -1051,8 +1071,8 @@ tags: [hide-input]
 plt.scatter(X_1[:, 0], X_1[:, 1], label='$x_1$')
 plt.scatter(X_2[:, 0], X_2[:, 1], label='$x_2$')
 plt.legend()
-plt.xlim([-2, 2])
-plt.ylim([-2, 2])
+plt.xlim(-2, 2)
+plt.ylim(-2, 2)
 plt.gca().set_aspect('equal')
 plt.tight_layout()
 plt.show()
@@ -1106,8 +1126,8 @@ y_max = -1.0 * (a_[0] * x_max + b_) / a_[1]
 plt.scatter(X_1[:, 0], X_1[:, 1], label='$x_1$')
 plt.scatter(X_2[:, 0], X_2[:, 1], label='$x_2$')
 plt.axline((x_min, y_min), (x_max, y_max), color='black', linestyle='--', linewidth=2)
-plt.xlim([-2, 2])
-plt.ylim([-2, 2])
+plt.xlim(-2, 2)
+plt.ylim(-2, 2)
 plt.legend()
 plt.gca().set_aspect('equal')
 plt.tight_layout()
@@ -1246,8 +1266,8 @@ labels = ['$x_1$', '$x_2$']
 for i in range(len(labels)):
     idx = np.where(y_circ == i)
     plt.scatter(X_circ[idx, 0], X_circ[idx, 1], label=labels[i])
-plt.xlim([-1.25, 1.25])
-plt.ylim([-1.25, 1.25])
+plt.xlim(-1.25, 1.25)
+plt.ylim(-1.25, 1.25)
 plt.gca().set_aspect('equal')
 plt.legend()
 plt.tight_layout()
@@ -1298,8 +1318,8 @@ for i in range(len(labels)):
     idx = np.where(y_pred == i)
     plt.scatter(X_circ[idx, 0], X_circ[idx, 1], label=labels[i])
 
-plt.xlim([-1.25, 1.25])
-plt.ylim([-1.25, 1.25])
+plt.xlim(-1.25, 1.25)
+plt.ylim(-1.25, 1.25)
 plt.gca().set_aspect('equal')
 plt.legend()
 plt.tight_layout()
@@ -1488,8 +1508,8 @@ for i in range(len(labels)):
     idx = np.where(y_pred == i)
     plt.scatter(X_circ[idx, 0], X_circ[idx, 1], label=labels[i])
 
-plt.xlim([-1.25, 1.25])
-plt.ylim([-1.25, 1.25])
+plt.xlim(-1.25, 1.25)
+plt.ylim(-1.25, 1.25)
 plt.gca().set_aspect('equal')
 plt.legend()
 plt.tight_layout()
