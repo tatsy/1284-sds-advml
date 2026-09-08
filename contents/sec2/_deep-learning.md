@@ -520,10 +520,6 @@ model = Network(48 * 48, n_classes)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-(ssec:optimizer-preparation)=
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 :::{admonition} 練習問題
 :class: question
 
@@ -540,6 +536,7 @@ model = Network(48 * 48, n_classes)
 活性化関数のReLUを、シグモイド関数 (`torch.sigmoid`)に置き換えて学習を行い、損失関数の下がり方がどのように変わるかを比べよ。また、その違いを勾配消失の観点から説明せよ。
 :::
 
+(ssec:optimizer-preparation)=
 ### オプティマイザの準備
 
 +++
