@@ -79,7 +79,11 @@ result_df = pd.DataFrame(
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## 分類問題 (classification)
+## 分類問題とデータの準備
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### 分類に用いるデータセット
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -179,7 +183,7 @@ X_test, y_test = X_test[:n_samples], y_test[:n_samples]
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## データのスケーリング
+### データのスケーリング
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -226,7 +230,15 @@ clf.fit(X, y)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## 最近傍探索による分類
+## 基本的な分類器
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+識別に用いる分類器には多くの種類がある。まずは、考え方が単純な2つの分類器を試してみよう。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### 最近傍探索による分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -311,7 +323,7 @@ result_df.loc[len(result_df), :] = ['k-nearest', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## ロジスティック回帰による分類
+### ロジスティック回帰による分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -402,7 +414,15 @@ result_df.loc[len(result_df), :] = ['Logistic', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## バギングによる分類
+## アンサンブル学習
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+複数の分類器を組み合わせることで、単体の分類器より高い性能を得ようとする考え方を**アンサンブル学習**と呼ぶ。ここでは、その代表的な手法を、単純なものから順に見ていく。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### バギングによる分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -410,7 +430,15 @@ result_df.loc[len(result_df), :] = ['Logistic', acc_test, 'Test']
 
 例えば、訓練データが$N$個のサンプルからなる時、$M$個のサブサンプル ($M \leq N$)を取り出して、分類器を学習する。この操作を複数のサブサンプルと分類器に対して実行する。このようにブートストラップ・サンプルで訓練された分類器のことを**弱分類器**と呼ぶ。
 
-最終結果は、単純には、得られた分類器の予測の中で一番多数の票を集めたものが与えられる。以下に単純なバギングの実装例を与える。
+最終結果は、単純には、得られた分類器の予測の中で一番多数の票を集めたものが与えられる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+#### 発展: 自前実装によるバギング
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+仕組みを確かめるために、以下にscikit-learnを使わないバギングの実装例を与える。
 
 ```{code-cell} ipython3
 ---
@@ -463,7 +491,11 @@ print(f'Bagging: acc(test)={acc_test:.2f}%')
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-バギングをscikit-learnの(`BaggingClassifier`)を用いて実装した場合には以下のようになる。
+#### scikit-learnによるバギング
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+バギングをscikit-learnの`BaggingClassifier`を用いて実装した場合には以下のようになる。
 
 ```{code-cell} ipython3
 ---
@@ -538,7 +570,7 @@ result_df.loc[len(result_df), :] = ['Bagging', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## ランダム・フォレストによる分類
+### ランダム・フォレストによる分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -546,7 +578,15 @@ result_df.loc[len(result_df), :] = ['Bagging', acc_test, 'Test']
 
 そこで、ランダム・フォレストでは、訓練データからブートストラップ・サンプルを抽出し、さらに、その特徴のうちランダムに数個だけを選んで弱分類器を学習する。即ち、学習する特徴ベクトルが$C$次元であるとして、その中から$c$個 ($c \leq C$)だけをランダムに抽出したものを特徴ベクトルとして学習を行う。
 
-このようにすることで十分に$N$に近い$M$であっても、分布の異なるサンプル集合を得ることができる。以下に簡易実装を示す。
+このようにすることで十分に$N$に近い$M$であっても、分布の異なるサンプル集合を得ることができる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+#### 発展: 自前実装によるランダム・フォレスト
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+以下に簡易実装を示す。
 
 ```{code-cell} ipython3
 ---
@@ -605,6 +645,10 @@ slideshow:
 acc_test = 100.0 * np.sum(y_pred == y_test) / len(y_test)
 print(f'Random Forest: acc(test)={acc_test:.2f}%')
 ```
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+#### scikit-learnによるランダム・フォレスト
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -678,7 +722,7 @@ result_df.loc[len(result_df), :] = ['Random forest', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## 発展: AdaBoostによる分類
+### 発展: AdaBoostによる分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -779,7 +823,7 @@ result_df.loc[len(result_df), :] = ['AdaBoost', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## 発展: 勾配ブースティングによる分類
+### 発展: 勾配ブースティングによる分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -873,7 +917,11 @@ result_df.loc[len(result_df), :] = ['Gradient boosting', acc_test, 'Test']
 
 (ssec:support-vector-machine)=
 
-## サポートベクトルマシンによる分類
+## サポートベクトルマシン
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### 線形サポートベクトルマシン
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -910,6 +958,10 @@ $$
 $$
 
 あとは、この不等式制約付きの最小化問題を解けば良い。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+#### 発展: マージン最大化問題の解法
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1088,6 +1140,10 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+#### scikit-learnによる線形SVM
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
 以下ではSVMを使って、MNIST のデータを分類していく。多クラス分類の場合には、one-vs-one 方式の二つの方式があり、それぞれ以下のような方法を指す。
 
 - **one-vs-one方式:** $K$個あるクラスの任意1のペアに対し1対1学習させる。従って合計で$K(K-1)/2$個のSVMモデルを学習する必要がある。
@@ -1165,7 +1221,7 @@ result_df.loc[len(result_df), :] = ['Linear SVM', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## カーネル法を用いたサポートベクトルマシン
+### カーネル法を用いたサポートベクトルマシン
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1318,6 +1374,10 @@ $$
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+#### 発展: カーネル関数が満たすべき性質
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
 「カーネル関数」は、上記の通り、何らかの高次元空間における内積を表わすように定義される。このような性質を満たすためには、カーネル関数$k$が$\mathbb{R}^d \times \mathbb{R}^d$から$\mathbb{R}$への写像であって、関数が**半正定値性**を持つ必要がある。
 
 半正定値性、とは行列においては、任意のベクトルに対する二次形式が**0 以上**になることを指す。より厳密には、行列$\mathbf{A} \in \mathbb{R}^{d \times d}$が半正定値行列であるとは、
@@ -1372,7 +1432,9 @@ $$
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{warning}
+:::{admonition} この議論の厳密性について
+:class: warning
+
 上記は、数学的には厳密な議論ではなく、あくまで限られた$n$個のベクトル集合$\mathbf{x}_1, \ldots, \mathbf{x}_n$について、カーネル関数が内積を定義するような高次元空間への写像$\phi$が存在することを直感的に分かるように説明した。
 
 より厳密な議論のためには、カーネル関数の連続性や二乗可積分性などの性質が必要になるが、これらの議論は別の専門書に譲ることとする。一例として、以下の教科書が詳しい。
