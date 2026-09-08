@@ -9,9 +9,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.19.1
+    jupytext_version: 1.19.5
 kernelspec:
-  display_name: sdsadvml
+  display_name: sdsadvml (3.12.6.final.0)
   language: python
   name: python3
 ---
@@ -39,8 +39,8 @@ import warnings
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.exceptions import ConvergenceWarning
 from tqdm.notebook import tqdm
+from sklearn.exceptions import ConvergenceWarning
 
 # 実験に用いるデータ数
 n_images_per_char = 200
@@ -406,8 +406,8 @@ slideshow:
   slide_type: ''
 tags: [remove-output]
 ---
-from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import StandardScaler
 
 clf = make_pipeline(
@@ -1324,8 +1324,8 @@ print('%.2f' % (acc_test * 100.0))
 
 **結果: Histogram of Oriented Gradientの利用**
 
-- 訓練時精度: [](#hog_acc_train)%
-- 評価時精度: [](#hog_acc_test)%
+- 訓練時精度: ![](#hog_acc_train)%
+- 評価時精度: ![](#hog_acc_test)%
 
 +++
 
