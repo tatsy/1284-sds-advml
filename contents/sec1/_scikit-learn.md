@@ -9,9 +9,9 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.19.1
+    jupytext_version: 1.19.5
 kernelspec:
-  display_name: sdsadvml (3.11.13)
+  display_name: sdsadvml (3.12.10)
   language: python
   name: python3
 ---
@@ -41,14 +41,12 @@ tags: [remove-cell]
 import os
 import random
 import warnings
-from itertools import product
 
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from tqdm.notebook import tqdm
 from sklearn.exceptions import ConvergenceWarning
 
 # グラフの設定
@@ -79,7 +77,11 @@ result_df = pd.DataFrame(
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## 分類問題 (classification)
+## 分類問題とデータの準備
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### 分類に用いるデータセット
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -116,7 +118,7 @@ y_org = np.array(y_org, dtype=np.uint8)
 
 なお、特に`data_home`を指定しない場合はホームディレクトリに`scikit_learn_data`というディレクトリが作成され、その中にデータがキャッシュされる。一度目に上記のコードを実行すると、データのダウンロードに時間がかかるが、二度目以降はキャッシュされたデータを読み込むため時間が短縮される (それでも数秒はかかる)。
 
-上記、scikit-learnの関数で得られるデータは[Pandas](https://pandas.pydata.org/)の`DataFrame`という方になっているのでおく。なお、データを画像として可視化すると以下のようになっている。
+なお、`fetch_openml`が返すデータは[Pandas](https://pandas.pydata.org/)の`DataFrame`型であるため、上記のコードでは`np.array`によってNumPyの配列に変換している。データを画像として可視化すると以下のようになっている。
 
 ```{code-cell} ipython3
 ---
@@ -132,7 +134,7 @@ ims = np.reshape(X_org[:8], (-1, 28, 28))
 fig, axs = plt.subplots(2, 4, figsize=(6, 3))
 axs = axs.flatten()
 for i in range(8):
-    axs[i].imshow(ims[i], cmap='gray', vmin=0, vmax=1, interpolation=None)
+    axs[i].imshow(ims[i], cmap='gray', vmin=0, vmax=1, interpolation='none')
     axs[i].set_title(f'label is {y_org[i]:d}')
     axs[i].set(xticks=[], yticks=[])
 
@@ -179,7 +181,7 @@ X_test, y_test = X_test[:n_samples], y_test[:n_samples]
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## データのスケーリング
+### データのスケーリング
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -202,31 +204,39 @@ X_scaled = scaler.transform(X)
 X_test_scaled = scaler.transform(X_test)
 ```
 
-なお、実際の機械分類モデル (例えば`LinearRegression`)などと一緒に用いる場合には、`make_pipeline`関数を用いると、スケーリングにテスト用データを誤って使うと言った間違い(以下の注意を参照)を防ぐことができ、実装も簡単である。
+なお、実際の機械分類モデル (例えば`LogisticRegression`)などと一緒に用いる場合には、`make_pipeline`関数を用いると、スケーリングにテスト用データを誤って使うと言った間違い(以下の注意を参照)を防ぐことができ、実装も簡単である。
 
 
 ```python
 from sklearn.pipeline import make_pipeline
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
 
 clf = make_pipeline(
     StandardScaler(),
-    LinearRegression(),
+    LogisticRegression(),
 )
-clf.train(X, y)
+clf.fit(X, y)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{admonition} スケーリングする際の注意
+:::{admonition} スケーリングする際の注意
 :class: warning
 
 データのスケーリングを行う場合、**スケールを決定するのに使えるデータは訓練データのみ**であることに注意する (テストデータがどんなデータなのかは事前に分からないため)。また、テストをする際にも、同様の(訓練データに基づいた)スケーリングをするのを忘れないようにすること。
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## 最近傍探索による分類
+## 基本的な分類器
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+識別に用いる分類器には多くの種類がある。まずは、考え方が単純な2つの分類器を試してみよう。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### 最近傍探索による分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -301,7 +311,17 @@ result_df.loc[len(result_df), :] = ['k-nearest', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## ロジスティック回帰による分類
+:::{admonition} 練習問題
+:class: question
+
+`n_neighbors`の値を 1, 5, 20, 100 と変化させたときに、訓練時と評価時の精度がどのように変わるかを調べよ。
+
+また、`n_neighbors=1`のときに訓練時の精度がどうなるかを、アルゴリズムの定義から予想した上で確かめよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### ロジスティック回帰による分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -316,7 +336,7 @@ $$
 なお、ソフトマックス関数は、入力$\mathbf{x}$を以下の式によって$\mathbf{x}'$へと変換する。
 
 $$
-x'_i = \sigma(\mathbf{x}) = \frac{\exp x_i}{\sum_{j=1}^n \exp x_j}
+x'_i = \sigma(\mathbf{x})_i = \frac{\exp x_i}{\sum_{j=1}^n \exp x_j}
 $$
 
 従って、予測ラベル$\mathbf{y}$の各要素は0から1の値を取り、なおかつ$\mathbf{y}$の全要素の合計は1になる。このことから$\mathbf{y}$はラベルの予測確率を表わしており、この中で最も大きな値を持つ要素が予測識別の結果であると考えられる。
@@ -384,15 +404,23 @@ result_df.loc[len(result_df), :] = ['Logistic', acc_test, 'Test']
 
 +++
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
-`ScandardScaler`を使う場合と使わない場合で、`LogisticRegression`の性能を比較せよ。
-::::
+`StandardScaler`を使う場合と使わない場合で、`LogisticRegression`の性能を比較せよ。
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## バギングによる分類
+## アンサンブル学習
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+複数の分類器を組み合わせることで、単体の分類器より高い性能を得ようとする考え方を**アンサンブル学習**と呼ぶ。ここでは、その代表的な手法を、単純なものから順に見ていく。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### バギングによる分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -400,7 +428,15 @@ result_df.loc[len(result_df), :] = ['Logistic', acc_test, 'Test']
 
 例えば、訓練データが$N$個のサンプルからなる時、$M$個のサブサンプル ($M \leq N$)を取り出して、分類器を学習する。この操作を複数のサブサンプルと分類器に対して実行する。このようにブートストラップ・サンプルで訓練された分類器のことを**弱分類器**と呼ぶ。
 
-最終結果は、単純には、得られた分類器の予測の中で一番多数の票を集めたものが与えられる。以下に単純なバギングの実装例を与える。
+最終結果は、単純には、得られた分類器の予測の中で一番多数の票を集めたものが与えられる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+#### 発展: 自前実装によるバギング
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+仕組みを確かめるために、以下にscikit-learnを使わないバギングの実装例を与える。
 
 ```{code-cell} ipython3
 ---
@@ -453,7 +489,11 @@ print(f'Bagging: acc(test)={acc_test:.2f}%')
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-バギングをscikit-learnの(`BaggingClassifier`)を用いて実装した場合には以下のようになる。
+#### scikit-learnによるバギング
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+バギングをscikit-learnの`BaggingClassifier`を用いて実装した場合には以下のようになる。
 
 ```{code-cell} ipython3
 ---
@@ -518,15 +558,33 @@ result_df.loc[len(result_df), :] = ['Bagging', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## ランダム・フォレストによる分類
+:::{admonition} 練習問題
+:class: question
+
+`BaggingClassifier`の`n_estimators`を 1, 10, 50 と変化させたときに、精度がどのように変わるかを調べよ。
+
+また、上記の簡易実装では`np.random.randint`によってブートストラップ・サンプルを作っているが、これは同じサンプルが複数回選ばれうる**復元抽出**である。1つのブートストラップ・サンプルに、元の訓練データのうち何割が含まれるかを実際に数えて確かめよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### ランダム・フォレストによる分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 ランダム・フォレストはバギングの弱分類器による推論が似通ってしまう問題を解決するアンサンブル学習法の一つである。バギングにおいて、予測が偏ってしまう問題は、ブートストラップ・サンプルのサイズ$M$が十分$N$に近い場合に、訓練データの分布が似通ってしまうことに原因がある。
 
-そこで、ランダム・フォレストでは、訓練データからブートストラップ・サンプルを抽出し、さらに、その特徴のうちランダムに数個だけを選んで弱分類器を学習する。即ち、学習する特徴ベクトルが$C$次元であるとして、その中から$c$ ($c \geq C$)だけをランダムに抽出したものを特徴ベクトルとして学習を行う。
+そこで、ランダム・フォレストでは、訓練データからブートストラップ・サンプルを抽出し、さらに、その特徴のうちランダムに数個だけを選んで弱分類器を学習する。即ち、学習する特徴ベクトルが$C$次元であるとして、その中から$c$個 ($c \leq C$)だけをランダムに抽出したものを特徴ベクトルとして学習を行う。
 
-このようにすることで十分に$N$に近い$M$であっても、分布の異なるサンプル集合を得ることができる。以下に簡易実装を示す。
+このようにすることで十分に$N$に近い$M$であっても、分布の異なるサンプル集合を得ることができる。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+#### 発展: 自前実装によるランダム・フォレスト
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+以下に簡易実装を示す。
 
 ```{code-cell} ipython3
 ---
@@ -588,6 +646,10 @@ print(f'Random Forest: acc(test)={acc_test:.2f}%')
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+#### scikit-learnによるランダム・フォレスト
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
 ランダム・フォレストをscikit-learnの`RandomForestClassifier`を用いて実装した場合には以下のようになる。なお、scikit-learn のランダム・フォレストは弱分類器に決定木しか使えないため、バギングの時のように弱分類器のモデルを指定することはできない。
 
 ```{code-cell} ipython3
@@ -599,7 +661,7 @@ tags: [remove-output]
 ---
 from sklearn.ensemble import RandomForestClassifier
 
-# 訓練モデルの構築 (弱識別器にロジスティック回帰を使用)
+# 訓練モデルの構築 (弱識別器は決定木に固定されている)
 clf = make_pipeline(
     StandardScaler(),
     RandomForestClassifier(),
@@ -648,7 +710,21 @@ result_df.loc[len(result_df), :] = ['Random forest', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## AdaBoostによる分類
+:::{admonition} 練習問題
+:class: question
+
+`RandomForestClassifier`には、各弱分類器が使用する特徴の数を指定する`max_features`という引数がある。この値を変化させたときに、精度がどのように変わるかを調べよ。
+
+また、上記の簡易実装において`n_sub_dim`を`n_dim`と等しくすると、何と同じ手法になるかを考えよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### 発展: AdaBoostによる分類
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+ここからの2つの節は、講義の中では扱わない発展的な内容である。アンサンブル学習をより深く知りたい場合に読んでほしい。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -732,18 +808,20 @@ result_df.loc[len(result_df), :] = ['AdaBoost', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-```{warning}
+:::{admonition} 弱識別器より精度が落ちるのはなぜか
+:class: warning
+
 上記の例では弱識別器にロジスティック回帰を用いているが、それにも関わらず、**ロジスティック回帰を単体で用いる場合に比べて精度が落ちている**ことが分かる。これは、AdaBoostにおいて、
 
 1. 弱分類器の学習は、単体の分類器の学習よりも甘めに行われる (最適化問題を最後まで収束させない)
 1. 分類が上手くいかないデータが多い場合には、重み付け操作により、そのようなノイズデータに過剰適合しやすくなる
 
 という問題があるためであり、より高い精度を得るためには、ハイパーパラメータのチューニングが必要になってくる。
-```
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## 勾配ブースティングによる分類
+### 発展: 勾配ブースティングによる分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -767,7 +845,7 @@ $$
 
 以下に、scikit-learnの`GradientBoostingClassifier`を用いた実装を示す。
 
-なお、勾配ブースティングは新たな弱分類器を学習するために、残差に対する回帰問題と、ラインサーチのステップを繰り返すため、AdaBoost 等の他のブースティングのアルゴリズムに比べて多くの計算時間を要する。そのため、以下のプログラムでは、`n_estimator`の数を小さめに設定している。
+なお、勾配ブースティングは新たな弱分類器を学習するために、残差に対する回帰問題と、ラインサーチのステップを繰り返すため、AdaBoost 等の他のブースティングのアルゴリズムに比べて多くの計算時間を要する。そのため、以下のプログラムでは、`n_estimators`の数を小さめに設定している。
 
 ```{code-cell} ipython3
 ---
@@ -827,21 +905,25 @@ result_df.loc[len(result_df), :] = ['Gradient boosting', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{admonition} 勾配ブースティングは非深層学習の有望株？
+:::{admonition} 勾配ブースティングは非深層学習の有望株？
 :class: note
 
-現在、深層学習を用いない機械分類のアルゴリズムの中では勾配ブースティングの発展形が大きな成果を挙げている。その中には**XGBoost** {cite:p}`chen2016xgboost` や**LightGBM** {cite:p}`ke2017lightgbm`などがあり、いずれもscikit-learnと類似したインターフェースで利用が可能なので、興味がある読者はこれらのライブラリを試してみとともに、原著の論文についても、ぜひ目を通してほしい。
-::::
+現在、深層学習を用いない機械分類のアルゴリズムの中では勾配ブースティングの発展形が大きな成果を挙げている。その中には**XGBoost** {cite:p}`chen2016xgboost` や**LightGBM** {cite:p}`ke2017lightgbm`などがあり、いずれもscikit-learnと類似したインターフェースで利用が可能なので、興味がある読者はこれらのライブラリを試してみるとともに、原著の論文についても、ぜひ目を通してほしい。
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 (ssec:support-vector-machine)=
 
-## サポートベクトルマシンによる分類
+## サポートベクトルマシン
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-サポートベクトルマシンは元々、2 クラス分類に対して提案された手法で、**サポートベクトル**という境界線(より厳密には超平面)を2つのクラスに属するデータ集合から求める問題を解く。
+### 線形サポートベクトルマシン
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+サポートベクトルマシンは元々、2 クラス分類に対して提案された手法で、2つのクラスに属するデータ集合を分ける**決定境界** (二次元なら直線、より一般には超平面)を求める問題を解く。このとき、決定境界からデータまでの余白が最も広くなるような境界を選ぶ、というのが手法の要点である。
 
 具体的には、データ空間の中で定義される超平面$\mathbf{a} \cdot \mathbf{x} + b=0$について、2つのクラスが$y_i \in \{ +1, -1 \}$のラベルを持つとして、以下の距離を最大化するような超平面のパラメータ$(\mathbf{a}, b)$を求める。
 
@@ -853,7 +935,7 @@ $$
 
 のように表せる。
 
-このとき、サポートベクトルマシンでは、この距離を全てのサンプルに対して和を取るのではなく、サポートベクトルに最も近いサンプルまでの距離を最大化するように取るのがポイントで、このサポートベクトルまでの距離のことを「マージン」と呼ぶ。
+このとき、サポートベクトルマシンでは、この距離を全てのサンプルについて足し合わせるのではなく、**超平面に最も近いサンプルまでの距離**を最大化するのがポイントである。この距離のことを**マージン**と呼び、マージンを与えるサンプル、すなわち超平面に最も近い位置にあるサンプルのことを**サポートベクトル**と呼ぶ。手法の名前は、この「境界を支えている」サンプルに由来している。
 
 従って、このマージンの値を$M$と置くと、解くべき最大化問題は、
 
@@ -867,17 +949,21 @@ $$
 \max_{M, \mathbf{a}, b} \frac{1}{\| \mathbf{a} \|} \quad \text{s.t.} \quad y_i (\mathbf{a} \cdot \mathbf{x}_i + b) \geq 1 \quad \text{for}~~i=1, \ldots, N
 $$
 
-このとき、目的関数の最大化は$\| \mathbf{a} \|$の最小化とも見なせるので、適当な誤差関数として最小二乗誤差を取って以下のように書き直す (通常はHinge誤差が使われる)。
+このとき、$1 / \| \mathbf{a} \|$の最大化は$\| \mathbf{a} \|$の最小化と等価であり、さらに後の微分の計算がしやすいように二乗して$1/2$を乗じても、最小値を与える$(\mathbf{a}, b)$は変わらない。従って、上記の問題は以下のように書き直せる。
 
 $$
 \min_{\mathbf{a}, b} \frac{1}{2} \| \mathbf{a} \|^2 \quad \text{s.t.} \quad y_i (\mathbf{a} \cdot \mathbf{x}_i + b) \geq 1 \quad \text{for}~~i=1, \ldots, N
 $$
 
-あとはこの問題を未定乗数法を用いて解けば良い。
+あとは、この不等式制約付きの最小化問題を解けば良い。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-上記の式にLagrangeの未定乗数法を適用してLagrange関数を求めると、
+#### 発展: マージン最大化問題の解法
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+上記の式にLagrangeの未定乗数法を適用してLagrange関数を求めると、乗数$\boldsymbol{\lambda} = (\lambda_1, \ldots, \lambda_N)^\top$を用いて、
 
 $$
 \begin{aligned}
@@ -885,23 +971,59 @@ $$
 &= \frac{1}{2} \| \mathbf{a} \|^2 - \boldsymbol{\lambda}^\top (\mathbf{y} \odot (\mathbf{X} \mathbf{a} + b \mathbf{1}) - \mathbf{1}) \\
 &= \frac{1}{2} \| \mathbf{a} \|^2 - \boldsymbol{\lambda}^\top (\mathbf{Y} \mathbf{X} \mathbf{a} + b \mathbf{y} - \mathbf{1})
 \end{aligned}
-$$
+$$ (eq:svm-lagrange-function)
 
-のように書ける。ただし、$\mathbf{Y}$は$\mathbf{y}$の要素を対角成分に持つ対角成分である。この関数の勾配が0になる箇所を求めれば、所望の$(\mathbf{a}, b)$が得られるので、以下の連立方程式を解けば良い。
+のように書ける。ただし、$\mathbf{Y}$は$\mathbf{y}$の要素を対角成分に持つ対角行列である。
+
+ここで注意が必要なのは、**制約が等式ではなく不等式である**という点である。等式制約であれば、Lagrange関数の勾配が$\mathbf{0}$になる点を求めれば良かったが、不等式制約の場合、最適解が満たすべき条件は**KKT条件** (Karush-Kuhn-Tucker条件)と呼ばれる次の4条件になる。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+**停留条件**
 $$
 \begin{aligned}
-\frac{\partial \mathcal{L}}{\partial \mathbf{a}} &= \mathbf{a} - \mathbf{X}^\top \mathbf{Y}^\top \boldsymbol{\lambda} = \mathbf{0} \\
-\frac{\partial \mathcal{L}}{\partial b} &= -\boldsymbol{\lambda}^\top \mathbf{y} = 0 \\
-\frac{\partial \mathcal{L}}{\partial \boldsymbol{\lambda}} &= -\mathbf{Y} \mathbf{X} \mathbf{a} - b \mathbf{y} + \mathbf{1} = \mathbf{0}
+\frac{\partial \mathcal{L}}{\partial \mathbf{a}} &= \mathbf{a} - \mathbf{X}^\top \mathbf{Y}^\top \boldsymbol{\lambda} = \mathbf{0}, \\
+\frac{\partial \mathcal{L}}{\partial b} &= -\boldsymbol{\lambda}^\top \mathbf{y} = 0
 \end{aligned}
 $$
 
++++
+
+**主問題の実行可能性**
+$$
+y_i (\mathbf{a} \cdot \mathbf{x}_i + b) - 1 \geq 0 \qquad \text{for}~~i=1, \ldots, N
+$$
+
++++
+
+**双対問題の実行可能性**
+$$
+\lambda_i \geq 0 \qquad \text{for}~~i=1, \ldots, N
+$$
+
++++
+
+**相補性条件**
+$$
+\lambda_i \left( y_i (\mathbf{a} \cdot \mathbf{x}_i + b) - 1 \right) = 0 \qquad \text{for}~~i=1, \ldots, N
+$$
+
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-この連立方程式は$(\mathbf{a}, b, \boldsymbol{\lambda})$に対して線形になっており、以下のように書き直せる。
+このうち、最後の**相補性条件**が重要である。この条件は、各サンプルについて $\lambda_i = 0$ であるか $y_i (\mathbf{a} \cdot \mathbf{x}_i + b) = 1$ すなわち**そのサンプルがちょうどマージン上にある**か、のいずれかであることを意味している。
+
+1つ目の停留条件は $\mathbf{a} = \sum_{i=1}^{N} \lambda_i y_i \mathbf{x}_i$ であるから、決定境界を決めているのは $\lambda_i \neq 0$ すなわち、**マージン上にあるサンプルだけ**ということになる。
+これが、これらのサンプルをサポートベクトルと呼ぶ理由であり、通常、サポートベクトルの数は全サンプル数よりずっと少ない。
+
+なお、KKT条件を満たす $\boldsymbol{\lambda}$ を求める問題は**二次計画問題**となり、線形の連立方程式のように一度で解くことはできない。
+scikit-learnの`SVC`は、この二次計画問題をSMO (sequential minimal optimization)と呼ばれるアルゴリズムによって数値的に解いている。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+とはいえ、二次計画問題をここで説明するのは大変なので、以下では**全てのサンプルがちょうどマージン上にある**と仮定した緩和問題を考えてみる。
+すなわち、相補性条件と不等式制約を無視し、全ての $i$ について $y_i (\mathbf{a} \cdot \mathbf{x}_i + b) = 1$ が成り立つとする。
+
+この場合 {eq}`eq:svm-lagrange-function` を $\mathbf{a}$, $b$, $\boldsymbol{\lambda}$ で偏微分して $\mathbf{0}$ に等しい点を求めると、以下の連立方程式が得られる。
 
 $$
 \begin{pmatrix}
@@ -919,7 +1041,9 @@ $$
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-単純のために、二次元空間において、$(-1, 0)$, $(+1, 0)$の二点を中心とするガウス分布から2クラスのサンプルを抽出し、上記のLagrange関数を最小化してみる。
+この緩和問題は本来解くべき問題とは異なるが、2つのクラスが対称に分布しているような単純な例であれば、得られる超平面の向きは真の解に近いものになる。実際に確かめてみよう。
+
+以下では、二次元空間において、$(-1, 0)$, $(+1, 0)$の二点を中心とするガウス分布から2クラスのサンプルを抽出する。
 
 ```{code-cell} ipython3
 ---
@@ -947,8 +1071,8 @@ tags: [hide-input]
 plt.scatter(X_1[:, 0], X_1[:, 1], label='$x_1$')
 plt.scatter(X_2[:, 0], X_2[:, 1], label='$x_2$')
 plt.legend()
-plt.xlim([-2, 2])
-plt.ylim([-2, 2])
+plt.xlim(-2, 2)
+plt.ylim(-2, 2)
 plt.gca().set_aspect('equal')
 plt.tight_layout()
 plt.show()
@@ -956,7 +1080,7 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-このサンプルデータに対して、上記の連立方程式を作成し、サポートベクトルとなる直線の方程式を求める。
+このサンプルデータに対して、上記の連立方程式を作成し、決定境界となる直線の方程式を求める。なお、この連立方程式は解が一意に定まらないため、対角成分に微小な値を加えて解いている。
 
 ```{code-cell} ipython3
 ---
@@ -982,7 +1106,7 @@ b_ = ans[2]
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-最後に、ここで求めた`a_`ならびに`b_`を使って、先ほどの散布図にサポートベクトルを描画してみる。
+最後に、ここで求めた`a_`ならびに`b_`を使って、先ほどの散布図に決定境界を描画してみる。
 
 ```{code-cell} ipython3
 ---
@@ -991,19 +1115,19 @@ slideshow:
   slide_type: ''
 tags: [hide-input]
 ---
-# サポートベクトルの端点を求める
+# 決定境界の端点を求める
 x_min = -5
 y_min = -1.0 * (a_[0] * x_min + b_) / a_[1]
 x_max = +5
 y_max = -1.0 * (a_[0] * x_max + b_) / a_[1]
 
-# サポートベクトルの描画
+# 決定境界の描画
 # NOTE: 直線を描くとグラフの範囲がずれるので、直線を描く前の範囲を保存しておく
 plt.scatter(X_1[:, 0], X_1[:, 1], label='$x_1$')
 plt.scatter(X_2[:, 0], X_2[:, 1], label='$x_2$')
 plt.axline((x_min, y_min), (x_max, y_max), color='black', linestyle='--', linewidth=2)
-plt.xlim([-2, 2])
-plt.ylim([-2, 2])
+plt.xlim(-2, 2)
+plt.ylim(-2, 2)
 plt.legend()
 plt.gca().set_aspect('equal')
 plt.tight_layout()
@@ -1012,13 +1136,29 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-この通り、正しくサポートベクトルが求められていることが確認できる。なお、上記は二つのクラスラベルを持つサンプルがサポートベクトルの両側に分かれて存在することを仮定した最適化を行っている。
+この通り、2つのクラスを分ける決定境界が求められていることが確認できる。ただし、これはあくまで上記の緩和問題の解であり、本来のサポートベクトルマシンの解とは異なることに注意してほしい。また、上記は二つのクラスラベルを持つサンプルが決定境界の両側に分かれて存在することを仮定した最適化を行っている。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-```{note}
-実際のサンプルは、必ずしもサポートベクトルの両側にサンプルが分かれて存在する物ばかりではなく、分布が重なっている場合もあるので、その場合には、より複雑な最適化問題を解く必要がある。
-```
+:::{admonition} 練習問題
+:class: question
+
+上記の緩和問題の解`a_`, `b_`と、`SVC(kernel='linear', C=1.0e6)`によって求めた真のサポートベクトルマシンの解 (`coef_`と`intercept_`)を比較せよ。
+
+このとき、(a) 2つの法線ベクトルのなす角、(b) 緩和問題の解に含まれる$\boldsymbol{\lambda}$に負の値がいくつ含まれるか、(c) `SVC`が報告するサポートベクトルの数 (`n_support_`)、の3点を確かめ、緩和問題の解がKKT条件のどれを満たしていないのかを説明せよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 分布が重なっている場合
+:class: note
+
+実際のサンプルは、必ずしも決定境界の両側にきれいに分かれて存在する物ばかりではなく、分布が重なっている場合もある。その場合には、マージンの中に入り込むサンプルを許容する**ソフトマージン**の考え方を導入し、制約を破った量に対するペナルティ (**Hinge誤差**が用いられる)を目的関数に加えた、より複雑な最適化問題を解く必要がある。`SVC`の引数`C`は、このペナルティの強さを決めるハイパーパラメータである。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+#### scikit-learnによる線形SVM
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1029,7 +1169,7 @@ plt.show()
 
 scikit-learnにおいてSVMによる分類を行うには`SVC`クラスを用いるが、このコンストラクタには`decision_function_shape=...`というパラメータがあり、これが`"ovo"`ならone-vs-one方式が、`"ovr"`(初期値)ならone-vs-rest方式が用いられる。
 
-また、`SVC`のパラメータである`C=...`は、どの程度の割合でマージンを飛び越えるサンプルが出現しても良いかを調整しており、より大きな数を指定すると、決定境界の両側にサンプルが分かれるようなサポートベクトルを求める。
+また、`SVC`のパラメータである`C=...`は、どの程度の割合でマージンを飛び越えるサンプルが出現しても良いかを調整しており、より大きな数を指定すると、決定境界の両側にサンプルがきれいに分かれるような、より厳しい決定境界を求める。
 
 ```{code-cell} ipython3
 ---
@@ -1089,7 +1229,17 @@ result_df.loc[len(result_df), :] = ['Linear SVM', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## カーネル法を用いたサポートベクトルマシン
+:::{admonition} 練習問題
+:class: question
+
+`LinearSVC`ならびに`SVC(kernel='linear')`の引数`C`は、マージンの中に入り込むサンプルをどの程度許容するかを決めるハイパーパラメータである (**ソフトマージン**と呼ばれる考え方に対応する)。
+
+`C`を大きくしたときと小さくしたときで、二次元のサンプルに対する決定境界がどのように変化するかを調べよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+### カーネル法を用いたサポートベクトルマシン
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1116,8 +1266,8 @@ labels = ['$x_1$', '$x_2$']
 for i in range(len(labels)):
     idx = np.where(y_circ == i)
     plt.scatter(X_circ[idx, 0], X_circ[idx, 1], label=labels[i])
-plt.xlim([-1.25, 1.25])
-plt.ylim([-1.25, 1.25])
+plt.xlim(-1.25, 1.25)
+plt.ylim(-1.25, 1.25)
 plt.gca().set_aspect('equal')
 plt.legend()
 plt.tight_layout()
@@ -1126,7 +1276,7 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-このサンプルは、明らかに超平面(この場合は直線)では正しく二つのクラスを分割できないが、線形1学習して分類を行い、その予測結果に基づいて色づけを行うとどうなるだろうか。
+このサンプルは、明らかに超平面(この場合は直線)では正しく二つのクラスを分割できないが、線形SVMを学習して分類を行い、その予測結果に基づいて色づけを行うとどうなるだろうか。
 
 ```{code-cell} ipython3
 ---
@@ -1168,8 +1318,8 @@ for i in range(len(labels)):
     idx = np.where(y_pred == i)
     plt.scatter(X_circ[idx, 0], X_circ[idx, 1], label=labels[i])
 
-plt.xlim([-1.25, 1.25])
-plt.ylim([-1.25, 1.25])
+plt.xlim(-1.25, 1.25)
+plt.ylim(-1.25, 1.25)
 plt.gca().set_aspect('equal')
 plt.legend()
 plt.tight_layout()
@@ -1178,9 +1328,15 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-予想通り、線形SVMは正しく識別を行うことができておらず、不適切にサポートベクトルが与えられてしまっていることが分かる。
+予想通り、線形SVMは正しく識別を行うことができておらず、不適切な決定境界が与えられてしまっていることが分かる。
 
-このような非線形の決定境界を持つようなモデルに対しては、カーネル法と呼ばれる方法でSVMを拡張する。これまで、サポートベクトルと点の間の距離は重み$\mathbf{a}$とサンプル$\mathbf{x}_i$の内積$\mathbf{a}^T \mathbf{x}_i$を用いて計算されてきたが、これを**カーネル関数**といういくつかの数学的な性質を満たす関数によって置き換える。
+このような非線形の決定境界を持つようなモデルに対しては、カーネル法と呼ばれる方法でSVMを拡張する。前述の停留条件より$\mathbf{a} = \sum_i \lambda_i y_i \mathbf{x}_i$と書けるので、超平面を定める関数は
+
+$$
+\mathbf{a}^\top \mathbf{x} + b = \sum_{i=1}^{N} \lambda_i y_i (\mathbf{x}_i^\top \mathbf{x}) + b
+$$
+
+のように、**サンプル同士の内積だけ**で書き表せる。カーネル法では、この内積を**カーネル関数**といういくつかの数学的な性質を満たす関数によって置き換える。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1236,6 +1392,10 @@ $$
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+#### 発展: カーネル関数が満たすべき性質
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
 「カーネル関数」は、上記の通り、何らかの高次元空間における内積を表わすように定義される。このような性質を満たすためには、カーネル関数$k$が$\mathbb{R}^d \times \mathbb{R}^d$から$\mathbb{R}$への写像であって、関数が**半正定値性**を持つ必要がある。
 
 半正定値性、とは行列においては、任意のベクトルに対する二次形式が**0 以上**になることを指す。より厳密には、行列$\mathbf{A} \in \mathbb{R}^{d \times d}$が半正定値行列であるとは、
@@ -1280,17 +1440,25 @@ $$
 
 すると、任意の$\sqrt{\lambda_i} \phi(\mathbf{x}_i)$、$\sqrt{\lambda_j} \phi(\mathbf{x}_j)$の組み合わせについて、カーネル関数により内積が定義できることになる。ここで内積が定義できるためには、固有値の平方根が実数である必要があるため、カーネル関数の半正定値性が必要だったのである。
 
-この関数$\phi$こそが、前述の例で示した高次元空間への写像$(x, y) \mapsto (1, \sqrt{2} x, \sqrt{2}y, x^2, y^2, \sqrt{2} xy)$等に対応しており、カーネル法を用いたサポートベクトルマシンでは、元々$\mathbf{a}^T \mathbf{x} + b = 0$としていた直線の方程式をカーネル関数を用いて$k(\mathbf{a}, \mathbf{x}) + b = 0$と置き換えれば良い。
+この関数$\phi$こそが、前述の例で示した高次元空間への写像$(x, y) \mapsto (1, \sqrt{2} x, \sqrt{2}y, x^2, y^2, \sqrt{2} xy)$等に対応している。カーネル法を用いたサポートベクトルマシンでは、上で見たように内積$\mathbf{x}_i^\top \mathbf{x}$の形でのみ現れていた部分をカーネル関数で置き換え、決定境界を
+
+$$
+\sum_{i=1}^{N} \lambda_i y_i k(\mathbf{x}_i, \mathbf{x}) + b = 0
+$$
+
+と定めれば良い。写像$\phi$を陽に計算する必要がなく、カーネル関数の値さえ計算できれば良い、という点がカーネル法の利点である。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{warning}
+:::{admonition} この議論の厳密性について
+:class: warning
+
 上記は、数学的には厳密な議論ではなく、あくまで限られた$n$個のベクトル集合$\mathbf{x}_1, \ldots, \mathbf{x}_n$について、カーネル関数が内積を定義するような高次元空間への写像$\phi$が存在することを直感的に分かるように説明した。
 
 より厳密な議論のためには、カーネル関数の連続性や二乗可積分性などの性質が必要になるが、これらの議論は別の専門書に譲ることとする。一例として、以下の教科書が詳しい。
 
 赤穂 昭太郎 著、『カーネル多変量解析 -非線形データ解析の新しい展開-』、岩波書店、2008年
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1340,8 +1508,8 @@ for i in range(len(labels)):
     idx = np.where(y_pred == i)
     plt.scatter(X_circ[idx, 0], X_circ[idx, 1], label=labels[i])
 
-plt.xlim([-1.25, 1.25])
-plt.ylim([-1.25, 1.25])
+plt.xlim(-1.25, 1.25)
+plt.ylim(-1.25, 1.25)
 plt.gca().set_aspect('equal')
 plt.legend()
 plt.tight_layout()
@@ -1412,12 +1580,12 @@ result_df.loc[len(result_df), :] = ['Kernel SVM', acc_test, 'Test']
 
 +++
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
 scikit-learn の`SVC`には`kernel=...`の引数に直接カーネル関数を渡すことができる。これを用いて、コサイン・カーネルならびにカイ二乗カーネルについて性能を評価せよ。
 
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1441,7 +1609,7 @@ ax = sns.barplot(
     y='Accuracy',
     hue='Phase',
     data=result_df.round(2),
-    errwidth=0,
+    err_kws={'linewidth': 0},
 )
 
 for i in ax.containers:
@@ -1461,7 +1629,7 @@ plt.show()
 
 機械学習においては、学習モデルが持つパラメータで、訓練データから決定されるものを指して「パラメータ」という言葉を用いるのが一般的である。一方で、訓練時の学習率など、学習モデル自体とは関係のないパラメータを**ハイパーパラメータ**と呼ぶ。
 
-これまでに示した機会分類モデルのプログラムではscikit-learnによって予め与えられたハイパーパラメータを用いて実験を行なってきた。一方、ハイパーパラメータの設定によっては、訓練データに過剰適合するなどして、パフォーマンスが上がらないことがある。
+これまでに示した機械分類モデルのプログラムではscikit-learnによって予め与えられたハイパーパラメータを用いて実験を行なってきた。一方、ハイパーパラメータの設定によっては、訓練データに過剰適合するなどして、パフォーマンスが上がらないことがある。
 
 このような時には、何らかの方法で適切なハイパーパラメータ (カーネルSVMの例では`kernel`や`C`)を見つける必要がある。
 
@@ -1493,9 +1661,15 @@ X_test, y_test = X_test[:n_samples], y_test[:n_samples]
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-検証用のデータが用意できたら、検証するハイパーパラメータの範囲を設定し、グリッドサーチと呼ばれる方法で、あらゆる組み合わせのパラメータについて検証用データに対する性能を比較する。ハイパーパラメータの組み合わせの中で、検証用データに対する性能が高かったものを最終的なパラメータとして設定する。
+検証用のデータが用意できたら、検証するハイパーパラメータの範囲を設定し、**グリッドサーチ**と呼ばれる方法で、あらゆる組み合わせのパラメータについて検証用データに対する性能を比較する。ハイパーパラメータの組み合わせの中で、検証用データに対する性能が高かったものを最終的なパラメータとして設定する。
 
 なお、グリッドサーチはハイパーパラメータの組み合わせ数によっては、非常に時間がかかるため、モデルの訓練に必要な最適化の繰り返し回数(`max_iter`)や許容誤差(`tol`)を甘めに設定しておくと良い。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+グリッドサーチ自体はscikit-learnの`GridSearchCV`が行なってくれる。この関数は名前の通り、後述する交差検証と組み合わせて使うのが一般的だが、`cv=...`に`PredefinedSplit`を渡すことで、「どのサンプルを訓練に、どのサンプルを検証に使うか」を自分で指定することができ、ホールドアウト検証にも利用できる。
+
+`PredefinedSplit`には、サンプルごとにどの分割に属するかを表わす配列を渡す。このとき、値が`-1`であるサンプルは検証には使われず、常に訓練に用いられる。従って、訓練データに`-1`を、検証データに`0`を割り当てれば、1回だけの分割、すなわちホールドアウト検証になる。
 
 ```{code-cell} ipython3
 ---
@@ -1504,38 +1678,27 @@ slideshow:
   slide_type: ''
 tags: [remove-output]
 ---
-# グリッドサーチによる最適パラメータを探索
-max_acc = 0.0
-best_params = None
+from sklearn.model_selection import GridSearchCV, PredefinedSplit
 
+# 訓練データと検証データを連結し、どちらに属するかをtest_foldで指定する
+# (-1は検証に使わない = 常に訓練に使うことを表わす)
+X_hold = np.concatenate([X, X_val], axis=0)
+y_hold = np.concatenate([y, y_val], axis=0)
+test_fold = np.concatenate([np.full(len(X), -1, dtype=np.int32), np.zeros(len(X_val), dtype=np.int32)])
+
+# グリッドサーチによる最適パラメータの探索
 kernel_types = ['linear', 'rbf', 'poly']
 C_values = [0.01, 0.1, 1.0, 10.0, 100.0]
-param_grid = {'kernel': kernel_types, 'C': C_values}
-gs_df = pd.DataFrame(columns=(list(param_grid.keys()) + ['Accuracy']))
+param_grid = {'svc__kernel': kernel_types, 'svc__C': C_values}
 
-best_index = 0
-param_sets = list(product(*param_grid.values()))
-for i, params in enumerate(tqdm(param_sets)):
-    param_dict = {list(param_grid.keys())[i]: v for i, v in enumerate(params)}
-    clf = make_pipeline(
-        StandardScaler(),
-        SVC(tol=1.0e-4, max_iter=20, **param_dict),
-    )
-    clf.fit(X, y)
+clf = make_pipeline(StandardScaler(), SVC(tol=1.0e-4, max_iter=20))
+gs = GridSearchCV(clf, param_grid, cv=PredefinedSplit(test_fold), n_jobs=-1)
+gs.fit(X_hold, y_hold)
 
-    # 精度の計算
-    acc_val = clf.score(X_val, y_val)
-
-    # データを追加
-    new_row = {k: v for k, v in param_dict.items()}
-    new_row['Accuracy'] = acc_val
-    gs_df.loc[len(gs_df), :] = list(new_row.values())
-
-    # ベスト・パラメータの更新
-    if max_acc < acc_val:
-        best_index = i
-        max_acc = acc_val
-        best_params = param_dict
+# 探索の結果を表にまとめる
+gs_df = pd.DataFrame(gs.cv_results_)[['param_svc__kernel', 'param_svc__C', 'mean_test_score']]
+gs_df.columns = ['kernel', 'C', 'Accuracy']
+best_index = gs.best_index_
 ```
 
 ```{code-cell} ipython3
@@ -1566,7 +1729,7 @@ gs_df.style.apply(custom_style, axis=None)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-最適なパラメータが決定できたら、繰り返し回数や許容誤差を正しく設定して、再度モデルを学習する。
+最適なパラメータが決定できたら、繰り返し回数や許容誤差を正しく設定して、再度モデルを学習する。`GridSearchCV`の`best_estimator_`には最良のパラメータが設定済みのモデルが入っているので、`set_params`で`max_iter`の制限だけを外して学習し直せば良い。
 
 ```{code-cell} ipython3
 ---
@@ -1575,11 +1738,8 @@ slideshow:
   slide_type: ''
 tags: [remove-output]
 ---
-# 最適パラメータでの再学習
-clf = make_pipeline(
-    StandardScaler(),
-    SVC(tol=1.0e-4, max_iter=-1, **best_params),
-)
+# 最適パラメータでの再学習 (max_iterの制限を外す)
+clf = gs.best_estimator_.set_params(svc__max_iter=-1)
 clf.fit(X, y)
 ```
 
@@ -1637,7 +1797,7 @@ result_df.loc[len(result_df), :] = ['Holdout K-SVM', acc_test, 'Test']
 
 交差検証は、グループが$G$個あるとき、1つのパラメータセットについて$G$回の訓練と$G$回の検証が必要になるため、非常に計算量が大きい。
 
-ここでは、scikit-learn に用意されている`GridSearchCV` (grid search cross validation)を用いて交差検証によるハイパーパラメータ調整を試してみる。
+ここでは、先ほどと同じ`GridSearchCV` (grid search cross validation)を、今度は本来の使い方である交差検証と組み合わせて用いてみる。
 
 なお、`GridSearchCV`で`make_pipeline`等で作成したパイプラインのハイパーパラメータを調整する場合、モデル名を小文字表記したもの(`SVC`なら`svc`)とハイパーパラメータ名 (`kernel`など)をアンダーバー2つで結んだものパラメータ名として用いる (以下の例を参照)。
 
@@ -1735,7 +1895,7 @@ ax = sns.barplot(
     y='Accuracy',
     hue='Phase',
     data=result_df[fil].round(2),
-    errwidth=0,
+    err_kws={'linewidth': 0},
 )
 
 for i in ax.containers:
@@ -1812,12 +1972,12 @@ acc_test = clf3.score(X_test, y_test)
 print(f'CV: acc(test)={100.0 * acc_test:.2f}%')
 ```
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
 事前学習済みのモデルを`pickle`と`joblib`を用いて保存した際のファイルサイズを比較せよ。また、線形SVMとカーネルSVMの事前学習済みモデルを保存した場合のファイルサイズを比較し、サイズ差が生じる原因について考察せよ。
 
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1841,7 +2001,7 @@ print(f'CV: acc(test)={100.0 * acc_test:.2f}%')
 
 - 正陽性 (true positive): 病気の人を、正しく病気と判別した
 - 偽陽性 (false positive): 病気でない人を、間違って病気と判別した
-- 正陰性 (true negative): 病気でない人を、正しく病気と判別した
+- 正陰性 (true negative): 病気でない人を、正しく病気でないと判別した
 - 偽陰性 (false negative): 病気の人を、間違って病気でないと判別した
 
 以上を表にまとめると、以下のようになる。
@@ -1945,7 +2105,7 @@ F1値の名前にある「1」は適合率と再現率を等しい重要度と�
 $$
 \text{F}_\beta = \left[ \frac{1}{1 + \beta^2} \left( \beta^2 \frac{1}{\text{Accuracy}} + \frac{1}{\text{Recall}} \right) \right]^{-1} = \frac{(1 + \beta^2) \cdot \text{Accuracy} \cdot \text{Recall}}{\beta^2 \text{Accuracy} + \text{Recall}}
 $$
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1955,7 +2115,7 @@ $$
 
 多クラス分類に対しても、精度(accuracy)、適合率(precision)、再現率(recall)、ならびにF1値と類似した指標を計算することができる。
 
-本題に入る前に、先ほど交差検定を用いて学習を行った分類器を、混合行列により評価してみる。混合行列の可視化にはscikit-learnの`ConfusionMatrixDisplay`を用いると良い。
+本題に入る前に、先ほど交差検証を用いて学習を行った分類器を、混同行列により評価してみる。混同行列の可視化にはscikit-learnの`ConfusionMatrixDisplay`を用いると良い。
 
 ```{code-cell} ipython3
 ---
@@ -1975,7 +2135,7 @@ plt.show()
 
 上記の混同行列は、2クラス分類の場合に示した2×2の表を拡張したものである。
 
-混同行列の各行を横に見ると、とある数字であると判別したもののうち、実際にその数字であったものの割合が計算でき、これが再現率(recall)に対応する。反対に、混同行列の各列を縦に見ると、とある数字が書かれた画像のうち、学習モデルにより正しく数字を当たられたものの割合を計算でき、これが適合率(precision)に対応する。
+この混同行列は、行が正解のクラス、列が予測されたクラスに対応している。従って、混同行列の各行を横に見ると、とある数字が書かれた画像のうち、学習モデルにより正しく数字を当てられたものの割合が計算でき、これが再現率(recall)に対応する。反対に、混同行列の各列を縦に見ると、とある数字であると判別したもののうち、実際にその数字であったものの割合を計算でき、これが適合率(precision)に対応する。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1994,16 +2154,16 @@ $$
 $$
 \begin{align*}
 \text{macro-Precision} &= \frac{1}{K} \sum_{k=1}^K P_k \\
-\text{marco-Recall} &= \frac{1}{K} \sum_{k=1}^K R_k \\
-\text{marco-F}_1 &= \frac{1}{K} \sum_{k=1}^K F_k
+\text{macro-Recall} &= \frac{1}{K} \sum_{k=1}^K R_k \\
+\text{macro-F}_1 &= \frac{1}{K} \sum_{k=1}^K F_k
 \end{align*}
 $$
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-一方で、マクロ平均は、病気の例の時と同様に、各クラスに属するサンプル数に偏りがある場合には、よりサンプル数が多いクラスの識別結果から強く影響を受けることになる。
+一方で、マクロ平均は各クラスを平等に扱うため、各クラスに属するサンプル数に偏りがある場合には、サンプル数の少ないクラスの識別結果が、その重要度に比べて強く結果に反映されることになる。
 
-そこで、クラスの違いを考慮せずに適合率、再現率であるマイクロ平均を以下のように計算する (結果的には同じ値になるが、考え方として分母の$\mathbf{C}$に対する添え字$k$と$l$の順序が異なる)。
+そこで、クラスの違いを考慮せず、混同行列の要素をクラスをまたいで先に足し合わせてから適合率と再現率を求める**マイクロ平均**を以下のように計算する。こちらは、サンプル数の多いクラスの識別結果がより強く反映される (結果的には同じ値になるが、考え方として分母の$\mathbf{C}$に対する添え字$k$と$l$の順序が異なる)。
 
 $$
 \begin{align*}
@@ -2104,12 +2264,22 @@ print(f'{micro_avg * 100.0:.2f}')
 
 +++
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
 マクロ平均ならびにマイクロ平均を用いて、本節で紹介した分類手法の性能を比較せよ。
 
-::::
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+本節で扱ったMNISTのように、各クラスのサンプル数がほぼ等しいデータセットでは、マクロ平均とマイクロ平均の値が近くなる。
+
+一方、あるクラスのサンプル数が極端に少ないデータセットでは、両者が大きく食い違うことがある。テストデータから特定の数字のサンプルを意図的に減らした上で両者を計算し、その差がどのように現れるかを確かめよ。
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
