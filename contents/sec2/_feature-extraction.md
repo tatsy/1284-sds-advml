@@ -256,7 +256,7 @@ MNISTでは手書き文字の画像が28x28=784次元ベクトル、ラベルが
 
 このようなデータをひらがなデータセットに対して自前で作成しよう。今回のデータセットは、
 - 濁音や半濁音、小文字を含まないひらがな48文字を扱う
-- 各文字の画像をランダムに[](#n_images_per_char)枚取り出す
+- 各文字の画像をランダムに![](#n_images_per_char)枚取り出す
 - 分類の難易度を上げるため、画像をランダムに回転したり、拡大縮小したりする
 という条件の下で作成する。
 
@@ -456,8 +456,8 @@ print('%.2f' % (acc_test * 100.0))
 
 **結果: 画像をそのまま入力**
 
-- 訓練時精度: [](#naive_acc_train)%
-- 評価時精度: [](#naive_acc_test)%
+- 訓練時精度: ![](#naive_acc_train)%
+- 評価時精度: ![](#naive_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -534,8 +534,8 @@ print('%.2f' % (acc_test * 100.0))
 
 **結果: 主成分分析による次元圧縮**
 
-- 訓練時精度: [](#pca_acc_train)%
-- 評価時精度: [](#pca_acc_test)%
+- 訓練時精度: ![](#pca_acc_train)%
+- 評価時精度: ![](#pca_acc_test)%
 
 +++
 
@@ -655,7 +655,7 @@ print(np.sum(b * p))
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-すると、上記の3x3の領域に対しては、LBPの値として **[](#lbp_val)** が求まる。
+すると、上記の3x3の領域に対しては、LBPの値として **![](#lbp_val)** が求まる。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -857,8 +857,8 @@ print('%.2f' % (acc_test * 100.0))
 
 **結果: Local Binary Patternの利用**
 
-- 訓練時精度: [](#lbp_acc_train)%
-- 評価時精度: [](#lbp_acc_test)%
+- 訓練時精度: ![](#lbp_acc_train)%
+- 評価時精度: ![](#lbp_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1043,8 +1043,8 @@ print('%.2f' % (acc_test * 100.0))
 
 **結果: Uniform LBPの利用**
 
-- 訓練時精度: [](#ulbp_acc_train)%
-- 評価時精度: [](#ulbp_acc_test)%
+- 訓練時精度: ![](#ulbp_acc_train)%
+- 評価時精度: ![](#ulbp_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1773,8 +1773,8 @@ print('%.2f' % (acc_test * 100.0))
 
 **結果: Bag of Visual Wordsの利用**
 
-- 訓練時精度: [](#bovw_acc_train)%
-- 評価時精度: [](#bovw_acc_test)%
+- 訓練時精度: ![](#bovw_acc_train)%
+- 評価時精度: ![](#bovw_acc_test)%
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1924,8 +1924,8 @@ print('%.2f' % (acc_test * 100.0))
 
 **結果: GMM-BoVW**
 
-- 訓練時精度: [](#bovwg_acc_train)%
-- 評価時精度: [](#bovwg_acc_test)%
+- 訓練時精度: ![](#bovwg_acc_train)%
+- 評価時精度: ![](#bovwg_acc_test)%
 
 +++
 
@@ -2240,8 +2240,8 @@ print('%.2f' % (acc_test * 100.0))
 
 **結果: FisherベクトルによるBoVW**
 
-- 訓練時精度: [](#fisher_acc_train)%
-- 評価時精度: [](#fisher_acc_test)%
+- 訓練時精度: ![](#fisher_acc_train)%
+- 評価時精度: ![](#fisher_acc_test)%
 
 +++
 
