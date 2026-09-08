@@ -2069,6 +2069,8 @@ class FisherVectorFeature(TransformerMixin):
         )
 
     def fit(self, X, y=None):
+        features = []
+
         # 各画像ごとにSIFT特徴を計算
         for x in tqdm(X, desc='SIFT extraction'):
             img = x.reshape(self.image_size)
