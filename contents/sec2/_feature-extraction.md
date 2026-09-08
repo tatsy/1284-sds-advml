@@ -654,12 +654,12 @@ img = np.pad(img, (1, 1), mode='edge')
 
 # 各画素のLBPを計算
 lbp_img = np.zeros_like(img).astype('uint8')
-for j in range(1, img.shape[0] - 1):
-    for i in range(1, img.shape[1] - 1):
-        c = img[i, j]
-        m = img[i - 1 : i + 2, j - 1 : j + 2]
+for iy in range(1, img.shape[0] - 1):
+    for ix in range(1, img.shape[1] - 1):
+        c = img[iy, ix]
+        m = img[iy - 1 : iy + 2, ix - 1 : ix + 2]
         b = (m > c).astype('int32')
-        lbp_img[i, j] = np.sum(p * b)
+        lbp_img[iy, ix] = np.sum(p * b)
 
 lbp_img = lbp_img[1:-1, 1:-1]
 ```
@@ -720,7 +720,7 @@ feature = []
 
 # パッチごとにLBPヒストグラムを計算
 for patch in lbp_patches:
-    hist, _ = np.histogram(patch, bins=32, range=(0, 256))
+    hist, _ = np.histogram(patch, bins=32, range=(0, 256), density=True)
     feature.append(hist)
 
 # 特徴ベクトルを一つにつなげる
@@ -1067,7 +1067,7 @@ gs = GridSpec(6, 6, figure=fig)
 for i in range(6):
     for j in range(6):
         ax = plt.subplot(gs[i, j])
-        ax.imshow(patches[i * 6 + j], cmap='gray', vmin=0, vmax=255, interpolation=None)
+        ax.imshow(patches[i * 6 + j], cmap='gray', vmin=0, vmax=255, interpolation='none')
         ax.set_xticks([])
         ax.set_yticks([])
 
@@ -1157,7 +1157,7 @@ blocks = np.array([histograms[i : i + bs, j : j + bs] for i in range(6 - bs + 1)
 hog = blocks.reshape((-1, n_angles * bs * bs))
 
 # ブロックごとのヒストグラムのノルムが1となるように正規化
-hog = hog / np.sqrt(np.sum(hog * hog, axis=1, keepdims=True))
+hog = hog / (np.sqrt(np.sum(hog * hog, axis=1, keepdims=True)) + 1.0e-8)
 hog = hog.flatten()
 ```
 
@@ -2228,13 +2228,4 @@ BoVWの性能がSIFT以外の特徴量 (OpenCVにはORB {cite}`rublee2011orb` (=
 
 ```{bibliography}
 :filter: docname in docnames
-```
-
-```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
-
 ```
