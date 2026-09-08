@@ -218,11 +218,11 @@ clf.train(X, y)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{admonition} スケーリングする際の注意
+:::{admonition} スケーリングする際の注意
 :class: warning
 
 データのスケーリングを行う場合、**スケールを決定するのに使えるデータは訓練データのみ**であることに注意する (テストデータがどんなデータなのかは事前に分からないため)。また、テストをする際にも、同様の(訓練データに基づいた)スケーリングをするのを忘れないようにすること。
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -298,6 +298,16 @@ result_df.loc[len(result_df), :] = ['k-nearest', acc_test, 'Test']
 
 - 訓練時精度: ![](#knn_acc_train)%
 - 評価時精度: ![](#knn_acc_test)%
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+`n_neighbors`の値を 1, 5, 20, 100 と変化させたときに、訓練時と評価時の精度がどのように変わるかを調べよ。
+
+また、`n_neighbors=1`のときに訓練時の精度がどうなるかを、アルゴリズムの定義から予想した上で確かめよ。
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -384,11 +394,11 @@ result_df.loc[len(result_df), :] = ['Logistic', acc_test, 'Test']
 
 +++
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
 `ScandardScaler`を使う場合と使わない場合で、`LogisticRegression`の性能を比較せよ。
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -515,6 +525,16 @@ result_df.loc[len(result_df), :] = ['Bagging', acc_test, 'Test']
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 バギングは、部分データを用いて学習した複数の分類器を組み合わせているだけなので、弱分類に用いる分類器(上記の例では`LogisticRegression`)と比べて、それほど精度が増加しないことが多い。これは、部分データ同士の相関が大きく、結果として、弱分類器の予測が似通ってしまうことに起因する。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+`BaggingClassifier`の`n_estimators`を 1, 10, 50 と変化させたときに、精度がどのように変わるかを調べよ。
+
+また、上記の簡易実装では`np.random.randint`によってブートストラップ・サンプルを作っているが、これは同じサンプルが複数回選ばれうる**復元抽出**である。1つのブートストラップ・サンプルに、元の訓練データのうち何割が含まれるかを実際に数えて確かめよ。
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -648,7 +668,21 @@ result_df.loc[len(result_df), :] = ['Random forest', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## AdaBoostによる分類
+:::{admonition} 練習問題
+:class: question
+
+`RandomForestClassifier`には、各弱分類器が使用する特徴の数を指定する`max_features`という引数がある。この値を変化させたときに、精度がどのように変わるかを調べよ。
+
+また、上記の簡易実装において`n_sub_dim`を`n_dim`と等しくすると、何と同じ手法になるかを考えよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+## 発展: AdaBoostによる分類
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+ここからの2つの節は、講義の中では扱わない発展的な内容である。アンサンブル学習をより深く知りたい場合に読んでほしい。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -732,18 +766,20 @@ result_df.loc[len(result_df), :] = ['AdaBoost', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-```{warning}
+:::{admonition} 弱識別器より精度が落ちるのはなぜか
+:class: warning
+
 上記の例では弱識別器にロジスティック回帰を用いているが、それにも関わらず、**ロジスティック回帰を単体で用いる場合に比べて精度が落ちている**ことが分かる。これは、AdaBoostにおいて、
 
 1. 弱分類器の学習は、単体の分類器の学習よりも甘めに行われる (最適化問題を最後まで収束させない)
 1. 分類が上手くいかないデータが多い場合には、重み付け操作により、そのようなノイズデータに過剰適合しやすくなる
 
 という問題があるためであり、より高い精度を得るためには、ハイパーパラメータのチューニングが必要になってくる。
-```
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-## 勾配ブースティングによる分類
+## 発展: 勾配ブースティングによる分類
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -827,11 +863,11 @@ result_df.loc[len(result_df), :] = ['Gradient boosting', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-::::{admonition} 勾配ブースティングは非深層学習の有望株？
+:::{admonition} 勾配ブースティングは非深層学習の有望株？
 :class: note
 
 現在、深層学習を用いない機械分類のアルゴリズムの中では勾配ブースティングの発展形が大きな成果を挙げている。その中には**XGBoost** {cite:p}`chen2016xgboost` や**LightGBM** {cite:p}`ke2017lightgbm`などがあり、いずれもscikit-learnと類似したインターフェースで利用が可能なので、興味がある読者はこれらのライブラリを試してみとともに、原著の論文についても、ぜひ目を通してほしい。
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1089,6 +1125,16 @@ result_df.loc[len(result_df), :] = ['Linear SVM', acc_test, 'Test']
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
+:::{admonition} 練習問題
+:class: question
+
+`LinearSVC`ならびに`SVC(kernel='linear')`の引数`C`は、マージンの中に入り込むサンプルをどの程度許容するかを決めるハイパーパラメータである (**ソフトマージン**と呼ばれる考え方に対応する)。
+
+`C`を大きくしたときと小さくしたときで、二次元のサンプルに対する決定境界がどのように変化するかを調べよ。
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
 ## カーネル法を用いたサポートベクトルマシン
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -1290,7 +1336,7 @@ $$
 より厳密な議論のためには、カーネル関数の連続性や二乗可積分性などの性質が必要になるが、これらの議論は別の専門書に譲ることとする。一例として、以下の教科書が詳しい。
 
 赤穂 昭太郎 著、『カーネル多変量解析 -非線形データ解析の新しい展開-』、岩波書店、2008年
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1412,12 +1458,12 @@ result_df.loc[len(result_df), :] = ['Kernel SVM', acc_test, 'Test']
 
 +++
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
 scikit-learn の`SVC`には`kernel=...`の引数に直接カーネル関数を渡すことができる。これを用いて、コサイン・カーネルならびにカイ二乗カーネルについて性能を評価せよ。
 
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1812,12 +1858,12 @@ acc_test = clf3.score(X_test, y_test)
 print(f'CV: acc(test)={100.0 * acc_test:.2f}%')
 ```
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
 事前学習済みのモデルを`pickle`と`joblib`を用いて保存した際のファイルサイズを比較せよ。また、線形SVMとカーネルSVMの事前学習済みモデルを保存した場合のファイルサイズを比較し、サイズ差が生じる原因について考察せよ。
 
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1945,7 +1991,7 @@ F1値の名前にある「1」は適合率と再現率を等しい重要度と�
 $$
 \text{F}_\beta = \left[ \frac{1}{1 + \beta^2} \left( \beta^2 \frac{1}{\text{Accuracy}} + \frac{1}{\text{Recall}} \right) \right]^{-1} = \frac{(1 + \beta^2) \cdot \text{Accuracy} \cdot \text{Recall}}{\beta^2 \text{Accuracy} + \text{Recall}}
 $$
-::::
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -2104,12 +2150,22 @@ print(f'{micro_avg * 100.0:.2f}')
 
 +++
 
-::::{admonition} 問
+:::{admonition} 練習問題
 :class: question
 
 マクロ平均ならびにマイクロ平均を用いて、本節で紹介した分類手法の性能を比較せよ。
 
-::::
+:::
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+:::{admonition} 練習問題
+:class: question
+
+本節で扱ったMNISTのように、各クラスのサンプル数がほぼ等しいデータセットでは、マクロ平均とマイクロ平均の値が近くなる。
+
+一方、あるクラスのサンプル数が極端に少ないデータセットでは、両者が大きく食い違うことがある。テストデータから特定の数字のサンプルを意図的に減らした上で両者を計算し、その差がどのように現れるかを確かめよ。
+:::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
