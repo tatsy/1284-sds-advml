@@ -1,0 +1,9 @@
+@use "sass:meta";
+
+:root:not(.dark) {
+  @include meta.load-css("github");
+}
+
+.dark.dark {
+  @include meta.load-css("github-dark");
+}
