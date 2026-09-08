@@ -1086,6 +1086,15 @@ $$
 
 なお、今回は向きのない方向 (= orientation, 0°から180°)を求めるため、上記の$\theta$の式において$d_y$に絶対値がかかっていることに注意すること。
 
+また、`cv2.Sobel`の第2引数には出力画像のビット深度を指定するが、ここで`cv2.CV_8U`を指定すると、負の勾配が全て0に飽和してしまい、明るい領域から暗い領域へ向かうエッジが完全に失われる。例えば、暗い背景に明るい正方形が置かれた画像に対して縦方向のSobelフィルタをかけると、正方形の下端にあたる行の値は次のようになる。
+
+```
+CV_32F: [0, 0, -255, -765, -1020, -765, -255, 0, 0]
+CV_8U : [0, 0,    0,    0,     0,    0,    0, 0, 0]
+```
+
+符号付きの値を保持するため、以下では`cv2.CV_32F`を指定している。
+
 実装では$\arctan$の代わりに`np.arctan2`を用いる。`np.arctan2(y, x)`は$d_x$の符号まで考慮して角度を返すため、$d_y \geq 0$の下では$0°$から$180°$までの範囲が得られる。一方、NumPyの`np.arctan`は引数を1つしか取らない関数で、第2引数は計算結果の出力先(`out`)として解釈されてしまうため、$d_x$が無視されて角度が$0°$から$90°$の範囲にしか収まらなくなる。また、$d_y = 0$かつ$d_x < 0$のときには$\theta$がちょうど$180°$になり、ビンの番号が範囲外になるので、番号を`n_angles - 1`で頭打ちにしている。
 
 今、各パッチは8×8の大きさなので、勾配強度と勾配方向がそれぞれ64個ずつ求まる。求まった勾配方向をいくつかの方向に量子化 (今回は20°刻みで9方向)し、ヒストグラムを作成する。
@@ -1102,9 +1111,8 @@ n_angles = 9  # 角度の量子化数
 
 histograms = []
 for p in patches:
-    dx = cv2.Sobel(p, cv2.CV_8U, 1, 0)
-    dy = cv2.Sobel(p, cv2.CV_8U, 0, 1)
-    dx, dy = dx.astype('float32'), dy.astype('float32')
+    dx = cv2.Sobel(p, cv2.CV_32F, 1, 0)
+    dy = cv2.Sobel(p, cv2.CV_32F, 0, 1)
 
     # 勾配強度と角度を計算
     g = np.sqrt(dx * dx + dy * dy)
@@ -1182,9 +1190,8 @@ class HOGFeature(TransformerMixin):
             # パッチごとにヒストグラムを計算
             histograms = []
             for p in patches:
-                dx = cv2.Sobel(p, cv2.CV_8U, 1, 0)
-                dy = cv2.Sobel(p, cv2.CV_8U, 0, 1)
-                dx, dy = dx.astype('float32'), dy.astype('float32')
+                dx = cv2.Sobel(p, cv2.CV_32F, 1, 0)
+                dy = cv2.Sobel(p, cv2.CV_32F, 0, 1)
 
                 g = np.sqrt(dx * dx + dy * dy)
                 theta = 180.0 * np.arctan2(np.abs(dy), dx) / np.pi
