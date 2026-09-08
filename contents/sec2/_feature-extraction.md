@@ -1715,7 +1715,7 @@ $$
 P(\mathbf{x} | \boldsymbol\Theta) = \sum_{k=1}^K \frac{\alpha_k}{(2 \pi)^{D / 2} \left| \boldsymbol\Sigma_k \right|^{1/2}} \exp \left( - \frac{1}{2}(\mathbf{x} - \boldsymbol{\mu}_k)^\top \boldsymbol\Sigma_k^{-1}  (\mathbf{x} - \boldsymbol{\mu}_k) \right)
 $$ (eq:gaussian-mixture)
 
-のように書ける。この式で$\boldsymbol\Theta$はパラメータの集合 $\{ \alpha_k, \boldsymbol\mu_k, \boldsymbol\Sigma_k : k = 1, \ldots, K \}$を表わし、$\alpha_k \in [0, 1)$, $\boldsymbol\mu_k \in \mathbb{R}^D$, $\boldsymbol\Sigma_k \in \mathbb{R}^{D \times D}$は、それぞれ$k$番目のGauss分布に対する混合率、分布中心、共分散行列を表わす。
+のように書ける。この式で$\boldsymbol\Theta$はパラメータの集合 $\{ \alpha_k, \boldsymbol\mu_k, \boldsymbol\Sigma_k : k = 1, \ldots, K \}$を表わし、$\alpha_k \in [0, 1]$, $\boldsymbol\mu_k \in \mathbb{R}^D$, $\boldsymbol\Sigma_k \in \mathbb{R}^{D \times D}$は、それぞれ$k$番目のGauss分布に対する混合率、分布中心、共分散行列を表わす。
 
 ガウス混合分布を用いると、とある特徴量$\mathbf{x}$が$k$個のGauss分布のそれぞれにどの程度の寄与率$\gamma_k(\mathbf{x})$を持つかを以下のように計算できる。
 
@@ -1726,7 +1726,7 @@ $$ (eq:membership)
 これにより、特徴量$\mathbf{x}$に対する、特徴表現として、
 
 $$
-\boldsymbol\gamma = (\gamma_1(\mathbf{x}), \ldots, \gamma_K(\mathbf{x})^\top
+\boldsymbol\gamma(\mathbf{x}) = \left( \gamma_1(\mathbf{x}), \ldots, \gamma_K(\mathbf{x}) \right)^\top
 $$
 
 が得られる。これを画像に含まれる特徴量の集合$\mathcal{X} = \{ \mathbf{x}_i : i = 1, \ldots, N \}$に対して計算し、その平均値を画像の特徴ベクトルとする。
@@ -1861,7 +1861,7 @@ k平均法やGauss混合モデルは、教師なし学習法の一種で、そ�
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-BoVWの改良としてFisherベクトルを利用する手法は2007年にPerronninらによって提案された{cite}`perronnin2007fisher`。Fisherベクトルは、統計学等でも用いられるFisher情報量に基づく特徴表現である。とある確率密度分布が$\mathbf{x} \in \mathcal{X}$のパラメータ (母数)$\boldsymbol\Theta$に関する事後分布として $P(\mathbf{x} | \boldsymbol\Theta)$のように与えられる場合を考える。
+BoVWの改良としてFisherベクトルを利用する手法は2007年にPerronninらによって提案された{cite}`perronnin2007fisher`。Fisherベクトルは、統計学等でも用いられるFisher情報量に基づく特徴表現である。とある確率密度分布が、パラメータ (母数)$\boldsymbol\Theta$を与えたときの$\mathbf{x} \in \mathcal{X}$の条件付き密度 $P(\mathbf{x} | \boldsymbol\Theta)$ として与えられる場合を考える。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1875,14 +1875,14 @@ $$
 V(\mathbf{x}; \boldsymbol\Theta) = \nabla_{\boldsymbol\Theta} \log P(\mathbf{x} | \boldsymbol\Theta)
 $$
 
-のように表わす。なお、確率密度関数が連続関数であるとき、このFisherベクトルの平均はゼロベクトルになる。
+のように表わす。なお、微分と積分の順序交換が許される正則条件の下では、$\mathbf{x}$を$P(\mathbf{x} | \boldsymbol\Theta)$に従って取ったときのFisherベクトルの平均はゼロベクトルになる。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-Fisher情報量は上記のFisherベクトルの分散として定義される。この際、Fisherベクトルの平均が$\mathbf{0}$であることを用いると次の式で与えられる。
+Fisher情報量は上記のFisherベクトルの分散として定義される。この際、Fisherベクトルの平均が$\mathbf{0}$であることを用いると、分散共分散行列は次の式で与えられる。
 
 $$
-\mathbb{E}_{\mathbf{x} \sim \mathcal{X}} \left[ \nabla_{\boldsymbol\Theta} \log P(\mathbf{x} | \boldsymbol\Theta)) \right]
+\mathbf{I}(\boldsymbol\Theta) = \mathbb{E}_{\mathbf{x} \sim P(\cdot | \boldsymbol\Theta)} \left[ \nabla_{\boldsymbol\Theta} \log P(\mathbf{x} | \boldsymbol\Theta) \left( \nabla_{\boldsymbol\Theta} \log P(\mathbf{x} | \boldsymbol\Theta) \right)^\top \right]
 $$
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -1902,7 +1902,7 @@ $$
 $$
 \begin{align}
 \frac{\partial P(\mathbf{x} | \boldsymbol\Theta)}{\partial \alpha_k}
-&= \frac{\exp \left( -\frac{1}{2}(\mathbf{x} - \boldsymbol{\mu}_k)^\top \boldsymbol\Sigma_k^{-1}  (\mathbf{x} - \boldsymbol{\mu}_k) \right)}{(2\pi)^{D/2} | \boldsymbol\Sigma_k |^{1/2}} = \frac{\mathcal{N}(\mathbf{x} | \boldsymbol\mu_{k}, \boldsymbol\sigma_k)}{\alpha_k} \\
+&= \frac{\exp \left( -\frac{1}{2}(\mathbf{x} - \boldsymbol{\mu}_k)^\top \boldsymbol\Sigma_k^{-1}  (\mathbf{x} - \boldsymbol{\mu}_k) \right)}{(2\pi)^{D/2} | \boldsymbol\Sigma_k |^{1/2}} = \mathcal{N}(\mathbf{x} | \boldsymbol\mu_{k}, \boldsymbol\sigma_k) \\
 %
 \frac{\partial P(\mathbf{x} | \boldsymbol\Theta)}{\partial \mu_{k,d}}
 &= \alpha_k \left[ \frac{x_d - \mu_{k,d}}{\sigma_{k,d}^2} \right] \mathcal{N}(\mathbf{x} | \boldsymbol\mu_{k}, \boldsymbol\sigma_k) \\
@@ -1951,12 +1951,12 @@ $$
 
 $$
 \frac{\partial L(\mathcal{X} | \boldsymbol\Theta)}{\partial \mu_{k,d}}
-= \sum_{i=1}^N \gamma_k(\mathbf{x}_i) \left[ \frac{x_d - \mu_{k,d}}{\sigma_{k,d}^2} \right] \\
+= \sum_{i=1}^N \gamma_k(\mathbf{x}_i) \left[ \frac{x_{i,d} - \mu_{k,d}}{\sigma_{k,d}^2} \right] \\
 $$ (eq:deriv-mu)
 
 $$
 \frac{\partial L(\mathcal{X} | \boldsymbol\Theta)}{\partial \sigma_{k,d}}
-= \sum_{i=1}^N \gamma_k(\mathbf{x}_i) \left[ \frac{(x_d - \mu_{k,d})^2}{\sigma_{k,d}^3} - \frac{1}{\sigma_{k,d}} \right]
+= \sum_{i=1}^N \gamma_k(\mathbf{x}_i) \left[ \frac{(x_{i,d} - \mu_{k,d})^2}{\sigma_{k,d}^3} - \frac{1}{\sigma_{k,d}} \right]
 $$ (eq:deriv-sigma)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
