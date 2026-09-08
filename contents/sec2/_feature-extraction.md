@@ -1086,6 +1086,8 @@ $$
 
 なお、今回は向きのない方向 (= orientation, 0°から180°)を求めるため、上記の$\theta$の式において$d_y$に絶対値がかかっていることに注意すること。
 
+実装では$\arctan$の代わりに`np.arctan2`を用いる。`np.arctan2(y, x)`は$d_x$の符号まで考慮して角度を返すため、$d_y \geq 0$の下では$0°$から$180°$までの範囲が得られる。一方、NumPyの`np.arctan`は引数を1つしか取らない関数で、第2引数は計算結果の出力先(`out`)として解釈されてしまうため、$d_x$が無視されて角度が$0°$から$90°$の範囲にしか収まらなくなる。また、$d_y = 0$かつ$d_x < 0$のときには$\theta$がちょうど$180°$になり、ビンの番号が範囲外になるので、番号を`n_angles - 1`で頭打ちにしている。
+
 今、各パッチは8×8の大きさなので、勾配強度と勾配方向がそれぞれ64個ずつ求まる。求まった勾配方向をいくつかの方向に量子化 (今回は20°刻みで9方向)し、ヒストグラムを作成する。
 
 この際、各画素の方向に対応するビンには**勾配強度を加算**して、ヒストグラムを計算する。
@@ -1106,8 +1108,8 @@ for p in patches:
 
     # 勾配強度と角度を計算
     g = np.sqrt(dx * dx + dy * dy)
-    theta = 180.0 * np.arctan(np.abs(dy), dx) / np.pi
-    t = (theta * n_angles / 180.0).astype('int32')
+    theta = 180.0 * np.arctan2(np.abs(dy), dx) / np.pi
+    t = np.minimum((theta * n_angles / 180.0).astype('int32'), n_angles - 1)
 
     # 勾配強度を加算してヒストグラムを作成
     h = np.zeros((n_angles), dtype='float32')
@@ -1185,8 +1187,8 @@ class HOGFeature(TransformerMixin):
                 dx, dy = dx.astype('float32'), dy.astype('float32')
 
                 g = np.sqrt(dx * dx + dy * dy)
-                theta = 180.0 * np.arctan(np.abs(dy), dx) / np.pi
-                t = (theta * n_angles / 180.0).astype('int32')
+                theta = 180.0 * np.arctan2(np.abs(dy), dx) / np.pi
+                t = np.minimum((theta * n_angles / 180.0).astype('int32'), n_angles - 1)
 
                 hist = np.zeros((n_angles), dtype='float32')
                 for g_, t_ in zip(g.flatten(), t.flatten()):
