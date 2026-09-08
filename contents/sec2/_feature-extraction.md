@@ -1714,7 +1714,7 @@ print('%.2f' % (acc_test * 100.0))
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-### Gauss混合モデルを用いた改良
+### 発展: Gauss混合モデルを用いた改良
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1882,7 +1882,7 @@ BoVWの改良としてFisherベクトルを利用する手法は2007年にPerron
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-#### Fisherベクトルの導出
+#### 発展: Fisherベクトルの導出
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -1986,7 +1986,7 @@ $$ (eq:deriv-sigma)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-#### Fisherベクトルの意味
+#### 発展: Fisherベクトルの意味
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
