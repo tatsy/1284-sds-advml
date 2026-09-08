@@ -380,11 +380,11 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-### 線形SVMによる分類
+## ベースライン: 画像をそのまま入力する
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-まずは、MNISTの時と同様にscikit-learnによる分類を試してみる。この時、[scikit-learnの節](#sec:scikit-learn)で紹介したように、予め入力データの輝度を正規化する処理である`StandardScaler`を使用する。
+特徴量抽出の効果を測るためには、比較の基準が必要である。まずは、MNISTの時と同様に、画像をそのままベクトルとして分類器に与える方法をベースラインとして試してみる。この時、[scikit-learnの節](#sec:scikit-learn)で紹介したように、予め入力データの輝度を正規化する処理である`StandardScaler`を使用する。
 
 ただし、従来の`LinearSVC`は学習がやや低速であるので、今回はミニバッチにより効率的に学習が可能な`SGDClassifier`を代わりに用いる。このクラスは、内部でデータセットの一部だけミニバッチとして分類器のパラメータ更新に用いる**確率的勾配降下法** (SGD=Stochastic Gradient Descent)により学習を行う。
 
