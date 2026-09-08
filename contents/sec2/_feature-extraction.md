@@ -2012,6 +2012,8 @@ $$ (eq:deriv-sigma)
 
 それでは、実際に全画像から取得したSIFT特徴量を用いて、各画像に対応するFisherベクトルを求めてみよう。Perronninらの元論文 {cite}`perronnin2007fisher`では、計算量を削減するために、得られたSIFT特徴量を主成分分析によって50次元減らした後、Gauss混合モデルをフィッティングしてFisherベクトルを求めている。
 
+なお、実装上の注意として、scikit-learnの`GaussianMixture`は`covariance_type='diag'`のとき、`covariances_`に**分散** $\sigma_{k,d}^2$ を格納する。{eq}`eq:deriv-mu`と{eq}`eq:deriv-sigma`の$\sigma_{k,d}$は標準偏差なので、平方根を取ってから式に代入する必要がある。
+
 ```{code-cell} ipython3
 :tags: [remove-output]
 
@@ -2037,13 +2039,13 @@ sub_feat = pca.transform(feature)  # (N, D)
 gamma = sub_gmm.predict_proba(sub_feat)  # (N, K)
 alpha = sub_gmm.weights_  # (K)
 mu = sub_gmm.means_  # (K, D)
-sigma = sub_gmm.covariances_  # (K, D)
+sigma = np.sqrt(sub_gmm.covariances_)  # (K, D) covariances_は分散なので平方根を取る
 
 g_over_a = gamma / alpha
 dLda = np.sum(g_over_a[:, 1:] - g_over_a[:, 0:1], axis=0)
 
 diff = sub_feat[:, None, :] - mu[None, :, :]  # (N, K, D)
-tmp0 = diff / sigma  # (N, K, D)
+tmp0 = diff / (sigma[None, :, :] ** 2)  # (N, K, D)
 dLdm = np.sum(gamma[:, :, None] * tmp0, axis=0)
 
 tmp0 = diff**2 / (sigma[None, :, :] ** 3)
@@ -2098,13 +2100,13 @@ class FisherVectorFeature(TransformerMixin):
             gamma = self.gmm.predict_proba(sub_feat)  # (N, K)
             alpha = self.gmm.weights_  # (K)
             mu = self.gmm.means_  # (K, D)
-            sigma = self.gmm.covariances_  # (K, D)
+            sigma = np.sqrt(self.gmm.covariances_)  # (K, D) covariances_は分散なので平方根を取る
 
             g_over_a = gamma / alpha
             dLda = np.sum(g_over_a[:, 1:] - g_over_a[:, 0:1], axis=0)
 
             diff = sub_feat[:, None, :] - mu[None, :, :]  # (N, K, D)
-            tmp0 = diff / sigma  # (N, K, D)
+            tmp0 = diff / (sigma[None, :, :] ** 2)  # (N, K, D)
             dLdm = np.sum(gamma[:, :, None] * tmp0, axis=0)
 
             tmp0 = diff**2 / (sigma[None, :, :] ** 3)
