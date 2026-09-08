@@ -468,7 +468,7 @@ print(n_episodes)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-最後に、両者ランダムに着手する場合に[](#n_episodes)回対戦すると、どの程度の勝敗になるのかを調べてみる。この際、手番はランダムに黒番と白番 (先攻と後攻)を入れ替えている。
+最後に、両者ランダムに着手する場合に![](#n_episodes)回対戦すると、どの程度の勝敗になるのかを調べてみる。この際、手番はランダムに黒番と白番 (先攻と後攻)を入れ替えている。
 
 また、ランダム対戦には少々時間がかかるため、以下のコードでは、`joblib`を用いて、並列実行により同時に複数の対局を行なっている。
 
@@ -534,9 +534,9 @@ print(draw)
 :::{admonition} 対局結果: ランダム (#1) vs ランダム (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** [](#rand_b_win)
-- **プレイヤー#2 勝ち:** [](#rand_w_win)
-- **両者引き分け:** [](#rand_draw)
+- **プレイヤー#1 勝ち:** ![](#rand_b_win)
+- **プレイヤー#2 勝ち:** ![](#rand_w_win)
+- **両者引き分け:** ![](#rand_draw)
 
 :::
 
@@ -650,7 +650,7 @@ def action_by_score(env):
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-このルーチンを用いて、先ほどと同様に[](#n_episodes)回の対戦を行ない、ランダムな着手に比べて、どのくらい勝率が上昇するかを見てみよう。
+このルーチンを用いて、先ほどと同様に![](#n_episodes)回の対戦を行ない、ランダムな着手に比べて、どのくらい勝率が上昇するかを見てみよう。
 
 ```{code-cell} ipython3
 ---
@@ -700,9 +700,9 @@ print(draw)
 :::{admonition} 対局結果: セル評価値 (#1) vs ランダム (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** [](#score_b_win)
-- **プレイヤー#2 勝ち:** [](#score_w_win)
-- **両者引き分け:** [](#score_draw)
+- **プレイヤー#1 勝ち:** ![](#score_b_win)
+- **プレイヤー#2 勝ち:** ![](#score_w_win)
+- **両者引き分け:** ![](#score_draw)
 
 :::
 
@@ -882,9 +882,9 @@ print(draw)
 :::{admonition} 対局結果: ミニマックス探索 (#1) vs ランダム (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** [](#minimax_b_win)
-- **プレイヤー#2 勝ち:** [](#minimax_w_win)
-- **両者引き分け:** [](#minimax_draw)
+- **プレイヤー#1 勝ち:** ![](#minimax_b_win)
+- **プレイヤー#2 勝ち:** ![](#minimax_w_win)
+- **両者引き分け:** ![](#minimax_draw)
 
 :::
 
@@ -1056,9 +1056,9 @@ print(draw)
 :::{admonition} 対局結果: アルファベータ探索 (#1) vs ミニマックス探索 (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** [](#ab_vs_minimax_b_win)
-- **プレイヤー#2 勝ち:** [](#ab_vs_minimax_w_win)
-- **両者引き分け:** [](#ab_vs_minimax_draw)
+- **プレイヤー#1 勝ち:** ![](#ab_vs_minimax_b_win)
+- **プレイヤー#2 勝ち:** ![](#ab_vs_minimax_w_win)
+- **両者引き分け:** ![](#ab_vs_minimax_draw)
 
 :::
 
@@ -1198,9 +1198,9 @@ print(draw)
 :::{admonition} 対局結果: 反復深化アルファベータ (#1) vs 反復深化ミニマックス (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** [](#ab_vs_minimax_deepen_b_win)
-- **プレイヤー#2 勝ち:** [](#ab_vs_minimax_deepen_w_win)
-- **両者引き分け:** [](#ab_vs_minimax_deepen_draw)
+- **プレイヤー#1 勝ち:** ![](#ab_vs_minimax_deepen_b_win)
+- **プレイヤー#2 勝ち:** ![](#ab_vs_minimax_deepen_w_win)
+- **両者引き分け:** ![](#ab_vs_minimax_deepen_draw)
 
 :::
 
@@ -1378,9 +1378,9 @@ print(draw)
 :::{admonition} 対局結果: 原始モンテカルロ (#1) vs アルファベータ探索 (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** [](#mc_vs_alpha_beta_b_win)
-- **プレイヤー#2 勝ち:** [](#mc_vs_alpha_beta_w_win)
-- **両者引き分け:** [](#mc_vs_alpha_beta_draw)
+- **プレイヤー#1 勝ち:** ![](#mc_vs_alpha_beta_b_win)
+- **プレイヤー#2 勝ち:** ![](#mc_vs_alpha_beta_w_win)
+- **両者引き分け:** ![](#mc_vs_alpha_beta_draw)
 
 :::
 
@@ -1755,9 +1755,9 @@ print(draw)
 :::{admonition} 対局結果: モンテカルロ木探索 (#1) vs アルファベータ探索 (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** [](#mcts_vs_alpha_beta_b_win)
-- **プレイヤー#2 勝ち:** [](#mcts_vs_alpha_beta_w_win)
-- **両者引き分け:** [](#mcts_vs_alpha_beta_draw)
+- **プレイヤー#1 勝ち:** ![](#mcts_vs_alpha_beta_b_win)
+- **プレイヤー#2 勝ち:** ![](#mcts_vs_alpha_beta_w_win)
+- **両者引き分け:** ![](#mcts_vs_alpha_beta_draw)
 
 :::
 
@@ -1811,9 +1811,9 @@ print(draw)
 :::{admonition} 対局結果: モンテカルロ木探索 (#1) vs 原始モンテカルロ (#2)
 :class: note
 
-- **プレイヤー#1 勝ち:** [](#mcts_vs_mc_b_win)
-- **プレイヤー#2 勝ち:** [](#mcts_vs_mc_w_win)
-- **両者引き分け:** [](#mcts_vs_mc_draw)
+- **プレイヤー#1 勝ち:** ![](#mcts_vs_mc_b_win)
+- **プレイヤー#2 勝ち:** ![](#mcts_vs_mc_w_win)
+- **両者引き分け:** ![](#mcts_vs_mc_draw)
 
 :::
 
