@@ -2201,7 +2201,7 @@ ax = sns.barplot(
     y='Accuracy',
     hue='Phase',
     data=result_df.round(2),
-    errwidth=0,
+    err_kws={'linewidth': 0},
 )
 
 for i in ax.containers:
