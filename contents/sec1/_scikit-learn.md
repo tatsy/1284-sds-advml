@@ -41,14 +41,12 @@ tags: [remove-cell]
 import os
 import random
 import warnings
-from itertools import product
 
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from tqdm.notebook import tqdm
 from sklearn.exceptions import ConvergenceWarning
 
 # グラフの設定
@@ -1643,9 +1641,15 @@ X_test, y_test = X_test[:n_samples], y_test[:n_samples]
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-検証用のデータが用意できたら、検証するハイパーパラメータの範囲を設定し、グリッドサーチと呼ばれる方法で、あらゆる組み合わせのパラメータについて検証用データに対する性能を比較する。ハイパーパラメータの組み合わせの中で、検証用データに対する性能が高かったものを最終的なパラメータとして設定する。
+検証用のデータが用意できたら、検証するハイパーパラメータの範囲を設定し、**グリッドサーチ**と呼ばれる方法で、あらゆる組み合わせのパラメータについて検証用データに対する性能を比較する。ハイパーパラメータの組み合わせの中で、検証用データに対する性能が高かったものを最終的なパラメータとして設定する。
 
 なお、グリッドサーチはハイパーパラメータの組み合わせ数によっては、非常に時間がかかるため、モデルの訓練に必要な最適化の繰り返し回数(`max_iter`)や許容誤差(`tol`)を甘めに設定しておくと良い。
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
+グリッドサーチ自体はscikit-learnの`GridSearchCV`が行なってくれる。この関数は名前の通り、後述する交差検証と組み合わせて使うのが一般的だが、`cv=...`に`PredefinedSplit`を渡すことで、「どのサンプルを訓練に、どのサンプルを検証に使うか」を自分で指定することができ、ホールドアウト検証にも利用できる。
+
+`PredefinedSplit`には、サンプルごとにどの分割に属するかを表わす配列を渡す。このとき、値が`-1`であるサンプルは検証には使われず、常に訓練に用いられる。従って、訓練データに`-1`を、検証データに`0`を割り当てれば、1回だけの分割、すなわちホールドアウト検証になる。
 
 ```{code-cell} ipython3
 ---
@@ -1654,38 +1658,27 @@ slideshow:
   slide_type: ''
 tags: [remove-output]
 ---
-# グリッドサーチによる最適パラメータを探索
-max_acc = 0.0
-best_params = None
+from sklearn.model_selection import GridSearchCV, PredefinedSplit
 
+# 訓練データと検証データを連結し、どちらに属するかをtest_foldで指定する
+# (-1は検証に使わない = 常に訓練に使うことを表わす)
+X_hold = np.concatenate([X, X_val], axis=0)
+y_hold = np.concatenate([y, y_val], axis=0)
+test_fold = np.concatenate([np.full(len(X), -1), np.zeros(len(X_val))])
+
+# グリッドサーチによる最適パラメータの探索
 kernel_types = ['linear', 'rbf', 'poly']
 C_values = [0.01, 0.1, 1.0, 10.0, 100.0]
-param_grid = {'kernel': kernel_types, 'C': C_values}
-gs_df = pd.DataFrame(columns=(list(param_grid.keys()) + ['Accuracy']))
+param_grid = {'svc__kernel': kernel_types, 'svc__C': C_values}
 
-best_index = 0
-param_sets = list(product(*param_grid.values()))
-for i, params in enumerate(tqdm(param_sets)):
-    param_dict = {list(param_grid.keys())[i]: v for i, v in enumerate(params)}
-    clf = make_pipeline(
-        StandardScaler(),
-        SVC(tol=1.0e-4, max_iter=20, **param_dict),
-    )
-    clf.fit(X, y)
+clf = make_pipeline(StandardScaler(), SVC(tol=1.0e-4, max_iter=20))
+gs = GridSearchCV(clf, param_grid, cv=PredefinedSplit(test_fold), n_jobs=-1)
+gs.fit(X_hold, y_hold)
 
-    # 精度の計算
-    acc_val = clf.score(X_val, y_val)
-
-    # データを追加
-    new_row = {k: v for k, v in param_dict.items()}
-    new_row['Accuracy'] = acc_val
-    gs_df.loc[len(gs_df), :] = list(new_row.values())
-
-    # ベスト・パラメータの更新
-    if max_acc < acc_val:
-        best_index = i
-        max_acc = acc_val
-        best_params = param_dict
+# 探索の結果を表にまとめる
+gs_df = pd.DataFrame(gs.cv_results_)[['param_svc__kernel', 'param_svc__C', 'mean_test_score']]
+gs_df.columns = ['kernel', 'C', 'Accuracy']
+best_index = gs.best_index_
 ```
 
 ```{code-cell} ipython3
@@ -1716,7 +1709,7 @@ gs_df.style.apply(custom_style, axis=None)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-最適なパラメータが決定できたら、繰り返し回数や許容誤差を正しく設定して、再度モデルを学習する。
+最適なパラメータが決定できたら、繰り返し回数や許容誤差を正しく設定して、再度モデルを学習する。`GridSearchCV`の`best_estimator_`には最良のパラメータが設定済みのモデルが入っているので、`set_params`で`max_iter`の制限だけを外して学習し直せば良い。
 
 ```{code-cell} ipython3
 ---
@@ -1725,11 +1718,8 @@ slideshow:
   slide_type: ''
 tags: [remove-output]
 ---
-# 最適パラメータでの再学習
-clf = make_pipeline(
-    StandardScaler(),
-    SVC(tol=1.0e-4, max_iter=-1, **best_params),
-)
+# 最適パラメータでの再学習 (max_iterの制限を外す)
+clf = gs.best_estimator_.set_params(svc__max_iter=-1)
 clf.fit(X, y)
 ```
 
@@ -1787,7 +1777,7 @@ result_df.loc[len(result_df), :] = ['Holdout K-SVM', acc_test, 'Test']
 
 交差検証は、グループが$G$個あるとき、1つのパラメータセットについて$G$回の訓練と$G$回の検証が必要になるため、非常に計算量が大きい。
 
-ここでは、scikit-learn に用意されている`GridSearchCV` (grid search cross validation)を用いて交差検証によるハイパーパラメータ調整を試してみる。
+ここでは、先ほどと同じ`GridSearchCV` (grid search cross validation)を、今度は本来の使い方である交差検証と組み合わせて用いてみる。
 
 なお、`GridSearchCV`で`make_pipeline`等で作成したパイプラインのハイパーパラメータを調整する場合、モデル名を小文字表記したもの(`SVC`なら`svc`)とハイパーパラメータ名 (`kernel`など)をアンダーバー2つで結んだものパラメータ名として用いる (以下の例を参照)。
 
