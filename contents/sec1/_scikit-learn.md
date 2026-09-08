@@ -116,7 +116,7 @@ y_org = np.array(y_org, dtype=np.uint8)
 
 なお、特に`data_home`を指定しない場合はホームディレクトリに`scikit_learn_data`というディレクトリが作成され、その中にデータがキャッシュされる。一度目に上記のコードを実行すると、データのダウンロードに時間がかかるが、二度目以降はキャッシュされたデータを読み込むため時間が短縮される (それでも数秒はかかる)。
 
-上記、scikit-learnの関数で得られるデータは[Pandas](https://pandas.pydata.org/)の`DataFrame`という方になっているのでおく。なお、データを画像として可視化すると以下のようになっている。
+なお、`fetch_openml`が返すデータは[Pandas](https://pandas.pydata.org/)の`DataFrame`型であるため、上記のコードでは`np.array`によってNumPyの配列に変換している。データを画像として可視化すると以下のようになっている。
 
 ```{code-cell} ipython3
 ---
@@ -132,7 +132,7 @@ ims = np.reshape(X_org[:8], (-1, 28, 28))
 fig, axs = plt.subplots(2, 4, figsize=(6, 3))
 axs = axs.flatten()
 for i in range(8):
-    axs[i].imshow(ims[i], cmap='gray', vmin=0, vmax=1, interpolation=None)
+    axs[i].imshow(ims[i], cmap='gray', vmin=0, vmax=1, interpolation='none')
     axs[i].set_title(f'label is {y_org[i]:d}')
     axs[i].set(xticks=[], yticks=[])
 
@@ -202,18 +202,18 @@ X_scaled = scaler.transform(X)
 X_test_scaled = scaler.transform(X_test)
 ```
 
-なお、実際の機械分類モデル (例えば`LinearRegression`)などと一緒に用いる場合には、`make_pipeline`関数を用いると、スケーリングにテスト用データを誤って使うと言った間違い(以下の注意を参照)を防ぐことができ、実装も簡単である。
+なお、実際の機械分類モデル (例えば`LogisticRegression`)などと一緒に用いる場合には、`make_pipeline`関数を用いると、スケーリングにテスト用データを誤って使うと言った間違い(以下の注意を参照)を防ぐことができ、実装も簡単である。
 
 
 ```python
 from sklearn.pipeline import make_pipeline
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
 
 clf = make_pipeline(
     StandardScaler(),
-    LinearRegression(),
+    LogisticRegression(),
 )
-clf.train(X, y)
+clf.fit(X, y)
 ```
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -326,7 +326,7 @@ $$
 なお、ソフトマックス関数は、入力$\mathbf{x}$を以下の式によって$\mathbf{x}'$へと変換する。
 
 $$
-x'_i = \sigma(\mathbf{x}) = \frac{\exp x_i}{\sum_{j=1}^n \exp x_j}
+x'_i = \sigma(\mathbf{x})_i = \frac{\exp x_i}{\sum_{j=1}^n \exp x_j}
 $$
 
 従って、予測ラベル$\mathbf{y}$の各要素は0から1の値を取り、なおかつ$\mathbf{y}$の全要素の合計は1になる。このことから$\mathbf{y}$はラベルの予測確率を表わしており、この中で最も大きな値を持つ要素が予測識別の結果であると考えられる。
@@ -397,7 +397,7 @@ result_df.loc[len(result_df), :] = ['Logistic', acc_test, 'Test']
 :::{admonition} 練習問題
 :class: question
 
-`ScandardScaler`を使う場合と使わない場合で、`LogisticRegression`の性能を比較せよ。
+`StandardScaler`を使う場合と使わない場合で、`LogisticRegression`の性能を比較せよ。
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -544,7 +544,7 @@ result_df.loc[len(result_df), :] = ['Bagging', acc_test, 'Test']
 
 ランダム・フォレストはバギングの弱分類器による推論が似通ってしまう問題を解決するアンサンブル学習法の一つである。バギングにおいて、予測が偏ってしまう問題は、ブートストラップ・サンプルのサイズ$M$が十分$N$に近い場合に、訓練データの分布が似通ってしまうことに原因がある。
 
-そこで、ランダム・フォレストでは、訓練データからブートストラップ・サンプルを抽出し、さらに、その特徴のうちランダムに数個だけを選んで弱分類器を学習する。即ち、学習する特徴ベクトルが$C$次元であるとして、その中から$c$ ($c \geq C$)だけをランダムに抽出したものを特徴ベクトルとして学習を行う。
+そこで、ランダム・フォレストでは、訓練データからブートストラップ・サンプルを抽出し、さらに、その特徴のうちランダムに数個だけを選んで弱分類器を学習する。即ち、学習する特徴ベクトルが$C$次元であるとして、その中から$c$個 ($c \leq C$)だけをランダムに抽出したものを特徴ベクトルとして学習を行う。
 
 このようにすることで十分に$N$に近い$M$であっても、分布の異なるサンプル集合を得ることができる。以下に簡易実装を示す。
 
@@ -619,7 +619,7 @@ tags: [remove-output]
 ---
 from sklearn.ensemble import RandomForestClassifier
 
-# 訓練モデルの構築 (弱識別器にロジスティック回帰を使用)
+# 訓練モデルの構築 (弱識別器は決定木に固定されている)
 clf = make_pipeline(
     StandardScaler(),
     RandomForestClassifier(),
@@ -803,7 +803,7 @@ $$
 
 以下に、scikit-learnの`GradientBoostingClassifier`を用いた実装を示す。
 
-なお、勾配ブースティングは新たな弱分類器を学習するために、残差に対する回帰問題と、ラインサーチのステップを繰り返すため、AdaBoost 等の他のブースティングのアルゴリズムに比べて多くの計算時間を要する。そのため、以下のプログラムでは、`n_estimator`の数を小さめに設定している。
+なお、勾配ブースティングは新たな弱分類器を学習するために、残差に対する回帰問題と、ラインサーチのステップを繰り返すため、AdaBoost 等の他のブースティングのアルゴリズムに比べて多くの計算時間を要する。そのため、以下のプログラムでは、`n_estimators`の数を小さめに設定している。
 
 ```{code-cell} ipython3
 ---
@@ -866,7 +866,7 @@ result_df.loc[len(result_df), :] = ['Gradient boosting', acc_test, 'Test']
 :::{admonition} 勾配ブースティングは非深層学習の有望株？
 :class: note
 
-現在、深層学習を用いない機械分類のアルゴリズムの中では勾配ブースティングの発展形が大きな成果を挙げている。その中には**XGBoost** {cite:p}`chen2016xgboost` や**LightGBM** {cite:p}`ke2017lightgbm`などがあり、いずれもscikit-learnと類似したインターフェースで利用が可能なので、興味がある読者はこれらのライブラリを試してみとともに、原著の論文についても、ぜひ目を通してほしい。
+現在、深層学習を用いない機械分類のアルゴリズムの中では勾配ブースティングの発展形が大きな成果を挙げている。その中には**XGBoost** {cite:p}`chen2016xgboost` や**LightGBM** {cite:p}`ke2017lightgbm`などがあり、いずれもscikit-learnと類似したインターフェースで利用が可能なので、興味がある読者はこれらのライブラリを試してみるとともに、原著の論文についても、ぜひ目を通してほしい。
 :::
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
@@ -1202,7 +1202,7 @@ plt.show()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-このサンプルは、明らかに超平面(この場合は直線)では正しく二つのクラスを分割できないが、線形1学習して分類を行い、その予測結果に基づいて色づけを行うとどうなるだろうか。
+このサンプルは、明らかに超平面(この場合は直線)では正しく二つのクラスを分割できないが、線形SVMを学習して分類を行い、その予測結果に基づいて色づけを行うとどうなるだろうか。
 
 ```{code-cell} ipython3
 ---
@@ -1529,7 +1529,7 @@ ax = sns.barplot(
     y='Accuracy',
     hue='Phase',
     data=result_df.round(2),
-    errwidth=0,
+    err_kws={'linewidth': 0},
 )
 
 for i in ax.containers:
@@ -1549,7 +1549,7 @@ plt.show()
 
 機械学習においては、学習モデルが持つパラメータで、訓練データから決定されるものを指して「パラメータ」という言葉を用いるのが一般的である。一方で、訓練時の学習率など、学習モデル自体とは関係のないパラメータを**ハイパーパラメータ**と呼ぶ。
 
-これまでに示した機会分類モデルのプログラムではscikit-learnによって予め与えられたハイパーパラメータを用いて実験を行なってきた。一方、ハイパーパラメータの設定によっては、訓練データに過剰適合するなどして、パフォーマンスが上がらないことがある。
+これまでに示した機械分類モデルのプログラムではscikit-learnによって予め与えられたハイパーパラメータを用いて実験を行なってきた。一方、ハイパーパラメータの設定によっては、訓練データに過剰適合するなどして、パフォーマンスが上がらないことがある。
 
 このような時には、何らかの方法で適切なハイパーパラメータ (カーネルSVMの例では`kernel`や`C`)を見つける必要がある。
 
@@ -1823,7 +1823,7 @@ ax = sns.barplot(
     y='Accuracy',
     hue='Phase',
     data=result_df[fil].round(2),
-    errwidth=0,
+    err_kws={'linewidth': 0},
 )
 
 for i in ax.containers:
@@ -1929,7 +1929,7 @@ print(f'CV: acc(test)={100.0 * acc_test:.2f}%')
 
 - 正陽性 (true positive): 病気の人を、正しく病気と判別した
 - 偽陽性 (false positive): 病気でない人を、間違って病気と判別した
-- 正陰性 (true negative): 病気でない人を、正しく病気と判別した
+- 正陰性 (true negative): 病気でない人を、正しく病気でないと判別した
 - 偽陰性 (false negative): 病気の人を、間違って病気でないと判別した
 
 以上を表にまとめると、以下のようになる。
@@ -2043,7 +2043,7 @@ $$
 
 多クラス分類に対しても、精度(accuracy)、適合率(precision)、再現率(recall)、ならびにF1値と類似した指標を計算することができる。
 
-本題に入る前に、先ほど交差検定を用いて学習を行った分類器を、混合行列により評価してみる。混合行列の可視化にはscikit-learnの`ConfusionMatrixDisplay`を用いると良い。
+本題に入る前に、先ほど交差検証を用いて学習を行った分類器を、混同行列により評価してみる。混同行列の可視化にはscikit-learnの`ConfusionMatrixDisplay`を用いると良い。
 
 ```{code-cell} ipython3
 ---
@@ -2063,7 +2063,7 @@ plt.show()
 
 上記の混同行列は、2クラス分類の場合に示した2×2の表を拡張したものである。
 
-混同行列の各行を横に見ると、とある数字であると判別したもののうち、実際にその数字であったものの割合が計算でき、これが再現率(recall)に対応する。反対に、混同行列の各列を縦に見ると、とある数字が書かれた画像のうち、学習モデルにより正しく数字を当たられたものの割合を計算でき、これが適合率(precision)に対応する。
+この混同行列は、行が正解のクラス、列が予測されたクラスに対応している。従って、混同行列の各行を横に見ると、とある数字が書かれた画像のうち、学習モデルにより正しく数字を当てられたものの割合が計算でき、これが再現率(recall)に対応する。反対に、混同行列の各列を縦に見ると、とある数字であると判別したもののうち、実際にその数字であったものの割合を計算でき、これが適合率(precision)に対応する。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -2082,16 +2082,16 @@ $$
 $$
 \begin{align*}
 \text{macro-Precision} &= \frac{1}{K} \sum_{k=1}^K P_k \\
-\text{marco-Recall} &= \frac{1}{K} \sum_{k=1}^K R_k \\
-\text{marco-F}_1 &= \frac{1}{K} \sum_{k=1}^K F_k
+\text{macro-Recall} &= \frac{1}{K} \sum_{k=1}^K R_k \\
+\text{macro-F}_1 &= \frac{1}{K} \sum_{k=1}^K F_k
 \end{align*}
 $$
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-一方で、マクロ平均は、病気の例の時と同様に、各クラスに属するサンプル数に偏りがある場合には、よりサンプル数が多いクラスの識別結果から強く影響を受けることになる。
+一方で、マクロ平均は各クラスを平等に扱うため、各クラスに属するサンプル数に偏りがある場合には、サンプル数の少ないクラスの識別結果が、その重要度に比べて強く結果に反映されることになる。
 
-そこで、クラスの違いを考慮せずに適合率、再現率であるマイクロ平均を以下のように計算する (結果的には同じ値になるが、考え方として分母の$\mathbf{C}$に対する添え字$k$と$l$の順序が異なる)。
+そこで、クラスの違いを考慮せず、混同行列の要素をクラスをまたいで先に足し合わせてから適合率と再現率を求める**マイクロ平均**を以下のように計算する。こちらは、サンプル数の多いクラスの識別結果がより強く反映される (結果的には同じ値になるが、考え方として分母の$\mathbf{C}$に対する添え字$k$と$l$の順序が異なる)。
 
 $$
 \begin{align*}
