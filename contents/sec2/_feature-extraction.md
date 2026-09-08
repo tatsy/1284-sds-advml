@@ -9,7 +9,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.19.5
+    jupytext_version: 1.19.1
 kernelspec:
   display_name: sdsadvml
   language: python
@@ -244,7 +244,7 @@ print(n_images_per_char)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-この表が示すとおり、各文字について、約1000の画像が含まれていることが確認できる。ただし、半濁音のひらがなは全体的に少なめで100-200程度となっている。
+この表が示すとおり、各文字について、約1000の画像が含まれていることが確認できる。ただし、半濁音のひらがなは全体的に少なめで100-300程度となっている。
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
@@ -252,10 +252,10 @@ print(n_images_per_char)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-MNISTでは手書き文字の画像が28x28=576次元ベクトル、ラベルが10種類の数字のいずれかを表わす0-9の数字であり、これらのデータを`scikit-learn`の`fetch_openml`から取得することができた。
+MNISTでは手書き文字の画像が28x28=784次元ベクトル、ラベルが10種類の数字のいずれかを表わす0-9の数字であり、これらのデータを`scikit-learn`の`fetch_openml`から取得することができた。
 
 このようなデータをひらがなデータセットに対して自前で作成しよう。今回のデータセットは、
-- 濁音や半濁音、小文字を含まないひらがな46文字を扱う
+- 濁音や半濁音、小文字を含まないひらがな48文字を扱う
 - 各文字の画像をランダムに[](#n_images_per_char)枚取り出す
 - 分類の難易度を上げるため、画像をランダムに回転したり、拡大縮小したりする
 という条件の下で作成する。
