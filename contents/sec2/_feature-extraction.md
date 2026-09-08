@@ -763,7 +763,8 @@ class LBPFeature(TransformerMixin):
         patches = patches.transpose((1, 0, 2, 3))  # (n_imgs, n_patches, ps, ps)
 
         # LBPの計算
-        mask = np.array([[1, 2, 4], [128, 0, 8], [64, 32, 16]], dtype='int32')
+        # 上の図と同じ重み (右上から時計回りに2の0乗、2の1乗、...)を用いる
+        mask = np.array([[64, 128, 1], [32, 0, 2], [16, 8, 4]], dtype='int32')
         mask = mask.reshape((1, 1, 3, 3))
         centers = patches[:, :, 1, 1].reshape((n_imgs, -1, 1, 1))
         binary = (patches > centers).astype('int32')
