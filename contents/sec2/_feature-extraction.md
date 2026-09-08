@@ -909,6 +909,8 @@ plt.show()
 
 また、画像の見た目から、文字がある部分の周りが一様に近いグレーで表現されており、回転に対してある程度の不変性を持っていそうなことも確認できる。
 
+ヒストグラムを作る際には、LBPの値域が$0$から$N+1$までの$N+2$通りであることに注意が必要である。ビンの境界を`np.arange(N + 3) - 0.5`のように半整数に置くことで、$N+2$個のビンが各LBP値に1対1で対応する。
+
 では、このUniform LBPを用いて、再度SVMによる文字の分類を試してみる。Uniform LBPを使う場合、画像の拡大縮小への対応力を上げるために、**中心画素からどのくらい離れたところの画素をLBPの計算に使うか**を変えつつ、LBPを取得して、それらを結合した特徴量を使う。
 
 ```{code-cell} ipython3
@@ -944,7 +946,8 @@ class UniformLBPFeature(TransformerMixin):
 
                 # パッチごとにヒストグラムを計算
                 patches = [lbp_img[y : y + ps, x : x + ps] for y in range(0, h, ps) for x in range(0, w, ps)]
-                histograms = [np.histogram(patch, bins=np.arange(a + 1), density=True)[0] for patch in patches]
+                # 値域は0からa+1までのa+2通りなので、ビンの境界を半整数に置く
+                histograms = [np.histogram(patch, bins=np.arange(a + 3) - 0.5, density=True)[0] for patch in patches]
                 lbp_feat.extend(histograms)
 
             feature = np.concatenate(lbp_feat)
