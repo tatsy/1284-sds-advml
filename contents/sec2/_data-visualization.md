@@ -21,7 +21,7 @@ kernelspec:
 
 +++
 
-機械学習において、データを扱う際には、データそのものがどのような性質を持っているかをよ事前に調べておくことが有効である。しかし、多くのデータは多次元のデータであるため、そのままデータがどのような分布になっているかを見ることは難しい。
+機械学習において、データを扱う際には、データそのものがどのような性質を持っているかをよく事前に調べておくことが有効である。しかし、多くのデータは多次元のデータであるため、そのままデータがどのような分布になっているかを見ることは難しい。
 
 そこで、データを2次元や3次元といった、人間にとって理解のしやすい次元に落として、データの分布の様子を見ることが必要になる。ここで用いるのが**次元削減**である。
 
@@ -471,7 +471,7 @@ plt.show()
 
 +++
 
-**ISOMAP**は多次元尺度構成法の拡張の一種で、**データ間の距離の計算にk-nearest neighbor graph (kNNグラフ)上で計算された測地距離**を用いる。なお、kNNグラフとは、各点とその近傍を結んで作られるグラフ構造を指す。このようなグラフを作成するために、以下のコードでは [KD木](https://en.wikipedia.org/wiki/K-d_tree)を用いた最近某探索を用いる。
+**ISOMAP**は多次元尺度構成法の拡張の一種で、**データ間の距離の計算にk-nearest neighbor graph (kNNグラフ)上で計算された測地距離**を用いる。なお、kNNグラフとは、各点とその近傍を結んで作られるグラフ構造を指す。このようなグラフを作成するために、以下のコードでは [KD木](https://en.wikipedia.org/wiki/K-d_tree)を用いた最近傍探索を用いる。
 
 ```{code-cell} ipython3
 from sklearn.neighbors import NearestNeighbors
@@ -487,9 +487,9 @@ distances = distances[:, 1:]
 indices = indices[:, 1:]
 ```
 
-ここで`distances`と`indices`は`[1000, 5]`の大きさのデータになっていて、各頂点に対する近傍点までの距離と、近傍点のインデックスが入っている。なお、探索元のデータ群と探索先のデータ群を同じにすると、`distances[:, 0]`が自分自身の点までの距離で0となってしまうため、kNNグラフを作る際には、このようなデータを除去しておく。
+ここで`distances`と`indices`は`(1500, 10)`の大きさ (サンプル数 × 近傍数)のデータになっていて、各頂点に対する近傍点までの距離と、近傍点のインデックスが入っている。なお、探索元のデータ群と探索先のデータ群を同じにすると、`distances[:, 0]`が自分自身の点までの距離で0となってしまうため、kNNグラフを作る際には、このようなデータを除去しておく。
 
-次にグラフ計算のためのライブラリである`networkx`を用いて、グラフ上での点と点の距離を計算する。まずはグラフの作成。`networkx`でグラフを作成するためには`(i, j, {"weight": 1.0})`のような辺の端点を表わす点のインデックス`i`, `j`と、辺に対する重みの除法を表わす`{"weight": 1.0}`を辺の数分だけ配列に格納し、その配列を用いて `from_edgelist` からグラフを作成する。
+次にグラフ計算のためのライブラリである`networkx`を用いて、グラフ上での点と点の距離を計算する。まずはグラフの作成。`networkx`でグラフを作成するためには`(i, j, {"weight": 1.0})`のような辺の端点を表わす点のインデックス`i`, `j`と、辺に対する重みの情報を表わす`{"weight": 1.0}`を辺の数分だけ配列に格納し、その配列を用いて `from_edgelist` からグラフを作成する。
 
 ```{code-cell} ipython3
 # kNNグラフの作成
@@ -570,7 +570,7 @@ plt.show()
 ::::{admonition} 問
 :class: question
 
-ISOMAPの結果は頂点間の「グラフ上での距離」に依存するため、各頂点において何個の頂点を近傍点と見なすかによって大きく次元削減の結果が変化する。上記の例において `n_neighbors` の値を変化させたときに結果がどのように変化するかを調べて見よ。
+ISOMAPの結果は頂点間の「グラフ上での距離」に依存するため、各頂点において何個の頂点を近傍点と見なすかによって大きく次元削減の結果が変化する。上記の例において `n_neighbors` の値を変化させたときに結果がどのように変化するかを調べてみよ。
 
 ::::
 
@@ -615,7 +615,7 @@ $$ (eq:lle-weight-derivation)
 +++
 
 $$
-\mathcal{L}(\mathbf{w}_i, \beta, \boldsymbol\mu) = \frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2 - \lambda (\mathbf{1}^\top \mathbf{w}_i - 1) - \sum_{k=1}^K \mu_k w_{ik}
+\mathcal{L}(\mathbf{w}_i, \lambda, \boldsymbol\mu) = \frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2 - \lambda (\mathbf{1}^\top \mathbf{w}_i - 1) - \sum_{k=1}^K \mu_k w_{ik}
 $$
 
 +++
@@ -645,7 +645,7 @@ $$
 
 +++
 
-となることが分かる。この時、行列 $\mathbf{D}_i \mathbf{D}_i^\top$ が半正定値行列であることを考慮すると、両辺に左側から $\mathbf{w}_i^\top$ を書けることにより、以下の不等式が得られる。
+となることが分かる。この時、行列 $\mathbf{D}_i \mathbf{D}_i^\top$ が半正定値行列であることを考慮すると、両辺に左側から $\mathbf{w}_i^\top$ を掛けることにより、以下の不等式が得られる。
 
 +++
 
@@ -665,7 +665,7 @@ $$
 
 +++
 
-以上より、{eq}`eq:lle-weight-derivation`を満たすように$\frac{1}{2} \| \mathbf{D}_i^\top \mathbf{z}_i \|^2$を最小化するとき、その最小値は$\frac{1}{2} \lambda \mathbf{1}^\top \mathbf{w}_i$になることが分かる。
+以上より、{eq}`eq:lle-weight-derivation`を満たすように$\frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2$を最小化するとき、その最小値は$\frac{1}{2} \lambda \mathbf{1}^\top \mathbf{w}_i$になることが分かる。
 
 よって、その時の$\mathbf{w}_i$を求めるためには、等式を満たす場合に関して、両辺を$\mathbf{w}_i$で微分することにより得られる以下の線形方程式を解けば良い。
 
@@ -711,7 +711,7 @@ $$ (eq:lle-quadratic-form)
 
 +++
 
-ただし、行列$\mathbf{W}$は、その$i$行において$i_1, \ldots, i_K$列の成分だけが非零の値を持つような疎行列、$\mathbf{Z} = [ \mathbf{z}_i \cdots \mathbf{z}_N ]^\top \in \mathbb{R}^{N\times d}$である。
+ただし、行列$\mathbf{W}$は、その$i$行において$i_1, \ldots, i_K$列の成分だけが非零の値を持つような疎行列、$\mathbf{Z} = [ \mathbf{z}_1 \cdots \mathbf{z}_N ]^\top \in \mathbb{R}^{N\times d}$である。
 
 {eq}`eq:lle-quadratic-form` は、行列 $\mathbf{M} = (\mathbf{I} - \mathbf{W})^\top (\mathbf{I} - \mathbf{W})$の二次形式なので、これを最小化するためには、$\mathbf{z}$を$\mathbf{M}$の固有値の絶対値が小さい順に、固有ベクトルを並べて、
 
@@ -1009,7 +1009,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-ただし、カーネル主成分分析は、カーネル法に用いるカーネルの種類と、そのカーネルを定義するパラメータに大きく依存している。例えば、上記のようにRBFカーネル $k(\mathbf{x}_i, \mathbf{x}_j) = \exp(-\gamma \| \mathbf{x}_i - \mathbf{x}_j \|^2)$を用いる場合、$\gamma$変化させることで全く異なる低次元空間表現が与えられる。
+ただし、カーネル主成分分析は、カーネル法に用いるカーネルの種類と、そのカーネルを定義するパラメータに大きく依存している。例えば、上記のようにRBFカーネル $k(\mathbf{x}_i, \mathbf{x}_j) = \exp(-\gamma \| \mathbf{x}_i - \mathbf{x}_j \|^2)$を用いる場合、$\gamma$を変化させることで全く異なる低次元空間表現が与えられる。
 
 ```{code-cell} ipython3
 gammas = [0.005, 0.01, 0.05]
@@ -1036,7 +1036,7 @@ plt.show()
 ::::{admonition} 問
 :class: question
 
-scikit-learnの`KernelPCA`には`SVC`クラスと同様に`kernel=...`に対して、いくつかのカーネル関数を指定することができる。多項式カーネル (`kernel=poly`)やコサインカーネル (`kernel=cosine`)を指定したときに次元削減の結果がどのように変化するかを調べて見よ。
+scikit-learnの`KernelPCA`には`SVC`クラスと同様に`kernel=...`に対して、いくつかのカーネル関数を指定することができる。多項式カーネル (`kernel=poly`)やコサインカーネル (`kernel=cosine`)を指定したときに次元削減の結果がどのように変化するかを調べてみよ。
 
 ::::
 
@@ -1059,7 +1059,7 @@ y = np.array(y, dtype='uint8')
 # 画像として見られるように配列の形を変更
 ims = np.reshape(X[:8], (-1, 28, 28))
 
-# 最初の5枚を確認してみる
+# 最初の8枚を確認してみる
 from matplotlib.gridspec import GridSpec
 
 fig = plt.figure(figsize=(8, 4))
@@ -1301,7 +1301,7 @@ show(row(plot, column(w1, w2, w3, w4, w5)))
 ::::{admonition} 問
 :class: question
 
-MNISTのデータについて、コサインカーネルを行った主成分分析により得られる画像を第5主成分まで調べて見よ (ヒント: `scikit-learn`の`KernelPCA`で`inverse_transform=True`を用いる)。
+MNISTのデータについて、コサインカーネルを行った主成分分析により得られる画像を第5主成分まで調べてみよ (ヒント: `scikit-learn`の`KernelPCA`で`inverse_transform=True`を用いる)。
 
 ::::
 
