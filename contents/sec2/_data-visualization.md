@@ -122,7 +122,7 @@ plt.show()
 $$
 \begin{aligned}
 \boldsymbol{\mu} &= \frac{1}{N} \sum_{i=1}^N \mathbf{x}_i \\
-\mathbf{C} &= \frac{1}{N} \sum_{i=1}^N (\bar{\mathbf{x}} - \mathbf{x}_i) (\bar{\mathbf{x}} - \mathbf{x}_i)^\top
+\mathbf{C} &= \frac{1}{N} \sum_{i=1}^N (\mathbf{x}_i - \boldsymbol{\mu}) (\mathbf{x}_i - \boldsymbol{\mu})^\top
 \end{aligned}
 $$
 
@@ -240,9 +240,9 @@ $$
 
 $$
 \begin{align}
-D_{i*}^2 &= N \| \mathbf{z}_i \|^2 + \sum_{j=1} \| \mathbf{z}_j \|^2 \\
+D_{i*}^2 &= N \| \mathbf{z}_i \|^2 + \sum_{j=1}^N \| \mathbf{z}_j \|^2 \\
 D_{*j}^2 &= \sum_{i=1}^N \| \mathbf{z}_i \|^2 + N \| \mathbf{z}_j \|^2 \\
-D_{**}^2 &= 2N \sum_{i=1} \| \mathbf{z}_i \|^2
+D_{**}^2 &= 2N \sum_{i=1}^N \| \mathbf{z}_i \|^2
 \end{align}
 $$
 
@@ -252,8 +252,8 @@ $$
 
 $$
 \begin{align}
-\| \mathbf{z}_i \|^2 &= \frac{1}{N} D_{*j}^2 - \frac{1}{2N^2} D_{**}^2 \\
-\| \mathbf{z}_j \|^2 &= \frac{1}{N} D_{i*}^2 - \frac{1}{2N^2} D_{**}^2 \\
+\| \mathbf{z}_i \|^2 &= \frac{1}{N} D_{i*}^2 - \frac{1}{2N^2} D_{**}^2 \\
+\| \mathbf{z}_j \|^2 &= \frac{1}{N} D_{*j}^2 - \frac{1}{2N^2} D_{**}^2 \\
 \mathbf{z}_i^\top \mathbf{z}_j &= \frac{1}{2} \left( \frac{1}{N} D_{i*}^2 + \frac{1}{N} D_{*j}^2 - \frac{1}{N^2} D_{**}^2 - D_{ij}^2 \right)
 \end{align}
 $$
@@ -330,7 +330,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-この多次元尺度構成法の結果は、定義式から分かるとおり、元のベクトルを線形に射影した物であり、元々のスイスロールのデータをとある方向 (元の空間での距離が最大限保たれる方向)から見たものと等価である。従って、主成分分析と比べて、ややスイスロールの帯の部分に拡がりのあるデータとなっているものの、全体の見た目としてはそれほど変わりがない。
+この多次元尺度構成法の結果は、主成分分析の結果と (回転や鏡映を除いて) **完全に一致する**。距離行列 $\mathbf{D}$ をEuclid距離で作った場合、$\mathbf{K} = -\frac{1}{2}\mathbf{H}\mathbf{D}^2\mathbf{H}$ は中心化したデータのGram行列 $\mathbf{X}_c \mathbf{X}_c^\top$ に等しく、その固有ベクトルは分散共分散行列 $\mathbf{X}_c^\top \mathbf{X}_c / N$ の固有ベクトルと1対1に対応するためである。つまり、古典的な多次元尺度構成法は「距離だけが与えられたときに主成分分析と同じ結果を得る方法」と言うことができ、線形の次元削減法に分類される理由もここにある。この同値性を示すことは、次の練習問題としておく。
 
 +++
 
