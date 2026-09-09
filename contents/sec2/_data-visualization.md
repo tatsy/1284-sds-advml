@@ -194,6 +194,15 @@ plt.tight_layout()
 plt.show()
 ```
 
+::::{admonition} 問
+:class: question
+
+分散共分散行列 $\mathbf{C}$ の固有値の和が、各次元の分散の和 $\mathrm{tr}\,\mathbf{C}$ に等しいことを示せ。その上で、スイスロールのデータについて `PCA` の `explained_variance_ratio_` を確認し、2次元に落としたときに全分散の何割が保たれているかを求めよ。
+
+::::
+
++++
+
 ### 多次元尺度構成法 (MDS)
 
 +++
@@ -338,6 +347,8 @@ plt.show()
 :class: question
 
 多次元尺度構成法の項で紹介した{eq}`eq:mds`を自身で導出せよ。
+
+また、$\mathbf{H} = \mathbf{I} - \frac{1}{N}\mathbf{1}\mathbf{1}^\top$ が $\mathbf{H}^2 = \mathbf{H}$、$\mathbf{H}^\top = \mathbf{H}$、$\mathbf{H}\mathbf{1} = \mathbf{0}$ を満たすこと (すなわち、$\mathbf{1}$ に直交する部分空間への射影行列であること)を示し、それを用いて、Euclid距離から作った $\mathbf{D}$ に対しては $-\frac{1}{2}\mathbf{H}\mathbf{D}^2\mathbf{H} = \mathbf{X}_c \mathbf{X}_c^\top$ ($\mathbf{X}_c$ は各行を中心化したデータ行列)となること、従って古典的な多次元尺度構成法が主成分分析と同じ結果を与えることを示せ。
 ::::
 
 +++
@@ -772,6 +783,15 @@ plt.show()
 
 +++
 
+::::{admonition} 問
+:class: question
+
+LLEの重み $\mathbf{w}_i$ が、近傍点全体の平行移動 $\mathbf{x} \mapsto \mathbf{x} + \mathbf{t}$、回転 $\mathbf{x} \mapsto \mathbf{R}\mathbf{x}$、拡大縮小 $\mathbf{x} \mapsto s\mathbf{x}$ に対して不変であることを、{eq}`eq:lle-weight-derivation`の目的関数と制約条件から示せ。平行移動に対する不変性には、重みの和が1という制約がどのように使われるか。
+
+::::
+
++++
+
 ### カーネル主成分分析
 
 +++
@@ -991,6 +1011,15 @@ plt.show()
 ```
 
 これはカーネル主成分分析に限らないが、次元削減のアルゴリズムにはいくつかのパラメータがあることがほとんどで、それらを変更すると、全く異なる結果が得られることも多い。従って、scikit-learn等のライブラリを用いる場合も、その背景でどのような計算が行われているのかを考えた上で、パラメータを適切に設定することが大切である。
+
++++
+
+::::{admonition} 問
+:class: question
+
+線形カーネル $k(\mathbf{x}_i, \mathbf{x}_j) = \mathbf{x}_i^\top \mathbf{x}_j$ を用いたカーネル主成分分析が、通常の主成分分析と同じ低次元表現を与えることを示せ (ヒント: このとき $\mathbf{HKH}$ は多次元尺度構成法の練習問題で扱った $\mathbf{X}_c \mathbf{X}_c^\top$ に一致する)。`KernelPCA(kernel='linear')` と `PCA` の結果を数値的にも比較せよ。
+
+::::
 
 +++
 
@@ -1268,7 +1297,16 @@ show(row(plot, column(w1, w2, w3, w4, w5)))
 ::::{admonition} 問
 :class: question
 
-MNISTのデータについて、コサインカーネルを行った主成分分析により得られる画像を第5主成分まで調べてみよ (ヒント: `scikit-learn`の`KernelPCA`で`inverse_transform=True`を用いる)。
+MNISTのデータについて、コサインカーネルを行った主成分分析により得られる画像を第5主成分まで調べてみよ (ヒント: `scikit-learn`の`KernelPCA`で`fit_inverse_transform=True`を指定すると`inverse_transform`が使える)。
+
+::::
+
++++
+
+::::{admonition} 問
+:class: question
+
+MNISTの画像 `X[10]` を、主成分を $d = 5, 20, 50, 100$ 個用いて $\boldsymbol\mu + \sum_{j=1}^d w_j \mathbf{v}_j$ の形で再構成し、元画像との二乗誤差が $d$ とともにどのように減るかを調べよ。また、その誤差が、使わなかった主成分に対応する固有値の和とどのような関係にあるかを考察せよ。
 
 ::::
 
