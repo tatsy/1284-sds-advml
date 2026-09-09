@@ -11,7 +11,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.19.5
 kernelspec:
-  display_name: sdsadvml (3.12.6.final.0)
+  display_name: sdsadvml (3.11.13)
   language: python
   name: python3
 ---
@@ -334,7 +334,7 @@ pbar.close()
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-データセットの作成が終了したら、8割の画像を訓練画像、残りの2割の画像をテスト画像として振り分けておく。
+データセットの作成が終了したら、8割の画像を訓練画像、残りの2割の画像をテスト画像として振り分けておく。以下のコードの `stratify=y` は、各文字について、訓練画像とテスト画像が同じ割合となるように分割するためのオプションである。
 
 ```{code-cell} ipython3
 ---
@@ -344,7 +344,7 @@ slideshow:
 ---
 from sklearn.model_selection import train_test_split
 
-X, X_test, y, y_test = train_test_split(X, y, train_size=0.8, shuffle=True)
+X, X_test, y, y_test = train_test_split(X, y, train_size=0.8, shuffle=True, stratify=y)
 
 print(f'#train: {len(X)}')
 print(f' #test: {len(X_test)}')
@@ -619,7 +619,7 @@ slideshow:
 tags: [remove-input]
 ---
 c = m[1, 1]
-b = (m > c).astype('int32')
+b = (m >= c).astype('int32')
 fig, ax = plt.subplots(figsize=(2, 2))
 draw_frame(b, fig, ax)
 ```
@@ -678,7 +678,7 @@ for iy in range(1, img.shape[0] - 1):
     for ix in range(1, img.shape[1] - 1):
         c = img[iy, ix]
         m = img[iy - 1 : iy + 2, ix - 1 : ix + 2]
-        b = (m > c).astype('int32')
+        b = (m >= c).astype('int32')
         lbp_img[iy, ix] = np.sum(p * b)
 
 lbp_img = lbp_img[1:-1, 1:-1]
@@ -740,7 +740,7 @@ feature = []
 
 # パッチごとにLBPヒストグラムを計算
 for patch in lbp_patches:
-    hist, _ = np.histogram(patch, bins=32, range=(0, 256), density=True)
+    hist = np.bincount(patch.flatten(), minlength=256) / patch.size
     feature.append(hist)
 
 # 特徴ベクトルを一つにつなげる
@@ -787,7 +787,7 @@ class LBPFeature(TransformerMixin):
         mask = np.array([[64, 128, 1], [32, 0, 2], [16, 8, 4]], dtype='int32')
         mask = mask.reshape((1, 1, 3, 3))
         centers = patches[:, :, 1, 1].reshape((n_imgs, -1, 1, 1))
-        binary = (patches > centers).astype('int32')
+        binary = (patches >= centers).astype('int32')
         lbp_imgs = np.sum(binary * mask, axis=(2, 3))
         lbp_imgs = lbp_imgs.reshape((-1, h, w))
 
@@ -796,7 +796,7 @@ class LBPFeature(TransformerMixin):
         features = []
         for lbp_img in lbp_imgs:
             patches = [lbp_img[y : y + ps, x : x + ps] for y in range(0, h, ps) for x in range(0, w, ps)]
-            histograms = [np.histogram(patch, bins=32, range=(0, 256), density=True)[0] for patch in patches]
+            histograms = [np.bincount(patch.flatten(), minlength=256) / patch.size for patch in patches]
             features.append(np.concatenate(histograms))
 
         return np.stack(features, axis=0)
@@ -1155,22 +1155,35 @@ slideshow:
 ---
 n_angles = 9  # 角度の量子化数
 
+# エッジの抽出を最初に行う
+dx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
+dy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
+
+# 勾配強度と角度を計算
+g = np.sqrt(dx * dx + dy * dy)
+theta = 180.0 * np.arctan2(np.abs(dy), dx) / np.pi
+
+# 隣接する角度にヒストグラムの寄与を分配する
+bin_width = 180.0 / n_angles
+bin_val = theta / bin_width - 0.5
+bin_lo = np.floor(bin_val).astype('int32')
+bin_lo = bin_lo % n_angles
+bin_hi = (bin_lo + 1) % n_angles
+w_hi = bin_val - bin_lo
+w_lo = 1.0 - w_hi
+
+# 実際のヒストグラムを作成
 histograms = []
-for p in patches:
-    dx = cv2.Sobel(p, cv2.CV_32F, 1, 0)
-    dy = cv2.Sobel(p, cv2.CV_32F, 0, 1)
-
-    # 勾配強度と角度を計算
-    g = np.sqrt(dx * dx + dy * dy)
-    theta = 180.0 * np.arctan2(np.abs(dy), dx) / np.pi
-    t = np.minimum((theta * n_angles / 180.0).astype('int32'), n_angles - 1)
-
-    # 勾配強度を加算してヒストグラムを作成
-    h = np.zeros((n_angles), dtype='float32')
-    for g_, t_ in zip(g.flatten(), t.flatten()):
-        h[t_] += g_
-
-    histograms.append(h)
+for iy in range(0, h, ps):
+    for ix in range(0, w, ps):
+        lo_p = bin_lo[iy : iy + ps, ix : ix + ps].flatten()
+        hi_p = bin_hi[iy : iy + ps, ix : ix + ps].flatten()
+        w_lo_p = w_lo[iy : iy + ps, ix : ix + ps].flatten()
+        w_hi_p = w_hi[iy : iy + ps, ix : ix + ps].flatten()
+        g_p = g[iy : iy + ps, ix : ix + ps].flatten()
+        hist = np.bincount(lo_p, weights=g_p * w_lo_p, minlength=n_angles)
+        hist += np.bincount(hi_p, weights=g_p * w_hi_p, minlength=n_angles)
+        histograms.append(hist)
 
 histograms = np.stack(histograms, axis=0)
 
@@ -1200,6 +1213,11 @@ hog = blocks.reshape((-1, n_angles * bs * bs))
 
 # ブロックごとのヒストグラムのノルムが1となるように正規化
 hog = hog / (np.sqrt(np.sum(hog * hog, axis=1, keepdims=True)) + 1.0e-8)
+
+# L2-Hys: 大きすぎる成分を0.2にクリップしてから再度正規化
+hog = np.clip(hog, 0.0, 0.2)
+hog = hog / (np.sqrt(np.sum(hog * hog, axis=1, keepdims=True)) + 1.0e-8)
+
 hog = hog.flatten()
 ```
 
@@ -1230,24 +1248,35 @@ class HOGFeature(TransformerMixin):
 
         features = []
         for img in imgs:
-            # パッチに分割
-            patches = [img[y : y + ps, x : x + ps] for y in range(0, h, ps) for x in range(0, w, ps)]
+            # エッジの抽出を最初に行う
+            dx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
+            dy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
 
-            # パッチごとにヒストグラムを計算
+            # 勾配強度と角度を計算
+            g = np.sqrt(dx * dx + dy * dy)
+            theta = 180.0 * np.arctan2(np.abs(dy), dx) / np.pi
+
+            # 隣接する角度にヒストグラムの寄与を分配する
+            bin_width = 180.0 / n_angles
+            bin_val = theta / bin_width - 0.5
+            bin_lo = np.floor(bin_val).astype('int32')
+            bin_lo = bin_lo % n_angles
+            bin_hi = (bin_lo + 1) % n_angles
+            w_hi = bin_val - bin_lo
+            w_lo = 1.0 - w_hi
+
+            # 実際のヒストグラムを作成
             histograms = []
-            for p in patches:
-                dx = cv2.Sobel(p, cv2.CV_32F, 1, 0)
-                dy = cv2.Sobel(p, cv2.CV_32F, 0, 1)
-
-                g = np.sqrt(dx * dx + dy * dy)
-                theta = 180.0 * np.arctan2(np.abs(dy), dx) / np.pi
-                t = np.minimum((theta * n_angles / 180.0).astype('int32'), n_angles - 1)
-
-                hist = np.zeros((n_angles), dtype='float32')
-                for g_, t_ in zip(g.flatten(), t.flatten()):
-                    hist[t_] += g_
-
-                histograms.append(hist)
+            for iy in range(0, h, ps):
+                for ix in range(0, w, ps):
+                    lo_p = bin_lo[iy : iy + ps, ix : ix + ps].flatten()
+                    hi_p = bin_hi[iy : iy + ps, ix : ix + ps].flatten()
+                    w_lo_p = w_lo[iy : iy + ps, ix : ix + ps].flatten()
+                    w_hi_p = w_hi[iy : iy + ps, ix : ix + ps].flatten()
+                    g_p = g[iy : iy + ps, ix : ix + ps].flatten()
+                    hist = np.bincount(lo_p, weights=g_p * w_lo_p, minlength=n_angles)
+                    hist += np.bincount(hi_p, weights=g_p * w_hi_p, minlength=n_angles)
+                    histograms.append(hist)
 
             histograms = np.stack(histograms, axis=0)
             histograms = histograms.reshape((ph, pw, -1))
@@ -1258,8 +1287,11 @@ class HOGFeature(TransformerMixin):
             )
             hog = blocks.reshape((-1, n_angles * bs * bs))
             hog = hog / (np.sqrt(np.sum(hog * hog, axis=1, keepdims=True)) + 1.0e-8)
-            hog = hog.flatten()
 
+            hog = np.clip(hog, 0.0, 0.2)
+            hog = hog / (np.sqrt(np.sum(hog * hog, axis=1, keepdims=True)) + 1.0e-8)
+
+            hog = hog.flatten()
             features.append(hog)
 
         return np.stack(features, axis=0)
