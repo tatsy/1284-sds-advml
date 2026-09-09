@@ -385,7 +385,8 @@ $$
 from tqdm.notebook import tqdm
 
 # SMACOFのパラメータ
-eps = 1.0e-3
+eps = 1.0e-3  # ゼロ除算を防ぐための微小量
+tol = 1.0e-3  # 収束判定の閾値
 max_iter = 100
 k = 2
 
@@ -397,25 +398,21 @@ old_stress = 1.0e20
 # SMACOF iterations
 progbar = tqdm(range(max_iter))
 for _ in progbar:
-    # Zから距離行列を計算
+    # 現在のZから距離行列とストレスを計算
     D_sr_prime = np.sqrt(np.sum((z_sr[:, None] - z_sr[None, :]) ** 2, axis=2))
-
-    # Guttman transformによるZの更新
-    ratio = D_sr / (D_sr_prime + 1.0e-3)
-    B = (np.diag(ratio.sum(axis=1)) - ratio) / n
-    z_sr = np.dot(B, z_sr)
-
-    # ストレスの計算
     stress = ((D_sr_prime.ravel() - D_sr.ravel()) ** 2).sum() / 2
     rel_stress = stress / np.sqrt((z_sr**2).sum(axis=1)).sum()
+    progbar.set_description(f'Stress: {rel_stress:.4f}')
 
     # ストレスの変化が一定以下になったら処理を終了
-    loss = np.abs(old_stress - rel_stress)
-    progbar.set_description(f'Stress: {rel_stress:.4f}')
-    if loss < eps:
+    if np.abs(old_stress - rel_stress) < tol:
         break
-
     old_stress = rel_stress
+
+    # Guttman transformによるZの更新
+    ratio = D_sr / (D_sr_prime + eps)
+    B = (np.diag(ratio.sum(axis=1)) - ratio) / n
+    z_sr = np.dot(B, z_sr)
 
 progbar.close()
 ```
