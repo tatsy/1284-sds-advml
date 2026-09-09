@@ -454,7 +454,7 @@ z_sr = mds.fit_transform(D_sr)
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (MDS with SMACOF, scikit-learn)')
+ax.set_title('Swiss Roll (MDS with SMACOF, scikit-learn)')
 ax.axis('equal')
 plt.tight_layout()
 plt.show()
@@ -532,7 +532,7 @@ z_sr = eigvec * np.sqrt(eigval[None, :])
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (ISOMAP)')
+ax.set_title('Swiss Roll (ISOMAP)')
 plt.tight_layout()
 plt.show()
 ```
@@ -559,7 +559,7 @@ z_sr = isomap.fit_transform(X_sr)
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=4)
-ax.set_title('Swiss Role (ISOMAP, scikit-learn)')
+ax.set_title('Swiss Roll (ISOMAP, scikit-learn)')
 plt.tight_layout()
 plt.show()
 ```
@@ -730,7 +730,7 @@ z_sr = eigvec
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (LLE)')
+ax.set_title('Swiss Roll (LLE)')
 plt.tight_layout()
 plt.show()
 ```
@@ -753,7 +753,7 @@ z_sr = lle.fit_transform(X_sr)
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (LLE, scikit-learn)')
+ax.set_title('Swiss Roll (LLE, scikit-learn)')
 plt.tight_layout()
 plt.show()
 ```
@@ -918,7 +918,7 @@ z_sr = K_sr @ eigvec / np.sqrt(eigval[None, :])
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (Kernel PCA)')
+ax.set_title('Swiss Roll (Kernel PCA)')
 ax.axis('equal')
 plt.tight_layout()
 plt.show()
@@ -942,7 +942,7 @@ z_sr = kpca.fit_transform(X_sr)
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (Kernel PCA, scikit-learn)')
+ax.set_title('Swiss Roll (Kernel PCA, scikit-learn)')
 ax.axis('equal')
 plt.tight_layout()
 plt.show()
@@ -1005,7 +1005,7 @@ fig = plt.figure(figsize=(8, 4))
 gs = GridSpec(2, 4, figure=fig)
 for i in range(8):
     ax = plt.subplot(gs[i])
-    ax.imshow(ims[i], cmap='gray', interpolation=None)
+    ax.imshow(ims[i], cmap='gray', interpolation='none')
     ax.set_title(f'label is {y[i]:d}')
     ax.set_xticks([])
     ax.set_yticks([])
@@ -1136,7 +1136,7 @@ from matplotlib.gridspec import GridSpec
 gs = GridSpec(1, 5)
 for i in range(5):
     ax = plt.subplot(gs[i])
-    ax.imshow(ims[i], cmap='gray', interpolation=None)
+    ax.imshow(ims[i], cmap='gray', interpolation='none')
     ax.set(title=f'#{i + 1:d}', xticks=[], yticks=[])
 
 plt.tight_layout()
@@ -1263,8 +1263,4 @@ scikit-learnには次元削減の手法としては他にもHessian Eigenmap{cit
 
 ```{bibliography}
 :filter: docname in docnames
-```
-
-```{code-cell} ipython3
-
 ```
