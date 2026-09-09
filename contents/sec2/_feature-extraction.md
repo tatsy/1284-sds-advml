@@ -609,7 +609,7 @@ draw_frame(m, fig, ax)
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-このとき、中心画素と周囲の8画素の大小を見比べて、大きいものを1, 小さいものを0に置き換える。
+このとき、周囲の8画素について中心画素以上の輝度を持つものを1、小さいものを0に置き換える。
 
 ```{code-cell} ipython3
 ---
@@ -712,7 +712,9 @@ plt.show()
 
 LBPを用いることの利点は画像の**相対的な輝度の大小だけを見ている**点にあり、仮に画像の輝度が2倍になったりしても求まるLBPの値は全く変化しない。そのため、同じ対象を異なる光源下で計算した場合などに一貫した特徴を得られる。
 
-ただし、このままLBP画像を扱うだけでは、得られる特徴ベクトルが画素の並びに強く依存することになるため、LBP画像をヒストグラム化することを考える。この際、画像全体をヒストグラム化するのではなく、画像をいくつかのパッチに分割して、パッチごとに計算したLBP画像の輝度ヒストグラムを一つにつなげて特徴ベクトルとして用いる。
+ただし、このままLBP画像を扱うだけでは、得られる特徴ベクトルが画素の並びに強く依存することになるため、LBP画像をヒストグラム化することを考える。この際、画像全体をヒストグラム化するのではなく、画像をいくつかのパッチに分割して、パッチごとに256通りのLBP値の出現頻度をヒストグラムとしたものを一つにつなげて特徴ベクトルとして用いる。
+
+なお、LBP値は8ビットの符号を整数に読み替えたものであって大小関係に大きな意味はない。そのため、ヒストグラム化する際には、LBP値の範囲でビンをまとめることはせず、256通りの値をそのまま256個のビンとしてヒストグラムを作成する。
 
 ```{code-cell} ipython3
 ps = 8  # パッチサイズ
@@ -1082,7 +1084,7 @@ Histogram of Oriented Gradient (HOG)が広く知られるようになったの�
 
 特にHOGは人物の全身といった特定の物体を見つける性能に優れており、一般物体認識や物体追跡等の多数の応用が生まれた。
 
-HOGは画像を、互いに重ならない小さなパッチに分割して計算を行う。今回用いるひらがな画像は48×48の大きさなので、これを8×8のパッチに区切ってみる。
+HOGは画像全体で計算した勾配情報をパッチごとに集計することで計算する。今回用いるひらがな画像は48×48の大きさなので、これを8×8のパッチに区切ってみる。
 
 ```{code-cell} ipython3
 ---
@@ -1134,18 +1136,20 @@ $$
 
 また、`cv2.Sobel`の第2引数には出力画像のビット深度を指定するが、ここで`cv2.CV_8U`を指定すると、負の勾配が全て0に飽和してしまい、明るい領域から暗い領域へ向かうエッジが完全に失われる。例えば、暗い背景に明るい正方形が置かれた画像に対して縦方向のSobelフィルタをかけると、正方形の下端にあたる行の値は次のようになる。
 
-```
+```text
 CV_32F: [0, 0, -255, -765, -1020, -765, -255, 0, 0]
 CV_8U : [0, 0,    0,    0,     0,    0,    0, 0, 0]
 ```
 
 符号付きの値を保持するため、以下では`cv2.CV_32F`を指定している。
 
-実装では$\arctan$の代わりに`np.arctan2`を用いる。`np.arctan2(y, x)`は$d_x$の符号まで考慮して角度を返すため、$d_y \geq 0$の下では$0°$から$180°$までの範囲が得られる。一方、NumPyの`np.arctan`は引数を1つしか取らない関数で、第2引数は計算結果の出力先(`out`)として解釈されてしまうため、$d_x$が無視されて角度が$0°$から$90°$の範囲にしか収まらなくなる。また、$d_y = 0$かつ$d_x < 0$のときには$\theta$がちょうど$180°$になり、ビンの番号が範囲外になるので、番号を`n_angles - 1`で頭打ちにしている。
+実装では $\arctan$ の代わりに `np.arctan2` を用いる。 `np.arctan2(y, x)` は $d_x$ の符号まで考慮して角度を返すため、 $d_y \geq 0$ の下では$0°$から $180°$ までの範囲が得られる。一方、NumPyの `np.arctan` は引数を1つしか取らない関数で、第2引数は計算結果の出力先 (`out`) として解釈されてしまうため、 $d_x$ が無視されて角度が $0°$ から $90°$ の範囲にしか収まらなくなる。
+
+また、 $d_y = 0$ かつ $d_x < 0$ のときには $\theta$ がちょうど $180°$ になり、ビンの番号が範囲外になるので、番号を `n_angles` で割ったあまりを取ることで巡回させている。
 
 今、各パッチは8×8の大きさなので、勾配強度と勾配方向がそれぞれ64個ずつ求まる。求まった勾配方向をいくつかの方向に量子化 (今回は20°刻みで9方向)し、ヒストグラムを作成する。
 
-この際、各画素の方向に対応するビンには**勾配強度を加算**して、ヒストグラムを計算する。
+この際、各画素の方向に対応するビンには**勾配強度を加算**して、ヒストグラムを計算する。なお、以下の計算では、勾配の方向を単純に量子化してビンの番号を決めるのではなく、隣接する2つのビンに線形補間で寄与を分配している。
 
 ```{code-cell} ipython3
 ---
@@ -1167,10 +1171,10 @@ theta = 180.0 * np.arctan2(np.abs(dy), dx) / np.pi
 bin_width = 180.0 / n_angles
 bin_val = theta / bin_width - 0.5
 bin_lo = np.floor(bin_val).astype('int32')
-bin_lo = bin_lo % n_angles
-bin_hi = (bin_lo + 1) % n_angles
 w_hi = bin_val - bin_lo
 w_lo = 1.0 - w_hi
+bin_lo = bin_lo % n_angles
+bin_hi = (bin_lo + 1) % n_angles
 
 # 実際のヒストグラムを作成
 histograms = []
@@ -1195,6 +1199,8 @@ print(f'{len(histograms):d} histograms with {histograms.shape[1]:d} bins are obt
 これにより6×6=36個のヒストグラムが求まった。ここで注意したいのは、これらのヒストグラムは勾配強度で計算されており、**場所によって、ヒストグラムのスケールが異なる**という点である。
 
 そこで、HOGでは、この6×6=36個のパッチを3×3のブロックごとに走査し、そのブロック内で連結したヒストグラムを正規化して用いる。今、勾配方向は9つに離散化されており、ブロック内のパッチが3×3=9個なので、1ブロックが持つヒストグラムの次元は9×9=81次元である。この81次元ベクトルをノルムが1になるように正規化しておく。
+
+なお、HOGでは、L2-Hysと呼ばれる正規化手法を用いることが多い。L2-Hysでは、まずベクトルをノルムが1になるように正規化し、その後、大きな成分を一定の端位にクリップしてから、再度ノルムが1になるように正規化する。以下の実装ではクリップの閾値を0.2に設定している。
 
 最終的に、81次元のヒストグラムが複数 (今回の場合は(6-3+1)×(6-3+1)=16個)求まるので、これらを連結して、画像の特徴量として用いる。
 
@@ -1260,10 +1266,10 @@ class HOGFeature(TransformerMixin):
             bin_width = 180.0 / n_angles
             bin_val = theta / bin_width - 0.5
             bin_lo = np.floor(bin_val).astype('int32')
-            bin_lo = bin_lo % n_angles
-            bin_hi = (bin_lo + 1) % n_angles
             w_hi = bin_val - bin_lo
             w_lo = 1.0 - w_hi
+            bin_lo = bin_lo % n_angles
+            bin_hi = (bin_lo + 1) % n_angles
 
             # 実際のヒストグラムを作成
             histograms = []
@@ -2132,6 +2138,8 @@ tags: [remove-output]
 feature = features[0]
 
 sub_feat = pca.transform(feature)  # (N, D)
+n_feat = sub_feat.shape[0]
+
 gamma = sub_gmm.predict_proba(sub_feat)  # (N, K)
 alpha = sub_gmm.weights_  # (K)
 mu = sub_gmm.means_  # (K, D)
@@ -2147,6 +2155,15 @@ dLdm = np.sum(gamma[:, :, None] * tmp0, axis=0)
 tmp0 = diff**2 / (sigma[None, :, :] ** 3)
 tmp1 = 1.0 / sigma[None, :, :]
 dLds = np.sum(gamma[:, :, None] * (tmp0 - tmp1), axis=0)
+
+# 正規化
+dLda /= n_feat
+dLdm /= n_feat
+dLds /= n_feat
+
+# Fisher情報量の対角近似を掛ける
+dLdm = dLdm * sigma / np.sqrt(alpha)[:, None]
+dLds = dLds * sigma / np.sqrt(2.0 * alpha)[:, None]
 
 fisher_vector = np.concatenate([dLda, dLdm.reshape(-1), dLds.reshape(-1)])
 ```
@@ -2193,6 +2210,7 @@ class FisherVectorFeature(TransformerMixin):
 
             # 次元削減
             sub_feat = self.pca.transform(feature)
+            n_feat = sub_feat.shape[0]
 
             # Fisherベクトルの計算
             gamma = self.gmm.predict_proba(sub_feat)  # (N, K)
@@ -2210,6 +2228,13 @@ class FisherVectorFeature(TransformerMixin):
             tmp0 = diff**2 / (sigma[None, :, :] ** 3)
             tmp1 = 1.0 / sigma[None, :, :]
             dLds = np.sum(gamma[:, :, None] * (tmp0 - tmp1), axis=0)
+
+            dLda /= n_feat
+            dLdm /= n_feat
+            dLds /= n_feat
+
+            dLdm = dLdm * sigma / np.sqrt(alpha)[:, None]
+            dLds = dLds * sigma / np.sqrt(2.0 * alpha)[:, None]
 
             fv = np.concatenate([dLda, dLdm.reshape(-1), dLds.reshape(-1)])
             features.append(fv)
