@@ -582,144 +582,86 @@ ISOMAPの結果は頂点間の「グラフ上での距離」に依存するた�
 
 **局所線形埋め込み法** (LLE = Locally Linear Embedding) {cite}`roweis2000nonlinear`は、高次元空間上の点である$\mathbf{x}_i$とその近傍において、線形性を保存するように低次元空間での表現を得る次元削減法である。
 
-今、$\mathbf{x}_i \in \mathbb{R}^D$ の近傍点として、 $\mathbf{x}_{i_1}, \ldots, \mathbf{x}_{i_K}$ が与えられたとしよう。LLEが仮定する線形性とは、 $\mathbf{x}_i$ が近傍点の凸結合として、以下のように表せることを意味する。
+今、$\mathbf{x}_i \in \mathbb{R}^D$ の近傍点として、 $\mathbf{x}_{i_1}, \ldots, \mathbf{x}_{i_K}$ が与えられたとしよう。LLEが仮定する局所線形性とは、 $\mathbf{x}_i$ が近傍点の**重みの和が1となる線形結合**として、以下のように表せることを意味する。
 
 $$
-\mathbf{x}_i = \sum_{k=1}^K w_{ik} \mathbf{x}_{i_k}, \quad \forall i, \forall k, ~~ w_{ik} \geq 0, ~~ \sum_{k=1}^K w_{ik} = 1
+\mathbf{x}_i \approx \sum_{k=1}^K w_{ik} \mathbf{x}_{i_k}, \quad \sum_{k=1}^K w_{ik} = 1
 $$ (eq:local-linearity)
 
-$\mathbf{d}_{i_k} = \mathbf{x}_{i_k} - \mathbf{x}_i$ を新たに導入し、さらに $\mathbf{D}_i = [ \mathbf{d}_{i_1} \cdots \mathbf{d}_{i_K} ] \in \mathbb{R}^{K \times D}$, $\mathbf{w}_i = (w_{i1} \cdots w_{iK})^\top \in \mathbb{R}^K$ と置くと、{eq}`eq:local-linearity`は以下のように書き直せる。
+重みの和を1に制限しているのは、近傍点全体を平行移動しても同じ重みで $\mathbf{x}_i$ を表せるようにするためである。なお、Roweis と Saul の原論文では重みに非負の制約は課しておらず、実際、以下の解法で得られる重みには負の値も現れる (このデータでは全体の2割弱が負になる)。従って、この線形結合は凸結合ではなく、**アフィン結合**である。
+
+$\mathbf{d}_{i_k} = \mathbf{x}_{i_k} - \mathbf{x}_i$ を新たに導入し、さらに、これらを行として並べた行列 $\mathbf{D}_i = [ \mathbf{d}_{i_1} \cdots \mathbf{d}_{i_K} ]^\top \in \mathbb{R}^{K \times D}$ と、重みを並べたベクトル $\mathbf{w}_i = (w_{i1} \cdots w_{iK})^\top \in \mathbb{R}^K$ を置く。重みの和が1であることを用いると、{eq}`eq:local-linearity`の両辺の差は
 
 $$
-\mathbf{D}_i^\top \mathbf{w}_i = \mathbf{0}
+\sum_{k=1}^K w_{ik} \mathbf{x}_{i_k} - \mathbf{x}_i = \sum_{k=1}^K w_{ik} (\mathbf{x}_{i_k} - \mathbf{x}_i) = \mathbf{D}_i^\top \mathbf{w}_i
 $$
 
-+++
-
-これを用いると、解くべき最適化問題は次のようになることが分かる。
+と書き直せる。従って、解くべき最適化問題は次のようになる。
 
 $$
 \begin{align}
 & \underset{\mathbf{w}_i}{\text{minimize:}} \quad \frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2 \\
-&\begin{aligned}
-    \text{subject to:} \quad & \mathbf{1}^\top \mathbf{w}_i = 1 & \\
-    & w_{ik} \geq 0 & (i = 1, \ldots, K)
-\end{aligned}
+& \text{subject to:} \quad \mathbf{1}^\top \mathbf{w}_i = 1
 \end{align}
 $$ (eq:lle-weight-derivation)
 
 +++
 
-この最適化問題は不等式制約を含むため、目的関数が二次、制約条件が一次であるものの、単純な線形問題には帰着されない。具体的にはKarush-Kuhn-Tucker条件 (KKT条件)を満たすように、以下のラグランジアンに関する制約付き最適化問題を解く必要がある。
-
-+++
+これは等式制約だけを持つ二次計画問題なので、Lagrangeの未定乗数法で解くことができる。ラグランジアンを
 
 $$
-\mathcal{L}(\mathbf{w}_i, \lambda, \boldsymbol\mu) = \frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2 - \lambda (\mathbf{1}^\top \mathbf{w}_i - 1) - \sum_{k=1}^K \mu_k w_{ik}
+\mathcal{L}(\mathbf{w}_i, \lambda) = \frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2 - \lambda (\mathbf{1}^\top \mathbf{w}_i - 1)
 $$
 
-+++
-
-このラグランジアンを用いると、{eq}`eq:lle-weight-derivation`の不等式制約付きの最小化問題におけるKKT条件は以下のように書ける。
-
-+++
+と置き、$\mathbf{w}_i$ に関する勾配を $\mathbf{0}$ とすると、
 
 $$
-\begin{align}
-\nabla \mathcal{L} = \mathbf{0}, & &\\
-w_{ik} \geq 0, & & k = 1, \ldots, K \\
-\mu_k w_{ik} = 0, & & k = 1, \ldots, K \\
-\mu_k \geq 0, & & k = 1, \ldots, K
-\end{align}
+\mathbf{D}_i \mathbf{D}_i^\top \mathbf{w}_i = \lambda \mathbf{1}
 $$
 
-+++
-
-すると、ラグランジアンの勾配が$\mathbf{0}$になるという条件から、
-
-+++
-
-$$
-\mathbf{D}_i \mathbf{D}_i^\top \mathbf{w}_i = \lambda \mathbf{1} + \boldsymbol\mu
-$$
-
-+++
-
-となることが分かる。この時、行列 $\mathbf{D}_i \mathbf{D}_i^\top$ が半正定値行列であることを考慮すると、両辺に左側から $\mathbf{w}_i^\top$ を掛けることにより、以下の不等式が得られる。
-
-+++
-
-$$
-\lambda \mathbf{1}^\top \mathbf{w}_i + \boldsymbol\mu^\top \mathbf{w}_i = \mathbf{w}_i^\top (\mathbf{D}_i \mathbf{D}_i^\top) \mathbf{w}_i \geq 0
-$$
-
-+++
-
-KKT条件より任意の$k$について$\mu_k w_{ik} = 0$であるので、結局、以下のように書ける。
-
-+++
-
-$$
-\frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2 = \frac{1}{2} \mathbf{w}_i (\mathbf{D}_i \mathbf{D}_i^\top) \mathbf{w}_i \geq \frac{1}{2} \lambda \mathbf{1}^\top \mathbf{w}_i
-$$
-
-+++
-
-以上より、{eq}`eq:lle-weight-derivation`を満たすように$\frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2$を最小化するとき、その最小値は$\frac{1}{2} \lambda \mathbf{1}^\top \mathbf{w}_i$になることが分かる。
-
-よって、その時の$\mathbf{w}_i$を求めるためには、等式を満たす場合に関して、両辺を$\mathbf{w}_i$で微分することにより得られる以下の線形方程式を解けば良い。
-
-+++
-
-$$
-\mathbf{D}_i \mathbf{D}_i^\top \mathbf{w}_i = \frac{1}{2} \lambda \mathbf{1}
-$$
-
-+++
-
-ここで、$\lambda$が未知であったことを考慮し、以下のように問題を書き換える。
-
-+++
+が得られる。ここで $\lambda$ は未知であるが、$\mathbf{w}_i$ は $\lambda$ に比例するだけなので、まず
 
 $$
 \mathbf{D}_i \mathbf{D}_i^\top \mathbf{w}'_i = \mathbf{1}
 $$
 
-+++
-
-ただし、$\mathbf{w}'_i = \frac{2}{\lambda} \mathbf{w}_i$とする。今、この線形方程式を解いて$\mathbf{w}'_i$が求まれば、$w_{ik}$の和が1であったことから、
+を解いて $\mathbf{w}'_i$ を求め、その後、重みの和が1になるように
 
 $$
-\mathbf{w}_i = \frac{{w}'_i}{\sum w'_{ik}}
+\mathbf{w}_i = \frac{\mathbf{w}'_i}{\sum_{k=1}^K w'_{ik}}
 $$
 
-と書ける。これで、とある頂点$\mathbf{x}_i$について、その近傍から$\mathbf{x}_i$を凸結合により表現するための重み$w_{ik}$を求めることができた。
+と正規化すれば良い ($\mathbf{w}_i = \lambda \mathbf{w}'_i$ であり、和が1という条件から $\lambda = 1 / \sum_k w'_{ik}$ と定まる)。
+
+なお、近傍点の数 $K$ がデータの次元 $D$ より大きい場合、$\mathbf{D}_i \mathbf{D}_i^\top$ は階数が $D$ 以下の特異行列になり得る。そのため、以下の実装では対角成分に小さな正則化項を加えてから線形方程式を解いている。
+
+これで、とある頂点$\mathbf{x}_i$について、その近傍から$\mathbf{x}_i$を線形結合により表現するための重み$w_{ik}$を求めることができた。
 
 +++
 
 局所線形埋め込みにおいては$\mathbf{x}_i$に対応する低次元空間表現$\mathbf{z}_i \in \mathbb{R}^d ~ (d \leq D)$が同じ局所線形性を有することを仮定する。即ち、
 
 $$
-\mathbf{z}_i = \sum_{k=1}^K w_{ik} \mathbf{z}_{i_k}, \quad \forall i, \forall k, ~~ w_{ik} \geq 0, ~~ \sum_{k=1}^K w_{ik} = 1
+\mathbf{z}_i \approx \sum_{k=1}^K w_{ik} \mathbf{z}_{i_k}, \quad \sum_{k=1}^K w_{ik} = 1
 $$
 
 が成立すると仮定する。これを全てのデータ点に対して考慮すれば、解くべき問題は以下の二乗誤差の最小化に帰着される。
 
 $$
-\sum_{i=1}^N \left\| \mathbf{z}_i - \sum_{k=1} w_{ik} \mathbf{z}_{i_k} \right\|^2 = \mathbf{z}^\top (\mathbf{I} - \mathbf{W})^\top (\mathbf{I} - \mathbf{W}) \mathbf{z}
+\sum_{i=1}^N \left\| \mathbf{z}_i - \sum_{k=1}^K w_{ik} \mathbf{z}_{i_k} \right\|^2 = \mathrm{tr} \left( \mathbf{Z}^\top (\mathbf{I} - \mathbf{W})^\top (\mathbf{I} - \mathbf{W}) \mathbf{Z} \right)
 $$ (eq:lle-quadratic-form)
 
 +++
 
 ただし、行列$\mathbf{W}$は、その$i$行において$i_1, \ldots, i_K$列の成分だけが非零の値を持つような疎行列、$\mathbf{Z} = [ \mathbf{z}_1 \cdots \mathbf{z}_N ]^\top \in \mathbb{R}^{N\times d}$である。
 
-{eq}`eq:lle-quadratic-form` は、行列 $\mathbf{M} = (\mathbf{I} - \mathbf{W})^\top (\mathbf{I} - \mathbf{W})$の二次形式なので、これを最小化するためには、$\mathbf{z}$を$\mathbf{M}$の固有値の絶対値が小さい順に、固有ベクトルを並べて、
+{eq}`eq:lle-quadratic-form` は、行列 $\mathbf{M} = (\mathbf{I} - \mathbf{W})^\top (\mathbf{I} - \mathbf{W})$ による $\mathbf{Z}$ の各列の二次形式の和である。$\mathbf{Z} = \mathbf{0}$ のような自明な解を除くため、各列が単位ノルムで互いに直交する ($\mathbf{Z}^\top \mathbf{Z} = \mathbf{I}$) という制約の下でこれを最小化すると、$\mathbf{M}$ の固有ベクトルを固有値の小さい順に並べて、
 
 $$
-\mathbf{z} = [\mathbf{u}_2 \cdots \mathbf{u}_{d+1}]
+\mathbf{Z} = [\mathbf{u}_2 \cdots \mathbf{u}_{d+1}]
 $$
 
-とすれば良いことが分かる。ただし、$\mathbf{M}$は半正定値行列で、絶対値最小の固有値$\lambda_1 = 0$であるため、これに対応する固有ベクトル$\mathbf{u}_1$を除いて、先頭から$d$個を並べている。
+とすれば良いことが分かる。ただし、$\mathbf{M}$ は半正定値行列で、最小の固有値は $\lambda_1 = 0$ であり、対応する固有ベクトル $\mathbf{u}_1$ は全ての成分が等しい定数ベクトルである (重みの和が1なので $(\mathbf{I} - \mathbf{W}) \mathbf{1} = \mathbf{0}$)。これは全ての点を同じ場所に写す意味のない解なので、$\mathbf{u}_1$ を除いて先頭から $d$ 個を並べている。
 
 以上の計算により、局所線形埋め込み法による低次元空間表現が得られた。
 
