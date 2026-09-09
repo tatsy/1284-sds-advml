@@ -16,18 +16,12 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:reinforcement-learning)=
 # 強化学習の基礎
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 """
 下準備のコード
 """
@@ -92,7 +86,7 @@ print(f'{n_play}')
 
 ## 多腕バンディット問題
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **多腕バンディット問題**とは、スロットゲームを題材に、得られる報酬の量を最大にする問題である。
 
@@ -113,11 +107,6 @@ print(f'{n_play}')
 まずは、多腕バンディット問題を扱うために、スロットゲームを実装してみる。スロット台のアームを表わす `SlotArm`というクラスを以下のように実装する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 class SlotArm:
     """
     スロットアームを表わすクラス
@@ -138,8 +127,6 @@ class SlotArm:
         return self.rng.uniform(0.0, 1.0) < self.ratio
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 この`SlotArm`クラスを配列として、スロット台のアームを複数用意する。
 
 以下の例では、![](#n_arms) 本のアームを持つスロット台を用意し、各アームが当たりを出す確率が0.1から0.2刻みで0.9までになるように設定する。
@@ -147,11 +134,6 @@ class SlotArm:
 なお、**これらの当たり確率は未知の値である**。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 0.1-0.9までの当たり確率を0.2刻みで設定
 ratios = np.linspace(0.1, 0.9, n_arms, endpoint=True)
 # その後、順番をランダムに入れ替える
@@ -187,22 +169,17 @@ print(f'{np.max(ratios):.2f}')
 
 という二つの目的の実現を目指している。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## ランダムな行動選択
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 まずは、上記の問題設定で、ランダムにアームを選んでスロットを回すという行動をとった場合に、どの程度の当たりが出るかを見てみよう。
 
 以下の実験では ![](#n_play) 回スロットをプレイできるとして実験を行う。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 history = []
 for _ in range(n_play):
     # ランダムに1つのスロットを選ぶ
@@ -233,25 +210,19 @@ S_rand = np.sqrt((history - E_rand) ** 2.0 / play_count)  # 推定当たり確�
 print(f'{E_rand[-1]:.3f}')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 :::{admonition} 結果: ランダムな行動選択
 :class: note
 
 当たり確率: ![](#random_ratio)
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 以下には、横軸にスロットを回した回数を取り、当たり確率とその推定値分散をプロットしたものを示す。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: random_plot
 
 fig, ax = plt.subplots()
@@ -280,15 +251,15 @@ plt.show()
 :class: image-stylish
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 このように、ランダムに回すと、得られる報酬は、当たり確率の ![](#avg_ratio) 程度に張り付くことが分かる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 貪欲法
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 報酬を増やすためにあり得そうな方法は、 **一番当たっているスロットを常に回す** という方策である。この手法を**貪欲法**と呼ぶ。
 
@@ -297,11 +268,6 @@ plt.show()
 ただし、最初の数回は当たり確率が安定しない可能性があるので、最初の10%は、ランダムに回している。このように最初の何回かを乱数による影響を除去するためにランダム試行する操作を**バーンイン**と呼ぶ。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # バーンインの回数
 n_burn_in = n_play // 10
 
@@ -347,8 +313,6 @@ S_greedy = np.sqrt((history - E_greedy) ** 2.0 / play_count)
 print(f'{E_greedy[-1]:.3f}')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 :::{admonition} 結果: 貪欲法
 :class: note
 
@@ -360,12 +324,8 @@ print(f'{E_greedy[-1]:.3f}')
 以下には得られた平均報酬の比較を示す。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: greedy_plot
 
 fig, ax = plt.subplots()
@@ -403,7 +363,7 @@ plt.show()
 :class: image-stylish
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 上記の結果を見てみると、一番当たっている物を回す、という戦略はそれほど悪くはないように見える。
 
@@ -413,11 +373,11 @@ plt.show()
 
 また、今回はスロットの当たり確率にそれなりに差があるため、全体の試行回数の10%程度で、一番当たるスロットがどれかが判明するが、実際には当たり確率が非常に近い場合もあり、貪欲法には依然改善の余地がある。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## $\varepsilon$-greedy法
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 $\varepsilon$-greedy法は、とある定数 $0 < \varepsilon < 1$ について、$\varepsilon$の確率でランダムにスロットを選び、 $1 - \varepsilon$ の確率で一番当たっているスロットを回す、という方法である。
 
@@ -428,11 +388,6 @@ $\varepsilon$-greedy法は、とある定数 $0 < \varepsilon < 1$ について�
 そのため、現在分かっている情報をできるだけ有効活用しよう、というのが$\varepsilon$-greedy法の考え方である。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 epsilon = 0.1
 
 history = []
@@ -473,8 +428,6 @@ S_eps = np.sqrt((history - E_eps) ** 2.0 / play_count)
 print(f'{E_eps[-1]:.3f}')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 :::{admonition} 結果: $\varepsilon$-greedy法
 :class: note
 
@@ -487,12 +440,8 @@ print(f'{E_eps[-1]:.3f}')
 以下には得られた平均報酬の比較を示す。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: eps_greedy_plot
 
 fig, ax = plt.subplots()
@@ -539,7 +488,7 @@ plt.show()
 :class: image-stylish
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 この結果から分かるように、完全にランダムに回す、というのをやめるだけで、試行回数が少ない段階から、かなり高い平均当たり確率が得られていることが分かる。
 
@@ -564,11 +513,11 @@ $\varepsilon$-greedy法においては、通常、試行回数が増えれば増
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## ソフトマックス探索
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 $\varepsilon$-greedy法でも十分に良い結果が得られているが、探査のために完全なランダム行動を取る、という点には、まだ改善の余地がある。
 
@@ -592,16 +541,11 @@ $$
 
 この定義はBolzmann関数と呼ばれるため、ソフトマックス関数は**Boltzmann探索**と呼ばれることもある。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ソフトマックス関数により得られる評価値は0から1の間の実数を取り、全てのスロットの評価値の合計は1となる。この時、仮に当たり確率の期待値が0であっても、ある程度の割合で選択され、一方で、確率としては、より当たり確率が高いものを相対的に多く選ぶという意味で、ランダム性と当たり確率の利用のバランスが良い。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 def boltzmann(x, tau=1.0):
     """Boltzmann関数"""
     x = x / tau
@@ -610,11 +554,6 @@ def boltzmann(x, tau=1.0):
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 tau = 0.1
 history = []
 n_arm_hit = np.zeros(n_arms)
@@ -651,8 +590,6 @@ S_smax = np.sqrt((history - E_smax) ** 2.0 / play_count)
 print(f'{E_smax[-1]:.3f}')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 :::{admonition} 結果: ソフトマックス探索
 :class: note
 
@@ -661,12 +598,8 @@ print(f'{E_smax[-1]:.3f}')
 :::
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: softmax_plot
 
 fig, ax = plt.subplots()
@@ -722,17 +655,17 @@ plt.show()
 :class: image-stylish
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 上記の結果を見てみると、ソフトマックス探索の最終的な平均当たり確率は、ほとんど最大の当たり確率と同じ値になっている。
 
 さらに、ソフトマックス法は**試行回数が少ない場合でも、安定して高い平均報酬が得られている**ことが分かる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## Upper Confidence Bound (UCB)
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 先ほどのソフトマックス探索は、多腕バンディット問題のような、各試行によって当たり確率が変化しないような問題に対しては高い性能を示す一方、**その時々で当たり確率が変動するような対象に対しては、安定して作用しない**こと知られている。
 
@@ -755,11 +688,6 @@ UCB1値の第1項が単純なアームの当たり確率を表す。第２項は
 このようにUCB1は、推定の当たり確率が高いか、推定値の信頼性が低いアームをより多く回すという戦略を上手く表わしている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 history = []
 n_arm_hit = np.zeros(n_arms)
 n_arm_play = np.zeros(n_arms)
@@ -797,8 +725,6 @@ S_ucb = np.sqrt((history - E_ucb) ** 2.0 / play_count)
 print(f'{E_ucb[-1]:.3f}')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 :::{admonition} 結果: UCB1
 :class: note
 
@@ -810,12 +736,8 @@ print(f'{E_ucb[-1]:.3f}')
 以下には得られた平均報酬の比較を示す。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: ucb_plot
 
 fig, ax = plt.subplots()
@@ -880,13 +802,13 @@ plt.show()
 :class: image-stylish
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 上記のようにUCB1は多腕バンディット問題のような、状態変化が少ない問題においてはソフトマックス探索に比べて最大当たり確率への収束が遅くなっているが、モデルを決定するパラメータがなく、状態変化が起こるモデルへの頑健性に優れている。
 
 この点については、以後の[Q学習](#sec:q-learning)の節などで各自で確認してみてほしい。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ::::{admonition} 問
 :class: question
@@ -895,7 +817,7 @@ UCBにはいくつかの種類があり、本資料で紹介したものはUCB1�
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 参考文献
 
@@ -904,10 +826,5 @@ UCBにはいくつかの種類があり、本資料で紹介したものはUCB1�
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 
 ```

@@ -16,12 +16,10 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:pytorch)=
 # PyTorchと自動微分
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 前回、[特徴量抽出](#sec:feature-extraction)では、画像から特徴量を検出し、それを画像識別に利用する方法を見てきた。
 
@@ -29,7 +27,7 @@ kernelspec:
 
 そのために、SIFTを始めとする特徴量の改善や、カーネル法を用いたSVMの性能改善などが試みられてきたが、その性能は徐々に頭打ちになっていく。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 そんな折、彗星のごとく現れた技術がニューラルネットワークを多層化した深層学習である。実は、ニューラルネット自体は人間の脳のシナプス同士の結合を模したモデルとして1950年代から研究されていた。
 
@@ -41,7 +39,7 @@ kernelspec:
 
 そして、2012年に深層学習を一躍有名にする出来事が起こる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ImageNetと呼ばれる大規模画像データセットの識別チャレンジであるILSVRC (ImageNet Large Scale Visual Recognition Challenge)において、トロント大学のGeoffrey Hintonらの研究チームが、AlexNet (筆頭著者のfirst nameから)と呼ばれる二股のニューラルネットを用いて、2位のエラー率26.2%に大差をつけ、エラー率わずか17.0％を達成し、優勝する {cite}`krizhevsky2012imagenet`。この時の2位のチーム(東京大学のチーム)が用いた手法はSIFT, Fisher Vector, SVMを組み合わせたものであった。
 
@@ -58,27 +56,23 @@ ImageNetと呼ばれる大規模画像データセットの識別チャレンジ
 
 などの技術が、一通り出そろう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 さらには、この頃になるとNVIDIAのCaffeや、モントリオール大学のtheano、FacebookのTorch、そしてPreferred NetworkのChainerといった汎用の深層学習用ライブラリが多数登場する。これによって、深層学習の研究が一気に花開き、現在に至る。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 本章では、深層学習のモデルを実際に構築する前段階として、深層学習のフレームワークであるPyTorchの基本的な使い方を学ぶ。具体的には、PyTorchにおけるデータの表現である**テンソル**の扱い方と、パラメータの最適化を支える**自動微分**の仕組み、そして自動微分を利用した最適化の方法について順に見ていく。
 
 実際にニューラルネットワークを構築し、画像を識別するモデルを学習させる手順については、次章の[深層学習による画像識別](#sec:deep-learning)で扱う。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **Google Colab用の準備**
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
+:tags: [hide-input]
+
 IN_COLAB = True
 try:
     import google.colab
@@ -95,12 +89,8 @@ if IN_COLAB:
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 import os
 
 import numpy as np
@@ -119,11 +109,9 @@ sns.set_theme(style='white', palette='colorblind', rc=rc)
 color_palette = sns.color_palette('colorblind')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## PyTorchの基本
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 本章では、数ある深層学習のフレームワークのうち、研究開発目的に最も一般的に使用されていると思われるPyTorchを扱う。
 
@@ -136,18 +124,11 @@ PyTorchには、いくつかのモジュールが用意されており、代表�
 の3つである。慣例的に、これらをこのような形でエイリアスを与えてインポートする。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # PyTorchのモジュール群
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 `torch`モジュールがテンソルデータそのもの(`torch.Tensor`等)や、データに対する操作 (`torch.exp`や`torch.transpose`等)が含まれる。
 
@@ -314,8 +295,6 @@ x = torch.tensor([1.0], dtype=torch.float32)
 print(x.item())
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 :::{admonition} 練習問題
 :class: question
 
@@ -324,7 +303,7 @@ print(x.item())
 また、この違いを[NumPyの基本](#sec:numpy)で扱ったビューとコピーの違いと対応付けて説明せよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -336,7 +315,7 @@ print(x.item())
 
 ## 自動微分
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 深層学習を支える重要な技術に**自動微分**がある。関数の微分は、損失関数の最小化といった最適化問題にとって重要な情報であり、例えば、最急降下法やニュートン法といったアルゴリズムは、それぞれ関数の1階微分 (勾配)と、2階微分 (Hesse行列)を用いる。
 
@@ -348,7 +327,7 @@ print(x.item())
 
 ### 自動微分の仕組み
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **自動微分**は、プログラム的に、とある演算とその微分計算がペアとして定義されており、演算の列によって表される関数の微分は、各演算の微分から、合成関数の微分としての連鎖律 (chain rule)により計算される。
 
@@ -398,11 +377,6 @@ $$
 では、上記の議論をPyTorchを用いて実験してみる。前述の通り、`torch.tensor`関数に`requires_grad`パラメータを指定することで、**自動微分により勾配が計算される変数**を作ることができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 変数を作成
 x = torch.tensor([2.0], requires_grad=True)
 ```
@@ -416,11 +390,6 @@ x = x.requires_grad_(True)
 それでは、ここで定義した$x$を用いて変数を用いて、$z = \cos(x^2)$を段階的に計算してみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # y = g(x) = x^2の計算
 y = x * x
 print(f'y = g(x) = {y.item():.1f}')
@@ -433,11 +402,6 @@ print(f'z = h(y) = {z.item():.5f}')
 最終的な$z$の$x$に関する微分を求めるには、`z.backward()`という関数を呼び出せば良い。ただし、この関数は**スカラーの出力にしか使えない**ので注意が必要。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 微分の計算
 z.backward()
 ```
@@ -454,11 +418,6 @@ except Exception as e:
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 dzdx_autograd = x.grad
 print(f'autograd: dz/dx = {dzdx_autograd.item():.5f}')
 
@@ -487,26 +446,21 @@ print(f'autograd.grad: dz/dx = {dzdx[0].item():.5f}')
 自動微分においては、計算の過程でこのような計算グラフをライブラリが内部的に構築しており、グラフを遡っていくことで、「最終的な出力」の「グラフ中に現れた変数」に関する微分を計算している。PyTorchの`backward`等の関数に渡せるパラメータの中にも`retain_graph`や`create_graph`など、「グラフ」という言葉を含むものがあるのはこのためである。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 勾配計算の制御
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 自動微分を実際に使う上では、勾配の計算を制御するための仕組みを3つ知っておく必要がある。いずれも、この後のニュートン法やオプティマイザの実装、そして次章の学習ループで実際に使うものである。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **勾配の累積**
 
 `backward`によって計算された勾配は、`grad`に**代入されるのではなく加算される**。そのため、同じ変数に対して`backward`を複数回呼び出すと、勾配が足し合わされていく。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 x = torch.tensor([2.0], requires_grad=True)
 for i in range(3):
     z = torch.cos(x * x)
@@ -517,11 +471,6 @@ for i in range(3):
 これは、複数の損失関数から得られる勾配を足し合わせたい場合などには便利な仕様である。一方、通常の最適化では、各ステップで勾配を計算し直したいので、その都度、勾配をゼロに戻す必要がある。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 x = torch.tensor([2.0], requires_grad=True)
 for i in range(3):
     if x.grad is not None:
@@ -534,18 +483,13 @@ for i in range(3):
 
 後述するオプティマイザを使う場合には、この処理が`optim.zero_grad()`として用意されている。深層学習の学習ループで、毎回`zero_grad`が呼ばれているのは、このためである。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **計算グラフからの切り離し**
 
 `requires_grad=True`である変数から計算された値は、自動微分のための計算グラフを保持している。この計算グラフが不要な場合、例えば、計算結果をNumPyの配列に変換して図に描きたい場合などには、`detach`を用いて計算グラフから切り離す。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 x = torch.tensor([2.0], requires_grad=True)
 z = torch.cos(x * x)
 
@@ -559,18 +503,13 @@ print('detachしてから:', z.detach().numpy())
 
 `detach`は、元の`torch.Tensor`とメモリを共有しつつ、計算グラフを持たない新しい`torch.Tensor`を返す。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **勾配計算の無効化**
 
 学習済みのモデルを使って予測をするときのように、そもそも勾配が必要ない場合には、`torch.no_grad()`のブロックの中で計算を行うことで、計算グラフの構築自体を省略できる。これにより、計算に必要なメモリが削減され、計算も多少高速になる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 x = torch.tensor([2.0], requires_grad=True)
 
 z = torch.cos(x * x)
@@ -623,12 +562,8 @@ $$
 この関数において$a = 1$, $b = 100$とするとして、二次元平面上に値をプロットすると以下のようになる (カラーバーは対数の値に対して計算されている)。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
+:tags: [hide-input]
+
 from matplotlib.colors import LogNorm
 
 xs = np.linspace(-2.0, 2.0, 200)
@@ -646,18 +581,13 @@ fig.colorbar(mappable, ax=ax)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}, "tags": ["hide-input"]}
++++ {"tags": ["hide-input"]}
 
 この関数は、$(1.0, 1.0)$の点を打った場所が関数の最小値をとる箇所になっているのだが、最小値の近傍が非常に狭い谷のような形になっており、さらにその谷が放物線上に湾曲しているため、この赤点の位置の最小値を求めることが困難であるとされている。
 
 まずは$(x, y) = (0, 0)$として、Rosenbrock関数自体の値を計算してみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 x = torch.tensor([0.0, 0.0], requires_grad=True)
 f = (x[0] - 1.0) ** 2.0 + 100.0 * (x[1] - x[0] ** 2.0) ** 2.0
 print(f'f(0, 0) = {f.item():f}')
@@ -742,7 +672,7 @@ $$
 
 となり、自動微分の結果が解析的な微分結果と一致していることが分かる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -750,7 +680,7 @@ $$
 $f(x) = \exp(-x^2)$ について、自動微分によって求めた $f'(2)$ の値と、解析的に求めた導関数に $x = 2$ を代入した値が一致することを確かめよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -797,22 +727,12 @@ $$
 では、ここまでの議論を踏まえて、実際に自動微分により求めたHesse行列を用いてRosenbrock関数を最小化してみよう (以下にコードと実行結果を示すが、まずは自分自身で考えてみてほしい)。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 def rosenbrock(x):
     """Rosenbrock function"""
     return (x[0] - 1.0) ** 2.0 + 100.0 * (x[1] - x[0] ** 2.0) ** 2.0
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 initial_x = np.array([-1.0, 1.5])
 
 
@@ -848,12 +768,8 @@ print('The answer is:', x.detach().numpy())
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
+:tags: [hide-input]
+
 from matplotlib.colors import LogNorm
 
 xs = np.linspace(-2.0, 2.0, 200)
@@ -877,13 +793,11 @@ fig.colorbar(mappable, ax=ax)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 この図では、$(-1.0, 1.5)$の初期値から$(1.0, 1.0)$の最小値に至るまでの最適化の過程をマーカー付きの曲線で示している。各マーカーの位置を見てみると、徐々に最小値に至るスピードが遅くなりつつも、正しく関数の最小値を取る箇所に収束していることが分かる。
 
 Rosenbrock関数の最小化については、解の初期値やニュートン法のステップ幅を変化させることで、収束が不安定になって最小解からはずれて・近づいてを繰り返すような軌跡を描くこともある。ぜひ、いろいろなパラメータで軌跡を描画して、その性質の理解に努めて欲しい。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -891,7 +805,7 @@ Rosenbrock関数の最小化については、解の初期値やニュートン�
 上記のニュートン法により得られた関数最小化の軌跡を、単純な[最急降下法](https://en.wikipedia.org/wiki/Gradient_descent)ならびに一階導関数だけを用いてHesse行列を近似する[準ニュートン法](https://en.wikipedia.org/wiki/Quasi-Newton_method)と比較せよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -901,7 +815,7 @@ Rosenbrock関数の最小化については、解の初期値やニュートン�
 また、初期値`initial_x`をいろいろに変えてみて、最小値に収束しない場合があることを確かめよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 機械学習と損失関数
 :class: note
@@ -911,7 +825,7 @@ Rosenbrock関数の最小化については、解の初期値やニュートン�
 ニューラルネットのパラメータ最適化(=訓練)には、ニュートン法や準ニュートン法のような損失関数の二階微分を考慮するような方法を用いることは少なく (ただしAdaSecant{cite}`gulcehre2014adasecant`のような二階微分を考慮する方法もある)、多くの場合は単純な確率的最急降下法やRMSprop, Adamのようなアルゴリズムが使われることが多い。これは、パラメータ数が多くなると、Hesse行列を求めるのに多くの計算量が必要になるためで、そうであれば、一階微分だけが求まれば実行できる最急降下法を安定化させるように工夫する方が良い、という発想である。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## オプティマイザによる最適化
 
@@ -1029,12 +943,8 @@ for name, opt in optims.items():
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 xs = np.linspace(-2.0, 2.0, 200)
 ys = np.linspace(-1.0, 3.0, 200)
 xs, ys = np.meshgrid(xs, ys)
@@ -1075,7 +985,7 @@ plt.show()
 
 このような、最適化手法の性質の違いに留意しつつ、適切なオプティマイザを選ぶことが好ましい。ただし、オプティマイザに関しては、Adamの発展形などもいろいろと提案されており、新しいものを使おうとすると切りがないため、深層学習を使って研究する場合には、現在、他の多くの研究で用いられているものを使っておくのが無難だろう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -1085,7 +995,7 @@ plt.show()
 また、SGDが発散してしまうような大きな学習率であっても、Adamでは解が収束する場合がある。これがなぜかを、それぞれの更新式から説明せよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -1093,21 +1003,21 @@ plt.show()
 Adamのパラメータ $\beta_1$ (PyTorchでは`betas`引数の第1要素)を 0 に設定すると、どのアルゴリズムに近い挙動になると考えられるか。更新式から予想した上で、実際に軌跡を描いて確かめよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 以上で、PyTorchにおけるテンソルの扱い方、自動微分の仕組み、そして自動微分を利用した最適化について一通り見てきた。
 
 次章の[深層学習による画像識別](#sec:deep-learning)では、ここで学んだ内容を土台として、実際にニューラルネットワークを構築し、平仮名の画像を識別するモデルを学習させる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 発展的な内容
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここから先の節は、講義の中では扱わない発展的な内容である。PyTorchの自動微分に、自分で定義した演算を組み込みたい場合に読んでほしい。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 発展: 自動微分可能な演算の定義
 
@@ -1164,7 +1074,7 @@ print(f'my cosine: dzdx = {x.grad.item():.5f}')
 
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 参考文献
 

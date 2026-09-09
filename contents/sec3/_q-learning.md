@@ -16,12 +16,10 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:q-learning)=
 # SARSAとQ学習
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここまでで扱った多腕バンディット問題は、取れる行動の種類が少なく、また、問題の状態が変化しない、すなわち、いつスロットを回しても、各アームの当たり確率は変化しない、という特徴があった。
 
@@ -34,12 +32,8 @@ TD学習の代表的な手法には**SARSA** (state-action-reward-state-action)�
 この両者において、行動価値関数$Q$は、とある**状態**$s$ (stateのs)において取った**行動**$a$ (actionのa)の価値を関数として、$Q(s, a)$のように表す。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 """
 Google Colabの準備
 """
@@ -61,12 +55,8 @@ if IN_COLAB:
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input, remove-cell]
----
+:tags: [hide-input, remove-cell]
+
 import random
 
 import numpy as np
@@ -109,11 +99,9 @@ sns.set_theme(style='whitegrid', palette='colorblind', rc=rc)
 print(f'{n_episodes}')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## Markov決定過程
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 SARSAやQ学習で扱う対象は**Markov決定過程**と呼ばれる状態遷移のモデルである。
 
@@ -152,11 +140,11 @@ $$ (eq:bellman-equation-2)
 
 これから紹介するSASRAやQ学習は、{eq}`eq:bellman-equation-2`を満たすような$Q(s, a)$を強化学習の枠組みによって求めるものである。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## TD学習のアルゴリズム
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 SARSAを始めとするTD学習法は、実際の環境において、適当な行動を取ったときに得られる報酬と状態遷移から、{eq}`eq:bellman-equation-2`の両辺の差が小さくなるように$Q(s, a)$の値を更新する。
 
@@ -229,11 +217,11 @@ Q学習は、その事前に分からない行動価値関数を適当な形で�
 
 しかも、Q学習は更新過程にあるQテーブルが最適な行動価値関数だと考えているので、$\varepsilon$-greedy法やソフトマックス探索のような**方策決定法を別途用いる必要が無い**というのが重要な性質である。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 倒立振子のバランシング
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 TD学習法を実際に試すために、比較的単純な倒立振子のバランスを取るゲームについて考える。倒立振子のシミュレータは[Gymnasium](https://gymnasium.farama.org/)というライブラリ(旧名: OpenAI Gym)から簡単に使用することができる。
 
@@ -252,11 +240,6 @@ pip install "gymnasium[classic-control]"
 このように`render_mode`を指定しておくと、`env.render`関数によって画面の情報をNumPyの配列として得ることができるので、Matplotlibを用いて、初期状態を描画してみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 import gymnasium as gym
 
 # ゲーム環境の作成
@@ -272,12 +255,8 @@ img = env.render()
 最終行の`env.render()`で得られた画像を表示すると次のようになる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: q-learning-cartpole-init-state
 fig, ax = plt.subplots()
 ax.imshow(img)
@@ -289,27 +268,20 @@ plt.show()
 :class: image-stylish
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 このように、CartPoleは台車 (cart)の上に倒立振子 (pole)が取り付けられたものを制御して、できる限り長い時間、振子が倒れないようにバランスを取るゲームである。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 倒立振子は、その状態を表すいくつかのパラメータを持っており、それが`reset`関数の戻り値として取得される`obsrv`の中に格納されている。
 
 `obsrv`は`tuple`型の変数になっていて、CartPole環境の場合には**第1要素に状態を表す変数が入っている**。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 現在の状態変数を確認
 print(obsrv[0])
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 CartPole環境の場合は、4つの浮動小数が格納されており、先頭から、
 - 台車の水平位置
@@ -327,23 +299,16 @@ CartPole環境の場合は、4つの浮動小数が格納されており、先�
 | 2 | 振子の角度 | -24° | +24° |
 | 3 | 振子の角速度 | -Inf | +Inf |
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 この値は、`env`の`observation_space`フィールドで確認することができる。
 
 CartPole環境の場合には`observation_space`は`Box`という型で表されていて、`low`、`high`というフィールドにパラメータの最小値、最大値が格納されている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 print(f'Lower bound: {env.observation_space.low}')
 print(f'Upper bound: {env.observation_space.high}')
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 Gyminasiumのゲーム環境には、この他にも多数の関数が用意されており、それを強化学習に用いることができる。
 
@@ -358,17 +323,10 @@ Gyminasiumのゲーム環境には、この他にも多数の関数が用意さ�
 ランダムな行動選択には、`env.action_space.sample()`を使うことができる。CartPole環境の場合には`env.action_space.n`に格納されているとおり、取り得る行動は **0: 左に移動**, **1: 右に移動** の2つだけなので、`sample`関数はこのうちの一方をランダムに返してくる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # ランダムに5回行動選択をしてみる
 for i in range(5):
     print(env.action_space.sample())
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 選んだ行動をとって状態を更新するには`env.step`関数を用いる。`step`関数の引数に行動を表す整数を与えることで状態が更新される。
 
@@ -383,27 +341,15 @@ for i in range(5):
 のような構成となっている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 obsrv, reward, done, _, _ = env.step(0)
 print('Observation:', obsrv)
 print('Reward:', reward)
 print('Finished?:', done)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 これらを用いてランダムに行動選択をし、その時々の状態を画像として格納する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # ゲーム環境のリセット
 obsrv, _ = env.reset()
 frames = []
@@ -426,12 +372,8 @@ while True:
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # アニメーションの描画
 fig, ax = plt.subplots()
 ax.set(xticks=[], yticks=[])
@@ -453,26 +395,19 @@ display.display(html)
 plt.close()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 このようにランダムに行動した場合には、途中で棒の傾きが一定以上になってしまい、エピソードが終了していることが分かる。
 
 以下では、Q学習によって行動評価関数を最適化し、より長い時間、倒立状態を保てるようにしてみよう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### Qテーブルを使う準備
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 まずはQテーブルを作成するために、4種類のパラメータを離散化しておこう。以下の例では、**速度と各速度の範囲を適当に狭めておき、その上で各パラメータの取り得る範囲を8分割する**
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 N_INPUTS = env.observation_space.shape[0]  # 状態を表す変数の数
 N_ACTIONS = env.action_space.n  # 取れる行動の数
 N_DIGITS = 8  # 各パラメータを何段階で量子化するか
@@ -483,38 +418,22 @@ lower[1], upper[1] = -5.0, 5.0  # 速度の範囲を修正
 lower[3], upper[3] = -0.5 * np.pi, 0.5 * np.pi  # 角速度の範囲を修正
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 今回の倒立振子の例ではパラメータ4つを8分割しているので、取り得る離散状態の組み合わせは$8^4 = 4096$通りである。取り得る行動は左に行くか、右に行くかの2種類であるので、結局、Qテーブルのサイズは$4096 \times 2$となる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # Q値テーブルの初期化 (乱数による初期化)
 q_table = np.random.random(size=(N_DIGITS**N_INPUTS, env.action_space.n))
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 8分割されたパラメータの範囲を求めるには`np.linspace`関数が使える。この関数はこれまで第1, 第2引数にスカラー値を入力して使ってきたが、サイズが同じであれば配列を指定することもできる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 bins = np.transpose(np.linspace(lower, upper, N_DIGITS))
 print('Cart position:\n', bins[0])
 print('Cart velocity:\n', bins[1])
 print('Pole angle:\n', bins[2])
 print('Pole angular velocity:\n', bins[3])
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 今、とある状態変数が与えられた時に、それが4096個の離散状態のどれに対応するのかを定めておく必要がある。
 
@@ -523,60 +442,34 @@ print('Pole angular velocity:\n', bins[3])
 各パラメータが8つの範囲のどれに属するかを求めるには`np.digitize`関数が使える。4つのパラメータのそれぞれについて、リスト内包表記によって所属する範囲のインデックスを求めるとすれば、以下のようなコードになる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 obsrv, _ = env.reset()
 digits = [np.digitize(o, b) for o, b in zip(obsrv, bins)]
 print(digits)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 現在は各パラメータの範囲を8つに分割しているので、`digits`には0-7の整数が与えられる。従って、この数字を8進数であると考えて、10進数表記に直せば、各離散状態に対して重複のない整数のインデックスを付与することができる。
 
 このような計算は、単純には以下のようなfor文を用いたコードで実現できる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 index = 0
 for n in digits:
     index = index * N_DIGITS + n
 print(index)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 もう少しPythonらしい書き方にするのであれば、`functools.reduce`関数を用いて以下のように書くこともできる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from functools import reduce
 
 index = reduce(lambda a, b: a * N_DIGITS + b, digits)
 print(index)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 これらを踏まえて、状態を表わすインデックスを計算するコードを関数化しておく。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 def to_state_index(obsrv, bins):
     digits = [np.digitize(o, b) for o, b in zip(obsrv, bins)]
     return reduce(lambda a, b: a * N_DIGITS + b, digits)
@@ -699,11 +592,11 @@ SARSAにおいて、ソフトマックス探索の部分をUCB1値や他の評�
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### Q学習によるQテーブルの最適化
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 前述の通り、SARSAは次の行動を決定するために、ソフトマックス探索のような行動決定法を別途用いる必要があった。
 
@@ -711,7 +604,7 @@ SARSAにおいて、ソフトマックス探索の部分をUCB1値や他の評�
 
 従って、次の行動`a0`を得るアルゴリズムは以下のようなシンプルなものになる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ```python
 # 一番価値が高く見積もられている行動をとる
@@ -722,12 +615,8 @@ obsrv, reward, done, _, _ = env.step(a0)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 # Q値テーブルの初期化
 q_table = np.random.random(size=(N_DIGITS**N_INPUTS, env.action_space.n))
 
@@ -762,11 +651,6 @@ for epi in tqdm(range(n_episodes)):
 学習結果のテストはSARSAの時と同様に、Q値が最も高い行動を常に選択することとする。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 frames = []
 obsrv, _ = env.reset()
 while True:
@@ -783,12 +667,8 @@ while True:
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # アニメーションの描画
 fig, ax = plt.subplots()
 ax.set(xticks=[], yticks=[])
@@ -809,8 +689,6 @@ display.display(html)
 # Matplotlibのウィンドウを閉じる
 plt.close()
 ```
-
-+++ {"editable": true, "raw_mimetype": "", "slideshow": {"slide_type": ""}}
 
 Q学習は、行動選択のために別途方策を用いる必要がないという点でSARSAと比べてシンプルなアルゴリズムでありながら、SARSAと同程度に長い時間、倒立状態をキープできている。
 

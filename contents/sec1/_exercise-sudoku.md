@@ -16,12 +16,10 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:exercise-sudoku)=
 # 演習 1 - 画像入力式数独ソルバーの作成
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ご存知の通り、数独というのは 9x9 のマスの中に 1-9 の数字を一定のルールのもとで入れていくパズルである。このルールとはすなわち、
 
@@ -75,24 +73,17 @@ rc = {'figure.dpi': 150}
 sns.set_theme(style='white', palette='colorblind', rc=rc)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## 数独を解く
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 まずは数独の問題がテキストで与えられている場合について、解き方を見ていこう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 今回は数独の問題が以下の形式のテキストとして与えられることとする。Python は複数行のテキストを以下のように定義することができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 problem = """
 -35-9--48
 --9--8--3
@@ -106,63 +97,35 @@ problem = """
 """
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 これを扱いやすくするために NumPy の配列に直してみる。まずはテキストを行ごとの配列に変換する。Pythonの文字列型のメソッドである`split`は空白文字や改行文字ごとに文字列を区切ってくれるのでこれを用いる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 problem = problem.split()
 print(problem)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 するとproblemの長さは9となる。各行を文字ごとに分割するには、同じようにリスト内包表記を用いると簡単にできる。以下に二重ループを用いたリスト内包表記の例を示す。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 problem = [c for line in problem for c in line]
 print(problem)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 すると今度はproblemが81個の要素を持つ一次元配列になる。現在、各数字は文字であり、数字ではないので、各文字を数字に置き換える。また、まだ埋まっていないセルを表す`-`は 0 に置き替える。
 
 このような置き換えは次のようなハッシュ(Python の用語では dict)を使うと簡単に書ける。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 numbers = {'-': 0}
 numbers.update({str(i): i for i in range(1, 10)})
 print(numbers)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 このハッシュを使って文字を数字に置き換えるには、やはりリスト内包表記を用いる。その後、NumPy の配列に直しておく。
 
 ここまで一次元配列で作業をしてきたが、9x9 の二次元配列の方が以後の作業がやりやすいので、配列の形も直しておく。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 import numpy as np
 
 problem = np.array([numbers[c] for c in problem], dtype='uint8')
@@ -170,16 +133,9 @@ problem = problem.reshape((9, 9))
 print(problem)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 とすると、先ほどまでの文字が数字に置き換わるはずだ。なお、ここまで繰り返しリスト内包表記も用いたが、これらをまとめて 1 行で書くこともできる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 problem = """
 -35-9--48
 --9--8--3
@@ -194,19 +150,12 @@ problem = """
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 problem = np.array(
     [numbers[c] for line in problem.split() for c in line],
     dtype='uint8',
 ).reshape((9, 9))
 print(problem)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 ::::{admonition} 改行文字
 :class: note
@@ -216,11 +165,11 @@ print(problem)
 プログラミングにおいては、改行文字の違いが問題となることも多いので、LFに統一する、あるいはCRLFに統一する、など自分でルールを決めてエディタ(VSCodeなど)を設定しておくと良い。
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 使用済みの数字を調べる
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 問題が数字の配列として表せたところで、使用済みの数字を調べる方法を見ていく。今`i`行`j`列にある数字の候補にどの数字が残っているのかを調べたいとする。
 
@@ -232,16 +181,11 @@ l = 3 * (j // 3)
 blk_nums = problem[k : k + 3, l : l + 3].flatten()  # 一次元配列として取り出す
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 一例として 1 行 1 列の空マスに何が入るのかを調べて見る。行、列、ブロックに使われている数字は、それぞれ以下のようになっている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 row_nums = problem[0, :]
 print('    Row #1:', row_nums)
 col_nums = problem[:, 0]
@@ -250,30 +194,21 @@ blk_nums = problem[0:3, 0:3].flatten()
 print('Block #1-1:', blk_nums)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 まだ使える数字は 1-9 の数字の中で、これらの配列に現れていない数字である。配列中に数字があるかどうかは`in`を使うと調べられるので、リスト内包表記を使えば、未使用の数字が簡単に調べられる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 used_nums = np.concatenate([row_nums, col_nums, blk_nums])
 unused_nums = np.array([i for i in range(10) if i not in used_nums])
 print('Unused numbers:', unused_nums)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 このように、`(0, 0)`の空マスに入りうる候補の数字は`{1, 2, 7}`の 3 つであることが分かる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### バックトラック法による解法
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 最初に、数独をコンピュータに解かせる最も単純な方法を考えてみよう。
 
@@ -281,13 +216,13 @@ print('Unused numbers:', unused_nums)
 
 ただ、これでは正しい解が見つかる確率が低すぎるため、計算に時間がかかりすぎる。各マスに入れられる数字の候補は 9 通りでマスが 81 マスあるので、最悪の場合には$9^{81} \approx 2.0 \times 10^{77}$個の候補について調べる必要がある。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 一方で、実際にはいくつかのマスにはすでに数字が入っており、上記のように何も考えずに全てのパターンを試すのは非常に効率が悪いことが分かる。そこで、可能な候補についてだけ、しらみ潰しに調べることを考える。これを実現するのがバックトラック法である。
 
 これでも効率がとても良いとは言えないが、実際には最初の方の数字がある程度決まると、後の方の数字は急速に候補が少なくなるため、実用的にはそれなりに高速に動作する。少なくとも 9x9 の問題であれば、十分に速い(16x16 の問題になるとそうはいかない！)
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 バックトラック法は**深さ優先探索**の一種で、数独の例で言えば、**候補となる数字を仮に入れる操作をできる限り繰り返し、もし最後のマスまで数字が入れば成功、途中で数字が入れられなくなったら失敗**として違う候補を試す、というものである。
 
@@ -295,7 +230,7 @@ print('Unused numbers:', unused_nums)
 
 どちらの方法にも一長一短があるが、今回はスタックを用いる前提で話を進める。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 バックトラック法による数独の解法の流れは次のようになる。
 
@@ -306,17 +241,13 @@ print('Unused numbers:', unused_nums)
    3. その空マスに各候補を入れたものをスタックに追加
    4. この際、もしマスが全て埋まっていたら、成功と見なし処理を終了
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 この部分の実装は演習課題とするが、上手く問題が解ければ、以下のような解答が得られるはずである。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 import matplotlib.pyplot as plt
 from IPython import display
 from matplotlib.animation import ArtistAnimation
@@ -333,12 +264,8 @@ if has_advml:
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 if has_advml:
     print('Solution is:\n' + str(solver.backtrack(problem.copy())))
 else:
@@ -346,12 +273,8 @@ else:
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: avg_time_bt_simple
 if has_advml:
     _start = time.perf_counter()
@@ -364,26 +287,19 @@ else:
     print('Not available')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 上記は、素直にバックトラック法を実装した場合の実行時間であるが、一回の問題を解くのに平均![](#avg_time_bt_simple)となっており、十分高速であることが分かる
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 処理の効率化
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ある程度素直にバックトラック法を実装した場合でも、簡単な数独の問題であれば数十ミリ秒で解くことができる。だが、次の問題はどうだろう？
 
 参照: <https://www.j-cast.com/premium/2018/10/19341452.html?p=all>
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 problem = """
 ---------
 3--2-9--7
@@ -398,12 +314,8 @@ problem = """
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 problem = np.array(
     [numbers[c] for line in problem.split() for c in line],
     dtype='uint8',
@@ -411,12 +323,8 @@ problem = np.array(
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 if has_advml:
     print('Solution (simple backtrack):\n' + str(solver.backtrack(problem)))
 else:
@@ -424,12 +332,8 @@ else:
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: avg_time_bt_hard
 if has_advml:
     _start = time.perf_counter()
@@ -464,8 +368,6 @@ else:
     print('Not available')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 この問題だと、単純なバックトラック法では![](#avg_time_bt_hard)ほどの時間がかかる。
 
 バックトラック法を高速化する手法には、候補の数が少ないものから埋めていく、などの様々な方法が考えられるので、各自、プログラムを書いて試してみてほしい。
@@ -477,11 +379,6 @@ else:
 また、各自の確認用に難易度の異なる4問を示しておく。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # レベル1
 problem = """
 -35-9--48
@@ -497,11 +394,6 @@ problem = """
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # レベル2
 # https://si-coding.net/sudoku10.html
 problem = """
@@ -518,11 +410,6 @@ problem = """
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # レベル3
 # https://www.j-cast.com/premium/2018/10/19341452.html?p=all
 problem = """
@@ -539,11 +426,6 @@ problem = """
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 世界一難しい？
 # https://www.conceptispuzzles.com/ja/index.aspx?uri=info/article/424
 problem = """
@@ -559,11 +441,9 @@ problem = """
 """
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## 演習: 実用的な数独ソルバーの作成
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここまでの内容を利用して、写真から数独の問題を読み取り、答えを返すプログラムを作成してみよう。
 
@@ -576,12 +456,8 @@ problem = """
 レベル2まで十分に解ければ、この課題の達成度としては十分で、レベル3は発展的なチャレンジ問題として考えてよい。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 import cv2
 import matplotlib.gridspec as gridspec
 
@@ -616,8 +492,6 @@ p3.set_title('Level 3')
 plt.tight_layout()
 plt.show()
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **入力の形式**
 
@@ -655,7 +529,7 @@ answer
 
 各画像は独立したプロセスで評価され、1画像あたりの実行時間は最大15秒となっている。ある画像でタイムアウト、例外、または不正な形式の出力が発生しても、他の画像の評価には影響がないようになっている。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **プログラムの例 (スケルトン)**
 
@@ -698,7 +572,7 @@ def solve(problem: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
     return np.zeros((9, 9), dtype=np.int32)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **採点方法**
 
@@ -732,7 +606,7 @@ $$
 | 2 | 2点 | 20点 |
 | 3 | 3点 | 30点 |
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **使用可能なライブラリ**
 
@@ -750,7 +624,7 @@ $$
 
 **これ以外のライブラリの使用は認められず**、仮にローカル環境で追加ライブラリをインストールしたとしても、採点時には反映されないので注意すること。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **テスト方法**
 
@@ -778,11 +652,11 @@ pytest -k final
 
 GitHub Actions上の結果は、開発中に性能を確認するためのフィードバックとして用いる。**最終成績は、提出されたコミットSHAに対応するコードを教員側の環境で同じ評価用データと採点プログラムを用いて再実行した結果により決定する。**
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 高度な問題を解くためのヒント
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 今回の演習では
 
@@ -798,7 +672,7 @@ GitHub Actions上の結果は、開発中に性能を確認するためのフィ
 
 #### 問題領域の切り出し
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 問題領域の切り出しについては、 [図形の検出](#sec:figure-detection) の項で学んだ内容を参考に、数独問題の枠を検出し、セルの中の数字を切り離した画像を 81 枚得るようにするのが良い。レベル 1 の場合には、そのまま正方形の領域を切り出せば問題の領域が手に入る。
 
@@ -810,7 +684,7 @@ GitHub Actions上の結果は、開発中に性能を確認するためのフィ
 
 #### 機械分類による数字の認識
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここまで、数字の認識には MNIST を訓練データとして用いてきた。しかし、手書き文字と数独の問題に用いられているフォントとは大きな乖離があるため、MNIST で訓練した分類器ではフォントで書かれた文字を十分に識別できないだろう。
 
@@ -823,11 +697,6 @@ GitHub Actions上の結果は、開発中に性能を確認するためのフィ
 より多くの訓練データをプログラム的に作成するには、Pillowの`ImageDraw`を用いる方法がある。例えば、背景が白の画像を用意して、以下のように数字を書き込むことができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
@@ -868,7 +737,7 @@ plt.show()
 
 #### 数独の問題を解く
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 数独の問題を解くアルゴリズムは冒頭で説明したバックトラック法で概ね問題ない。今回の課題では、`solve()`には`recognize()`が返した9×9の配列だけが渡される。認識に自信がないセルが`0`になっている場合には、それを通常の空きマスとして扱い、数独の行・列・ブロックの制約を使って補うことができる。
 

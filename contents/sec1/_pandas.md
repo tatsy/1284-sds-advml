@@ -16,23 +16,19 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}, "tags": ["remove-input"]}
++++ {"tags": ["remove-input"]}
 
 (sec:pandas)=
 
 # Pandasの基本
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Pandas (panel-data-s の略)は、Python 向けのデータ分析ライブラリで、主にスプレッドシート状のデータを扱うことができる。Pandas では以下に説明する`DataFrame`を使って、データの操作やファイル入出力、グラフの作成等を行うことができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 """
 下準備のコード
 """
@@ -45,11 +41,9 @@ sns.set_theme(style='white', palette='colorblind', rc=rc)
 color_palette = sns.color_palette('colorblind')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## DataFrame の操作
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Pandas の中核をなすデータ構造に`DataFrame`がある。DataFrame とは、スプレッドシート状のデータを扱うデータ構造で、Excel のように数値を縦横に配置したデータを作ることができる。
 
@@ -64,16 +58,11 @@ Pandas の中核をなすデータ構造に`DataFrame`がある。DataFrame と�
 
 </div>
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 例えば、テストの点数を集計したようなデータを考えてみる。以下、三人の学生について、数学と英語の点数を集計した物である (性別と点数の間には特別な意味はない)。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -87,42 +76,23 @@ df = pd.DataFrame(
 print(df)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 上記の通り、`print`で`DataFrame`を出力すると、表のように整理された文字列が出力される。また、Jupyter 環境であれば、単に`df`と書くか、IPython モジュールの`display`を用いることで HTML により整形された表を出力することができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 単にdfと書く
 df
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # displayの使用
 from IPython.display import display
 
 display(df)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 なお、`DataFrame`においては、各行にデフォルトで数字のインデックスが振られるが、これ自体は必要なく、例えば Name の列で各行を代表させれ十分であることも多い。このような場合には、DataFrame に対して`index`を指定して初期化する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 df_label = pd.DataFrame(
     {
         'Math': [100, 90, 85],
@@ -133,12 +103,8 @@ df_label = pd.DataFrame(
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 df_label
 ```
 
@@ -146,11 +112,11 @@ df_label
 `index`を指定しない場合は、`index`に当たる0, 1, 2, ...がラベルであると見なされる。特に行お操作を行うときに、ラベルがインデックスなのか、その他の文字列等なのかを意識しておくことが大事になる。
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 行と列の取り出し
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Pandas では行と列の意味合いが微妙に異なっており、それぞれを取り扱う場合に異なる操作が必要となる。
 
@@ -159,21 +125,11 @@ Pandas では行と列の意味合いが微妙に異なっており、それぞ�
 `DataFrame`の各列は`Series`という型で表わされていて、df に各列のラベルを与えることで取り出すことができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 col = df['Math']
 print(f'type is "{type(col).__name__:s}"')
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 col
 ```
 
@@ -196,23 +152,17 @@ df.iloc[0]
 df_label.loc['Taro']
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### 行と列の追加
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **列の追加**
 
 列を追加する方法はいくつかあるが、行と列でできるだけ似た操作を使うのなら`DataFrame`を辞書型のように扱って、データ列を代入する方法と`concat`を使う方法の 2 つがある。この 2 つなら辞書型として扱う方法の方が簡単で、行ラベルがインデックスなのか文字列等七日によって区別する必要がない。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # 辞書型として使う場合 (df自体が書き換わるので注意)
 df_copy = df.copy()
 df_copy['Physics'] = [75, 85, 80]
@@ -220,11 +170,6 @@ df_copy
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # concatを用いる方法 (行ラベルがインデックス)
 new_col = pd.Series({0: 75, 1: 85, 2: 80}, name='Physics')
 pd.concat([df, new_col], axis=1)
@@ -272,35 +217,21 @@ new_row = pd.Series({'Math': 100, 'English': 100}, name='Kikue')
 pd.concat([df_label, pd.DataFrame(new_row).T], axis=0)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### 行と列の削除
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 行や列の削除には共通で`drop`を用いる。この関数の引数には`index=...`(行ラベルを指定)と`columns=...`(列ラベルを指定)という引数があり、これらを用いて削除すべき行や列を指定する。なお、`drop`は`DataFrame`自体を**更新しない**ので、もし`DataFrame`自体を更新したい場合には引数に`inplace=True`を与える。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 df_copy = df_label.copy()
 df_copy.drop(index=['Jiro'])
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 df_copy = df_label.copy()
 df_copy.drop(columns=['Math'])
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 また、`labels=...`と`axis=...`を指定することで、行(`axis=0`)と列(`axis=1`)の何番目かを指定して削除することもできる。
 
@@ -375,16 +306,9 @@ print("Taro's avg: {:.3f}".format(df_label.loc['Taro'].mean()))
 print('English avg: {:.3f}'.format(df_label['English'].mean()))
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 これらを使うと、偏差値なども簡単に計算できる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 数学の偏差値を計算
 math_dev = 50.0 + (df['Math'] - df['Math'].mean()) / df['Math'].std() * 10.0
 math_dev.name = 'Math dev.'
@@ -392,11 +316,6 @@ print(math_dev)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 英語の偏差値を計算
 eng_dev = 50.0 + (df['English'] - df['English'].mean()) / df['English'].std() * 10.0
 eng_dev.name = 'Eng. dev.'
@@ -427,8 +346,6 @@ eng_avg = df['Math'].mean()
 df_copy.loc['Avg'] = [math_avg, 'N/A', eng_avg, 'N/A']
 df_copy
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 ## データの入出力
 
@@ -500,11 +417,6 @@ df_excel
 `DataFrame`は`plot`というメンバを持ち、さらに`plot`に対してグラフの種類に対応するメソッドを呼び出すことで簡単にグラフを作成することができる。以下は棒グラフと散布図を作る例である。また、同様の出力は`plot`をメソッドとして呼び出して`kind`パラメータにグラフの種類を指定することでも実現できる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 再度DataFrameを作成
 df = pd.DataFrame(
     {
@@ -516,37 +428,20 @@ df = pd.DataFrame(
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 棒グラフの作成
 df.plot.bar(x='Name', y=['Math', 'English'])
 plt.show()
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # plot(..., kind=...)を使う場合
 df.plot(x='Name', y=['Math', 'English'], kind='bar')
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 なお、グラフの見た目を調整したい場合には、`plt.title`等のメソッドを順次呼び出せば良い。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 df.plot.bar(x='Name', y=['Math', 'English'])
 plt.title('Exam scores')
 plt.xlabel('Student')
@@ -556,16 +451,9 @@ plt.legend(loc='upper right')
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 また、複数のグラフを並べたい場合には`plot`の`ax`パラメータに対して Matplotlib の`SubplotAxis`を指定すれば良い。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 fig = plt.figure(figsize=(8, 4))
 
 ax = fig.add_subplot(121)
@@ -581,10 +469,5 @@ plt.show()
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 
 ```

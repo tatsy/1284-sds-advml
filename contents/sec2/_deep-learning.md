@@ -16,28 +16,22 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:deep-learning)=
 # 深層学習による画像識別
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 前章の[PyTorchと自動微分](#sec:pytorch)では、PyTorchにおけるテンソルの扱い方と自動微分の仕組み、そして自動微分を利用した最適化の方法について学んだ。
 
 本章では、それらを土台として、実際にニューラルネットワークを構築し、画像を識別するモデルを学習させる手順を見ていく。題材には、国立国会図書館が公開している平仮名の文字画像データセットを用いる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **Google Colab用の準備**
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
+:tags: [hide-input]
+
 IN_COLAB = True
 try:
     import google.colab
@@ -54,12 +48,8 @@ if IN_COLAB:
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 import os
 
 import numpy as np
@@ -85,17 +75,11 @@ color_palette = sns.color_palette('colorblind')
 print(f'{epochs}')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 **平仮名データセットの準備**
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output, hide-input]
----
+:tags: [remove-output, hide-input]
+
 import zipfile
 
 import requests
@@ -122,11 +106,9 @@ if not os.path.exists('./hiragana73') or len(os.listdir('./hiragana73')) == 0:
         f.extractall()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## 多層パーセプトロンによる学習
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 PyTorchを使った深層学習をするために準備すべきことはいくつかある。以下では、
 
@@ -138,12 +120,12 @@ PyTorchを使った深層学習をするために準備すべきことはいく�
 
 のそれぞれについて順に説明する。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 (ssec:dataloader-preparation)=
 ### データローダの作成
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 データローダとは、PyTorchを用いたニューラルネットワークの学習において、ミニバッチ学習を簡単にするための仕組みである。通常、深層学習には大量の訓練データが必要であり、それら全てを考慮したパラメータの更新方向(=勾配)を求めることは現実的ではない。
 
@@ -152,11 +134,6 @@ PyTorchを使った深層学習をするために準備すべきことはいく�
 では、上記のひらがなデータセットについて、まずはデータの読み出しを行う役割を持つデータセット・クラスを作成してみよう。なお、このデータセットには濁音・半濁音を含む73種類の文字が収録されているが、[特徴量抽出](#sec:feature-extraction)のときと同様に、ここでも濁音・半濁音・小文字を含まないひらがな46文字だけを扱うことにする。データセット・クラスは`torch.utils.data.Dataset`型のサブクラスとして実装する。この際、コンストラクタと合わせて、データの総数を返す`__len__`関数と、データ1つをサンプルする`__getitem__`関数の二つを実装する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
@@ -215,8 +192,6 @@ class HiraganaDataset(Dataset):
         return image, num
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 さて、上記のデータセット・クラスにはコンストラクタの引数に`transform`という変数が渡されている。PyTorchではTorchVisionの`transforms`モジュールに用意されたデータ操作のためのクラスを用いることで、簡単にデータの前処理を行うことができる。
 
 なお、PyTorch 2.0以降は`transforms.v2`という新しいモジュールが導入されており、従来の`transforms`よりも幅広いタスクを前処理に追加することができる ([参考](https://pytorch.org/vision/main/auto_examples/transforms/plot_transforms_getting_started.html))。本項でも`v2`を使用して前処理を行なっていく。
@@ -231,11 +206,6 @@ class HiraganaDataset(Dataset):
 PyTorchの学習には、`torch.Tensor`型かつ`float32`型の変数を用いるので、上記の二つの前処理と合わせて、型の変換を行う`v2.ToImage` (`torch.Tensor`型への変更)と`v2.ToDtype` (データ内部の数値型を指定された型に変更する)を`v2.Compose`に与えている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # TorchVision
 from torchvision.transforms import v2
 
@@ -252,11 +222,6 @@ transform = v2.Compose(
 `transform`の準備ができたら、これを前処理計算として、データセット・クラスをインスタンス化する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 dataset = HiraganaDataset(dataroot='hiragana73', transform=transform)
 n_classes = dataset.n_classes
 print(f'{len(dataset):d} images from {n_classes:d} classes')
@@ -265,11 +230,6 @@ print(f'{len(dataset):d} images from {n_classes:d} classes')
 このようにして作られたデータセットクラスはscikit-learnの時と同様に `torch.utils.data.random_split`関数を使うことで、訓練用とテスト用にデータを分割することができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 train_data, test_data = torch.utils.data.random_split(dataset, lengths=[0.8, 0.2])
 print(f'#train: {len(train_data):d}, #test: {len(test_data):d}')
 ```
@@ -277,16 +237,9 @@ print(f'#train: {len(train_data):d}, #test: {len(test_data):d}')
 データセットの分割が完了したら、最後に`torch.utils.data.DataLoader`のインスタンス化を行う。このクラスはデータに対するイテレータとして用いることができ、予め`batch_size=...`で指定した数のデータを含むミニバッチを順に取り出してくれる。この際、データの順序をランダムにシャッフルするかどうかは`shuffle=...`で制御できる。訓練データはシャッフルを行い、テストデータはシャッフルを行わないで用いることが多い。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 :::{admonition} 練習問題
 :class: question
@@ -296,7 +249,7 @@ test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 また、画像のテンソルの各次元が何を表わしているのかを説明せよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -306,7 +259,7 @@ test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 訓練データをシャッフルしないで学習を行うと、何が問題になるだろうか。データセット・クラスが画像を文字の順に並べていることを踏まえて考えよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 (ssec:network-architecture)=
 ### ネットワークの構築
@@ -323,7 +276,7 @@ test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 
 #### 全結合層
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **全結合層** (fully-connected layer)は、入力のベクトル$\mathbf{x} \in \mathbb{R}^n$に対して、**重み行列** $\mathbf{W} \in \mathbb{R}^{m \times n}$と**バイアスベクトル** $\mathbf{b} \in \mathbb{R}^m$を使って
 
@@ -337,7 +290,7 @@ $$ (eq:fully-connected)
 
 現在の深層学習においては、以下に示す畳み込みニューラルネットで用いられる畳み込み層など、学習可能なパラメータを含む操作は多くの場合、線形の演算によって定義されることがほとんどである。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 #### 活性化関数
 
@@ -369,12 +322,8 @@ $$
 のような関数であり、以下のようなグラフを取る。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 x = np.linspace(-5.0, 5.0, 100)
 y = 1.0 / (1.0 + np.exp(-x))
 plt.plot(x, y)
@@ -401,12 +350,8 @@ $$
 のように書き直せる。シグモイド関数の性質から$x$が正負どちらかの方向に大きな値をとれば、1あるいは0に近づいていくため、シグモイド関数の微分$\sigma'(x)$は、入力の$x$が0から外れた値を取ると、急激に小さくなることが分かる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 x = np.linspace(-5.0, 5.0, 100)
 sigmoid = lambda x: 1.0 / (1.0 + np.exp(-x))
 y = sigmoid(x) * (1.0 - sigmoid(x))
@@ -415,17 +360,15 @@ plt.title('Derivative of sigmoid')
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 この勾配消失により、ニューラルネットの入力に近い側の層において学習が上手く進まないことが長く問題とされてきたが、ReLUは、その導関数が0か1なので、シグモイド関数で問題となっていたような勾配消失の問題が起きづらくなっている。
 
 このような理由から、現在の深層学習においてはReLUおよび、その変形を活性化関数として用いることが多いのである。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 #### データ正規化
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 現在の深層学習においては、バッチ正規化 (batch normalization)を始めとしたデータ正規化をネットワーク上に配置することが多い。これは、スケールの異なるデータに対して、ニューラルネットがパラメータを統一的に学習するのに役立つ。
 
@@ -439,11 +382,11 @@ plt.show()
 
 なお、PyTorchを始めとする深層学習用のライブラリにおいて、データ正規化のモジュール(`nn.BatchNorm1d`や`nn.InstanceNorm1d`など)は単なるバッチ内でのデータの正規化に加えて、さらに平均と標準偏差を調整するようなパラメータを学習可能変数として持っている。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 #### 単純なマルチレイヤ・パーセプトロン
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 では、ここまでの議論を踏まえて、単純なマルチレイヤ・パーセプトロンを実装してみる。PyTorchにおいては、**学習可能パラメータを含むモジュールはコンストラクタで定義しておく必要がある**ため、以下のコードでは、全結合層を表わす`nn.Linear`と、バッチ正規化を表わす`nn.BatchNorm1d`をコンストラクタの中でインスタンス化しておく。
 
@@ -452,11 +395,6 @@ plt.show()
 理由については後述するが、最終の全結合層に対する活性化関数には単なるソフトマックス関数ではなく、対数ソフトマックス関数を取る方が良い。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 class Network(nn.Module):
     """
     シンプルなマルチレイヤ・パーセプトロン
@@ -501,16 +439,9 @@ class Network(nn.Sequential):
         )
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 このようにして実装したニューラルネットは入出力の次元数を与えて、以下のようにインスタンス化しておく。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 model = Network(48 * 48, n_classes)
 ```
 
@@ -518,7 +449,7 @@ model = Network(48 * 48, n_classes)
 
 `train()`や`eval()`を呼び出すと、バッチ正規化や後述するドロップアウトの挙動が変化するため、必ずしも訓練時と同じデータでも同じ精度が出ない可能性があることに留意したい。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -528,7 +459,7 @@ model = Network(48 * 48, n_classes)
 また、その内訳を全結合層ごとに求め、どの層が最も多くのパラメータを持っているかを確かめよ ($n$ 次元から $m$ 次元への全結合層のパラメータ数が $mn + m$ であることを思い出すこと)。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -544,11 +475,6 @@ model = Network(48 * 48, n_classes)
 やや天下り式ではあるが、今回は、多くの問題に対して、それなりに良い性能を発揮するAdamをオプティマイザに用いる。ニューラルネットの学習可能パラメータは`parameters`関数で得られるので、これをオプティマイザの第一引数に指定する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 optim = torch.optim.Adam(model.parameters(), lr=1.0e-3)
 ```
 
@@ -572,7 +498,7 @@ $$
 
 交差エントロピーには、回帰問題で一般的に用いられる最小二乗誤差などと比べて、ラベルが正解から外れている時に、大きなペナルティが与えられる、という特徴があるため、より分類問題に向いた誤差指標と言える。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 多クラス分類では、ネットワークの出力を確率のように扱うために、最終層を**ソフトマックス関数**によって活性化するのが一般的である。活性化前の特徴ベクトルを$\mathbf{x}$とすると、活性化後のラベル$\mathbf{y}$の各次元$y_d$は、以下の式で与えられる。
 
@@ -580,7 +506,7 @@ $$
 y_d = \frac{e^{x_d}}{\sum_{j} e^{x_j}}
 $$
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ただし、前述のネットワークでは、最終層の活性化関数にソフトマックス関数ではなく**対数ソフトマックス関数**を用いていた。これは、ソフトマックス関数をそのまま計算すると、指数関数によるオーバーフローやアンダーフローが起こり、その対数を取る交差エントロピーの計算にも影響が及ぶためである。この点の詳細については「[発展: ソフトマックス関数の数値計算](#ssec:softmax-numerics)」で扱う。
 
@@ -604,11 +530,6 @@ $$
 PyTorchにおいては、慣習的に`criterion`という変数に損失関数を取ることが多く、それに倣って、以下のように`NNLLoss`クラスをインスタンス化しておく。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 損失関数の準備
 criterion = nn.NLLLoss()
 ```
@@ -624,7 +545,7 @@ criterion = nn.NLLLoss()
 
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -634,7 +555,7 @@ criterion = nn.NLLLoss()
 ただし、`nn.NLLLoss`には対数ソフトマックス関数を適用した後の値を、`nn.CrossEntropyLoss`には活性化する前の値を与える必要があることに注意すること。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 (ssec:training-loop)=
 ### トレーニング・ループ
@@ -648,11 +569,6 @@ criterion = nn.NLLLoss()
 学習と同時に、進行状況が分かるようにしておくことはとても大事で、以下の例では`tqdm`モジュールを用いて、訓練の進み具合と、その時の損失関数の値、ならびに識別精度を表示するようにしている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # モデルの初期化
 model = Network(48 * 48, n_classes)
 
@@ -700,12 +616,8 @@ accuracies = np.convolve(accuracies, box, mode='valid')
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 fig, ax1 = plt.subplots()
 ax2 = ax1.twinx()
 ax1.plot(np.arange(len(losses)), losses, label='loss', color=color_palette[0])
@@ -721,11 +633,6 @@ plt.show()
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 model.eval()
 pbar = tqdm(test_loader)
 n_succ = 0
@@ -747,7 +654,7 @@ print(f'Acc: {total_acc:.3f}')
 
 しかしながら、MLPにおいては画像を単純なベクトルとして扱うため、画像の空間的な情報を活かすことが出来ず、その結果はFisherベクトルを用いた場合の精度等には及ばない。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -757,7 +664,7 @@ print(f'Acc: {total_acc:.3f}')
 また、そうなる理由を[PyTorchと自動微分](#sec:pytorch)の「勾配計算の制御」で述べた勾配の累積の観点から説明せよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -804,11 +711,6 @@ $$
 これらを用いて簡単な畳み込みニューラルネットを実装したものが以下である。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 class CNN(nn.Module):
     """
     畳み込みニューラルネット
@@ -856,22 +758,12 @@ print('Your device is', device)
 デバイスが取得できたら、ネットワークならびに学習データを、デバイスに転送する操作が必要になる。具体的には、それぞれに用意された`to(...)`という関数に対して、上記の`device`インスタンスを指定する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # ネットワークおよびオプティマイザのインスタンス化
 model = CNN(1, n_classes).to(device)
 optim = torch.optim.Adam(model.parameters(), lr=1.0e-3)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 losses = []
 accuracies = []
 model.train()
@@ -924,11 +816,6 @@ plt.show()
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 model.eval()
 pbar = tqdm(test_loader)
 n_succ = 0
@@ -949,7 +836,7 @@ print(f'Acc: {total_acc:.3f}')
 
 このようにCNNを用いて画像としての特徴をより意識するようなニューラルネットワークを用いたことで、識別の精度が大幅に向上したことが分かる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -957,7 +844,7 @@ print(f'Acc: {total_acc:.3f}')
 MLPとCNNを用いた画像識別の各例について、オプティマイザの種類によって、誤差関数の収束と識別精度の上昇がどのように変化するかを調査せよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 練習問題
 :class: question
@@ -1129,15 +1016,15 @@ PyTorchで実装する場合には、活性化関数の後に`nn.Dropout`ある�
 実際、「線形操作」→「活性化関数」→「ドロップアウト」→「データ正規化」の順序の方が性能が向上するという見方もある。このように、論文に書かれていることが常に正しいとは限らないので、論文を読むときには、多少は疑いの目をもって読むことが大事である。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 発展的な内容
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここから先の節は、講義の中では扱わない発展的な内容である。ソフトマックス関数を自分で実装する場合や、学習が数値的に不安定になる原因を調べたい場合に読んでほしい。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 (ssec:softmax-numerics)=
 ### 発展: ソフトマックス関数の数値計算

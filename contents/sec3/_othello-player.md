@@ -16,16 +16,14 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:othello-player)=
 # オセロAIの作成
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここからは、より高度な強化学習の対象としてオセロを取り扱う。ご存じの通り、オセロは(諸説あるものの)日本で発祥した「はさみ碁」の一種で、白と黒のディスクを8×8の盤の上に並べ、同色で挟まれたディスクを裏返すことで、より多くのマスを獲得した方が勝利するというゲームである。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} オセロとリバーシ
 :class: note
@@ -37,12 +35,8 @@ kernelspec:
 :::
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 """
 Google Colab用の準備
 """
@@ -62,12 +56,8 @@ if IN_COLAB:
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 import time
 import random
 import contextlib
@@ -194,15 +184,13 @@ def check(p1_fn, p2_fn):
         Parallel(n_jobs=n_jobs, batch_size=1)(delayed(game)(p1_fn, p2_fn) for _ in range(n_episodes))
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## オセロゲーム環境
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### オセロモジュールのインストール
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 今回は、講義用に用意したオセロ用のゲーム環境を用いる。ゲーム環境用のモジュールは以下のURLからダウンロードできる。
 
@@ -217,11 +205,11 @@ def check(p1_fn, p2_fn):
 pip install xxx.whl
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### オセロモジュールの概要
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 このモジュールには大きく分けて、3つのクラスが定義されている。
 
@@ -234,106 +222,58 @@ pip install xxx.whl
 まずは、これらをモジュールからインポートして、ゲーム環境を作成してみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # オセロモジュールのインポート
 from othello import Action
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 環境の作成
 env = othello.make()
 env
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 上記のように、オセロ環境は初期状態ではディスクが配置されていない。ここでも`gymnasium`と同様に`reset`関数を呼び出すことで、ゲーム環境が初期化される。
 
 なお、オセロのプレイヤーや盤の情報などは全て変数`env`の中に`env.player`ならびに`env.board`として格納されており、`gymnasium`と異なっているので注意すること。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # ゲームのリセット
 env.reset()
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 print(f'Current player is "{env.player}"')
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 print(env.board)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 また、Jupyter Notebook環境においては`env`を表示することで盤面を表わす画像が表示されるようになっている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 env
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## ランダムな着手
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 まずは、オセロ環境の仕様を理解するために、白番、黒番ともにランダムに行動させて、どのように状態が変化するかを見てみよう。
 
 `env`には、現在の盤の状態で取ることができる「有効手」の配列を取得する`legal_actions`関数が提供されている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 有効手の列挙
 actions = env.legal_actions()
 print(actions)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 上記の出力から、黒番が4行C列、3行D列、6行E列、5行F列の4箇所のいずれかにディスクを置くことができることが分かる。
 
 着手を決定したら、`env.update`関数に手を表す変数を渡すと盤の状態が更新される。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 着手して状態を更新
 env.update(actions[0])
 ```
@@ -341,52 +281,28 @@ env.update(actions[0])
 すると現在の手番のプレイヤーと盤面が更新される。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 print(f'Current player is "{env.player}"')
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 print(env.board)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 `env`のJupyter Notebook環境における表示により、黒番が3行5列にディスクを置いたことで、着手したセルがハイライトされて、かつ、盤の状態が正しく更新されていることが確認できる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 env
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 オセロはルール上、着手可能な手がない、すなわちどこにディスクを置いても裏返せる相手方のディスクが存在しない時にはパスをすることになる。
 
 有効手が存在しない時には`legal_actions`が長さが0になるので、その場合は`turn_change`関数を呼び出して手番を交代する。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 これらを踏まえて、黒番、白番ともにランダムに着手させて、盤の状態変化を確認する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # ゲームのリセット
 env.reset()
 frames = []
@@ -415,12 +331,8 @@ frames.append(img)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # アニメーションの描画
 fig, ax = plt.subplots()
 ax.set(xticks=[], yticks=[])
@@ -441,32 +353,19 @@ display.display(html)
 plt.close()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 最終的な状態において、黒番、白番がそれぞれ何個のセルを専有しているかは`count`関数により計算できる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 print(f'#black: {env.count(Player.BLACK):d}')
 print(f'#white: {env.count(Player.WHITE):d}')
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: n_episodes
 print(n_episodes)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 最後に、両者ランダムに着手する場合に![](#n_episodes)回対戦すると、どの程度の勝敗になるのかを調べてみる。この際、手番はランダムに黒番と白番 (先攻と後攻)を入れ替えている。
 
@@ -475,11 +374,6 @@ print(n_episodes)
 以下での利便性のため、ランダムに着手する関数として`action_by_random`を作成しておく。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 def action_by_random(env):
     """有効手の中からランダムに手を選ぶ"""
     actions = env.legal_actions()
@@ -487,49 +381,31 @@ def action_by_random(env):
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 check(action_by_random, action_by_random)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: rand_b_win
 print(b_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: rand_w_win
 print(w_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: rand_draw
 print(draw)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 :::{admonition} 対局結果: ランダム (#1) vs ランダム (#2)
 :class: note
@@ -540,11 +416,11 @@ print(draw)
 
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 このようにランダムな着手では当然ながら、勝率はおよそ五分五分になる。以後は、この着手の方法を改良していき、より高い勝率を目指してみる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} オセロが解けた？
 :class: note
@@ -556,11 +432,11 @@ print(draw)
 Othello is Solved: <https://arxiv.org/abs/2310.19387>
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## セル評価値を用いた着手
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 人間(の初心者)がオセロを指すときに最初に覚えることと言えば、角が取れるように着手を調整する、ということだろう。
 
@@ -571,12 +447,8 @@ Othello is Solved: <https://arxiv.org/abs/2310.19387>
 このような人間の経験則に従って、各セルにディスクを置くことが、どのくらい得でどのくらい損なのかを表わす評価値を以下のように定義する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
+:tags: [hide-input]
+
 SCORE_BOARD = np.array(
     [
         [120, -20, 20, 5, 5, 20, -20, 120],
@@ -593,12 +465,8 @@ SCORE_BOARD = np.array(
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: fig:cell_scores
 
 fig, ax = plt.subplots()
@@ -621,8 +489,6 @@ ax.xaxis.tick_top()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 :::{figure} #fig:cell_scores
 :figclass: image-stylish sm:w-full md:w-1/2
 :name: "オセロ盤のセル評価値"
@@ -633,11 +499,6 @@ plt.show()
 以下、対戦用にセル評価値に基づいて着手する関数を用意しておく。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 def action_by_score(env):
     """セル評価値を用いた着手"""
     actions = env.legal_actions()
@@ -648,54 +509,34 @@ def action_by_score(env):
     return actions[np.argmax(scores)]
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 このルーチンを用いて、先ほどと同様に![](#n_episodes)回の対戦を行ない、ランダムな着手に比べて、どのくらい勝率が上昇するかを見てみよう。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 check(action_by_score, action_by_random)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: score_b_win
 print(b_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: score_w_win
 print(w_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: score_draw
 print(draw)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 :::{admonition} 対局結果: セル評価値 (#1) vs ランダム (#2)
 :class: note
@@ -706,16 +547,16 @@ print(draw)
 
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 上記の通り、人間の経験則を導入することでランダムに着手するのと比べて大幅に勝率が上昇していることが分かる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 (ssec:minimax)=
 ## ミニマックス探索
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 上記のセル評価値に基づく着手では、今まさに打とうとしている手が、**その時点においてどのくらいの価値を持つのか**だけを考慮していた。
 
@@ -737,11 +578,6 @@ print(draw)
 今回は、前述の盤面評価値を用いて「(自分の評価値) - (相手の評価値)」を、その盤面の評価値とする。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 def score_fn(env, current_player):
     """
     current_playerにとっての評価値を返す
@@ -803,11 +639,6 @@ def minimax(env, current_player, depth):
 以下、対戦用にミニマックス探索に基づく着手を関数化しておく。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 def action_by_minimax(env, depth=2):
     """ミニマックス法に基づく着手"""
 
@@ -831,49 +662,31 @@ def action_by_minimax(env, depth=2):
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 check(action_by_minimax, action_by_random)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: minimax_b_win
 print(b_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: minimax_w_win
 print(w_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: minimax_draw
 print(draw)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 結果は以下の通りで、ミニマックス探索で2手先を読むだけで飛躍的に勝率が上昇していることが分かる。
 
@@ -888,7 +701,7 @@ print(draw)
 
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 一方で、ミニマックス探索は現在の手番と探索中の盤面の手番の関係によって、盤面評価値の最大値を取るか最小値を取るかを切り替える必要があり、やや実装が複雑である。
 
@@ -908,7 +721,7 @@ print(draw)
 (ssec:alpha-beta)=
 ## アルファベータ探索
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ミニマックス探索は**再帰的に全ての手を評価する**ため、より多くの手を読もうとすると、かなり多くの時間を要する。実際、ミニマックス探索は**これまでの探索で見つかった最善手よりも悪い手**も探索しているがために、余計な計算を行なっている。
 
@@ -1021,34 +834,22 @@ check(action_by_alpha_beta, action_by_minimax)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: ab_vs_minimax_b_win
 print(b_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: ab_vs_minimax_w_win
 print(w_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: ab_vs_minimax_draw
 print(draw)
 ```
@@ -1159,34 +960,22 @@ check(action_by_alpha_beta_deepen, action_by_minimax_deepen)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: ab_vs_minimax_deepen_b_win
 print(b_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: ab_vs_minimax_deepen_w_win
 print(w_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: ab_vs_minimax_deepen_draw
 print(draw)
 ```
@@ -1204,12 +993,12 @@ print(draw)
 
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 (ssec:monte-carlo)=
 ## 原始モンテカルロ探索
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここまでに紹介したミニマックス法やアルファベータ法は、現在の状態に対して何らかの評価値が既に与えられている場合には有効であるものの、このような評価値を**どのように決定すれば最適なのか**は実際のところ難しい。
 
@@ -1217,22 +1006,17 @@ print(draw)
 
 従って、ここまでのセルの評価値に基づく探索には限界があり、**実際に勝てるのかどうか**に基づいた着手を目指す必要があると分かる。しかし、勝ち負けを知るためにはオセロを終局までプレイしなければならない。では、その過程ではどのような手を指せば良いだろうか。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **原始モンテカルロ探索**は、モンテカルロ法、すなわちランダムな着手によって、今の**オセロ盤の状態がどの程度、勝ちやすい、負けやすい状態なのかを近似的に推測しながら着手する手法**である。言い換えれば、どのような手が良いのかは一旦おいておいて、**適当に指しても勝ちやすければ、それが勝ちやすい局面**と見なして着手を決定する。
 
 今、とあるオセロの局面を考えたとき、着手できる手は通常複数ある。このような複数の手をランダムに指して、どの手がより勝ちに近づくかを推定するのだが、この問題は、まさに**多腕バンディット問題**と同様の問題であることが分かる。多腕バンディット問題においては、どのスロットアームを回すかを最適化していたが、今回はオセロの有効手に対して同様の操作を行なう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 まず、とある局面からランダムにプレイを行なって終局まで進める操作を関数として定義しておく。このような操作を**プレアウト**と呼ぶ。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 def playout(env):
     """ランダムに着手して終局まで進める"""
     while not env.is_done():
@@ -1245,19 +1029,17 @@ def playout(env):
         env.update(action)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 この関数を呼び出して、とある局面を終局まで進めたとき、今の手番のプレイヤーが勝ちなら **+1点** の報酬を得ることとする。
 
 プレイアウトをするべき手は多腕バンディット問題において、良い性能であったUCB1値を用いて選択する。UCB1値の定義を再掲しておく。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 $$
   \text{UCB1}_i = \frac{v_i}{n_i} + \sqrt{\frac{2 \log N}{n_i}}
 $$
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 この定義は多腕バンディット問題の時と若干表記が異なっているが、式中の各記号は次の通り。
 
@@ -1275,11 +1057,6 @@ $$
 このプレイアウト操作を制限時間内でできる限り実行したら、プレイアウトされた回数が最大の手が最適な手であると判断する。プレイアウトされた回数が最大である、ということは、UCB1値を用いた探索において、最も有望な手であるということに留意している。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 def action_by_monte_carlo(env, time_limit=1.0e-2):
     """
     原始モンテカルロ法に基づく着手
@@ -1324,56 +1101,36 @@ def action_by_monte_carlo(env, time_limit=1.0e-2):
     return actions[np.argmax(n_checks)]
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 では、原始モンテカルロ法の性能を評価するため、先ほどの反復深化版アルファベータ探索と対戦させてみる。着手に用いる制限時間は、どちらも100分の1秒とする。
 
 すると結果は次のようになる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 check(action_by_monte_carlo, action_by_alpha_beta_deepen)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: mc_vs_alpha_beta_b_win
 print(b_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: mc_vs_alpha_beta_w_win
 print(w_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: mc_vs_alpha_beta_draw
 print(draw)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 :::{admonition} 対局結果: 原始モンテカルロ (#1) vs アルファベータ探索 (#2)
 :class: note
@@ -1390,12 +1147,12 @@ print(draw)
 
 これらの手法の強さは探索に使える考慮時間の長さによっても変化するものの、ランダムなプレイアウトに基づく盤面の評価が非常に強力であることが分かる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 (ssec:monte-carlo-tree-search)=
 ## モンテカルロ木探索
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 原始モンテカルロの弱点は、**自分の候補手に対してしか有望な手を考えていない**という点にある。原始モンテカルロにおいては、自分が候補手を指したあとは**自分も相手もランダムに着手する**と仮定しているが、実際の対局においては、自分も相手も、より勝ちやすい手を指すのが普通だろう。
 
@@ -1409,7 +1166,7 @@ UCB1値を使って候補手の探索を行なう場合、この木構造を特�
 
 ### モンテカルロ木探索に基づく着手関数
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 モンテカルロ木探索に用いるUCTのノードを`UctNode`として実装したとしよう。
 
@@ -1422,11 +1179,6 @@ UCTの各ノードはUCB1値に基づいて探索されるので、一番有望�
 これらの考えを用いると`action_by_mcts`は次のようなコードとなる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 def action_by_mcts(env, time_limit=1.0e-2):
     """
     モンテカルロ木探索に基づく着手
@@ -1449,7 +1201,7 @@ def action_by_mcts(env, time_limit=1.0e-2):
 
 ### UCTノードの評価
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 次にモンテカルロ木探索において中心的な役割を担う`UctNode`クラスの実装について見ていこう。
 
@@ -1517,7 +1269,7 @@ def evaluate(self):
 
 ### 子ノードの展開
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 モンテカルロ木探索では、次に探索する子ノードを探索した数に基づいて次に着手を決定するのだが、そのためには、各子ノードの勝率を含むUCB1値が盤面の有望さを反映していなければならない。
 
@@ -1587,12 +1339,8 @@ def choose_child_node(self):
 以上を踏まえたUCTノードの実装例を以下に示す。なお、やや長いコードになるのため、最初の時点ではコードは非表示にしてある。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
+:tags: [hide-input]
+
 class UctNode:
     """
     UCB1値を用いた子ノードの探索を行うノード
@@ -1699,58 +1447,38 @@ class UctNode:
         return self.child_nodes[np.argmax(ucb1_values)]
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 以上が、モンテカルロ木探索の全体像であるが、再帰的な探索など、やや高度な内容を含むので、何度もコードと解説を読み直して理解に努めてみてほしい。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 では、このモンテカルロ木探索をアルファベータ探索と対戦させて、実力を確かめてみよう。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 check(action_by_mcts, action_by_alpha_beta_deepen)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: mcts_vs_alpha_beta_b_win
 print(b_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: mcts_vs_alpha_beta_w_win
 print(w_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: mcts_vs_alpha_beta_draw
 print(draw)
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 :::{admonition} 対局結果: モンテカルロ木探索 (#1) vs アルファベータ探索 (#2)
 :class: note
@@ -1761,7 +1489,7 @@ print(draw)
 
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 上記の通り、相手の手や、その後に続く自分の手に対してもUCB1値に基づく有望手の推定を行なうことで、アルファベータ探索と同程度の強さを実現することができた。
 
@@ -1776,34 +1504,22 @@ check(action_by_mcts, action_by_monte_carlo)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: mcts_vs_mc_b_win
 print(b_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: mcts_vs_mc_w_win
 print(w_win)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: mcts_vs_mc_draw
 print(draw)
 ```
@@ -1890,8 +1606,6 @@ display.display(html)
 plt.close()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ::::{admonition} 問
 :class: question
 
@@ -1899,7 +1613,7 @@ plt.close()
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ::::{admonition} 問
 :class: question

@@ -16,18 +16,12 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:feature-extraction)=
 # 画像特徴量の抽出
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 """
 下準備のコード
 """
@@ -67,15 +61,13 @@ result_df = pd.DataFrame(
 )
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 今回からは数字ではなく「ひらがな」のデータセットを用いて、より複雑な識別問題に取り組む。
 
 データセットは国立国会図書館の[NDLラボ](https://lab.ndl.go.jp/)が公開している文字画像データセットを使用する。
 
 - 文字画像データセット: <https://github.com/ndl-lab/hiragana_mojigazo>
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 実際のデータセットは、以下のURLにホストされているので、ここからダウンロードする。
 
@@ -84,11 +76,6 @@ result_df = pd.DataFrame(
 - <http://lab.ndl.go.jp/dataset/hiragana73.zip>
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 """
 平仮名73文字データセットの準備
 """
@@ -119,11 +106,9 @@ if not os.path.exists('./hiragana73') or len(os.listdir('./hiragana73')) == 0:
         f.extractall()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## データセットの前処理
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 このデータセットは濁音、半濁音を含むひらがな73文字に対して、そのUnicode値のフォルダの中に、48×48の画像がPNG形式で保存されている。
 
@@ -132,17 +117,10 @@ if not os.path.exists('./hiragana73') or len(os.listdir('./hiragana73')) == 0:
 一例として「あ」であれば、以下のようにUnicode値を得ることができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 char_a = 'あ'
 hex_a = hex(ord(char_a))
 print(f"Unicode of '{char_a:s}' is '{hex_a:s}'")
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 逆に、あいうえお順で文字を取得したければ、「あ」に対応するUnicode値である`0x3042`からスタートして、1ずつ値を上げていきながら、その数字を`chr`関数を用いて文字に変換すれば良い。
 
@@ -151,28 +129,17 @@ print(f"Unicode of '{char_a:s}' is '{hex_a:s}'")
 上記のひらがなデータセットは「ゃ」や「っ」などの小文字を含まない73文字から構成されているが、「あ」から「ん」までは、小文字を含め82文字なので、これを列挙してみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 for i in range(82):
     print(chr(int(hex_a, 16) + i), end='')
     if (i + 1) % 10 == 0:
         print()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ひらがなデータセットのフォルダ名は16進数を表わす`0x`の代わりに`U`が接頭辞になっているので、フォルダ名の`U`を`0x`に置換して、どの文字がデータセットに含まれているかをチェックしてみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # サブフォルダの数を調べる
 dirname = 'hiragana73'
 folders = sorted([d for d in os.listdir(dirname)])
@@ -186,17 +153,11 @@ for i, d in enumerate(folders):
         print()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 なお、本データセットでは各文字に対して以下の表に書かれた個数ずつ画像が含まれており、文字によって画像数に多少の偏りがあることが分かる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 import numpy as np
 import pandas as pd
 
@@ -232,25 +193,19 @@ df.style.format(precision=0).format_index('', axis=1).format_index('', axis=0).a
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: n_images_per_char
 print(n_images_per_char)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 この表が示すとおり、各文字について、約1000の画像が含まれていることが確認できる。ただし、半濁音のひらがなは全体的に少なめで100-300程度となっている。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 分類用のデータ加工
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 MNISTでは手書き文字の画像が28x28=784次元ベクトル、ラベルが10種類の数字のいずれかを表わす0-9の数字であり、これらのデータを`scikit-learn`の`fetch_openml`から取得することができた。
 
@@ -261,11 +216,6 @@ MNISTでは手書き文字の画像が28x28=784次元ベクトル、ラベルが
 という条件の下で作成する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 今回取り扱う平仮名のリスト
 chars = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわゐゑをん'
 n_chars = len(chars)
@@ -274,12 +224,8 @@ print(f'We have {n_chars} hiragana characters.')
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 import cv2
 
 # 読み込み画像の総数
@@ -332,16 +278,9 @@ y = np.stack(y, axis=0)
 pbar.close()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 データセットの作成が終了したら、8割の画像を訓練画像、残りの2割の画像をテスト画像として振り分けておく。以下のコードの `stratify=y` は、各文字について、訓練画像とテスト画像が同じ割合となるように分割するためのオプションである。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from sklearn.model_selection import train_test_split
 
 X, X_test, y, y_test = train_test_split(X, y, train_size=0.8, shuffle=True, stratify=y)
@@ -350,17 +289,11 @@ print(f'#train: {len(X)}')
 print(f' #test: {len(X_test)}')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 データセットの先頭数枚の画像は次のようになっている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
@@ -387,11 +320,11 @@ plt.show()
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## ベースライン: 画像をそのまま入力する
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 特徴量抽出の効果を測るためには、比較の基準が必要である。まずは、MNISTの時と同様に、画像をそのままベクトルとして分類器に与える方法をベースラインとして試してみる。この時、[scikit-learnの節](#sec:scikit-learn)で紹介したように、予め入力データの輝度を正規化する処理である`StandardScaler`を使用する。
 
@@ -400,12 +333,8 @@ plt.show()
 `SGDClassifier`はパラメータに`loss="hinge"`を渡すと、内部では線形SVMをモデルに使用する。本パラメータは初期値が`"hinge"`であるが、以下に示すソースコードでは、明示的にパラメータを指定する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import StandardScaler
@@ -418,48 +347,33 @@ clf.fit(X, y)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 識別精度の確認
 acc_train = clf.score(X, y)
 acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: naive_acc_train
 result_df.loc[len(result_df), :] = ['Image', acc_train, 'Train']
 print('%.2f' % (acc_train * 100.0))
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: naive_acc_test
 result_df.loc[len(result_df), :] = ['Image', acc_test, 'Test']
 print('%.2f' % (acc_test * 100.0))
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: 画像をそのまま入力**
 
 - 訓練時精度: ![](#naive_acc_train)%
 - 評価時精度: ![](#naive_acc_test)%
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 このように、今回は分類問題の難易度が上がっており、SVMを用いても十分な精度が得られていないことが分かる。これには画像を扱う上で次のような問題が考えられる。
 
@@ -468,23 +382,19 @@ print('%.2f' % (acc_test * 100.0))
 
 これらの問題を解決すべく、以下では、文字の向きや大きさに依存しづらく、画像情報よりも低次かつ有意な特徴を取り出して、その特徴を元に分類器を学習する方法を紹介する。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 主成分分析による次元圧縮
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 まずは、学習の効率化を図るために、前項、[次元削減](#sec:data-visualization)で紹介した主成分分析を用いて、画像データを低次元ベクトルに変換する。
 
 `make_pipeline`を用いた分類器の定義において、`StandardScaler`の前に`PCA`による次元削減を追加する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 from sklearn.decomposition import PCA
 
 clf = make_pipeline(
@@ -496,41 +406,26 @@ clf.fit(X, y)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 識別精度の確認
 acc_train = clf.score(X, y)
 acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: pca_acc_train
 result_df.loc[len(result_df), :] = ['PCA', acc_train, 'Train']
 print('%.2f' % (acc_train * 100.0))
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: pca_acc_test
 result_df.loc[len(result_df), :] = ['PCA', acc_test, 'Test']
 print('%.2f' % (acc_test * 100.0))
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: 主成分分析による次元圧縮**
 
@@ -552,11 +447,11 @@ PCAによる次元削減を用いると、画像の中から顕著な特徴が�
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## Local Binary Pattern (LBP)
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Local Binary Pattern (LBP)は、とある画素を中心とした3x3の領域について、中心画素と周りの画素の輝度の大小関係を数値化する手法である {cite}`ojala1996comparative`。
 
@@ -565,12 +460,8 @@ Local Binary Pattern (LBP)は、とある画素を中心とした3x3の領域に
 LBPの計算を理解するための一例として、とある中心画素周辺の画素値が以下のようになっている場合を考えよう。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 def draw_frame(problem, fig, ax):
     mask = (problem == 0).astype('float32')
     frame = []
@@ -595,46 +486,30 @@ def draw_frame(problem, fig, ax):
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 rng = np.random.RandomState(0)
 m = rng.randint(0, 256, size=(3, 3))
 fig, ax = plt.subplots(figsize=(2, 2))
 draw_frame(m, fig, ax)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 このとき、周囲の8画素について中心画素以上の輝度を持つものを1、小さいものを0に置き換える。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 c = m[1, 1]
 b = (m >= c).astype('int32')
 fig, ax = plt.subplots(figsize=(2, 2))
 draw_frame(b, fig, ax)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 この周囲の8画素に割り当てられた0, 1のパターンが8ビットの符号なし整数であると考えて数値を求める。この際、以下のような時計回りに2のべき乗が並んだ画像を用いる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 p = 2 ** np.array([[6, 7, 0], [5, 0, 1], [4, 3, 2]])
 p[1, 1] = 0
 
@@ -643,30 +518,19 @@ draw_frame(p, fig, ax)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: lbp_val
 print(np.sum(b * p))
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 すると、上記の3x3の領域に対しては、LBPの値として **![](#lbp_val)** が求まる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 この計算を先ほどと同様にデータセットの先頭画像の各画素に対して計算すると、LBP画像は次のようになる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 img = X[0].reshape((48, 48))
 
 # 輪郭の画素では計算できないので、画像を1画素分広げる
@@ -685,12 +549,8 @@ lbp_img = lbp_img[1:-1, 1:-1]
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 from matplotlib.gridspec import GridSpec
 
 fig = plt.figure(figsize=(6, 3))
@@ -707,8 +567,6 @@ ax.set(xticks=[], yticks=[], title='LBP image')
 plt.tight_layout()
 plt.show()
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 LBPを用いることの利点は画像の**相対的な輝度の大小だけを見ている**点にあり、仮に画像の輝度が2倍になったりしても求まるLBPの値は全く変化しない。そのため、同じ対象を異なる光源下で計算した場合などに一貫した特徴を得られる。
 
@@ -805,12 +663,8 @@ class LBPFeature(TransformerMixin):
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 clf = make_pipeline(
     LBPFeature(image_size=(48, 48)),
     PCA(n_components=128),
@@ -821,48 +675,33 @@ clf.fit(X, y)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 識別精度の確認
 acc_train = clf.score(X, y)
 acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: lbp_acc_train
 result_df.loc[len(result_df), :] = ['LBP', acc_train, 'Train']
 print('%.2f' % (acc_train * 100.0))
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: lbp_acc_test
 result_df.loc[len(result_df), :] = ['LBP', acc_test, 'Test']
 print('%.2f' % (acc_test * 100.0))
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: Local Binary Patternの利用**
 
 - 訓練時精度: ![](#lbp_acc_train)%
 - 評価時精度: ![](#lbp_acc_test)%
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 結果から分かる通り、輝度に頑健な特徴を用い、さらにパッチに分割して特徴を取り出したことで、単純に画像を主成分分析する場合と比べて大きく精度が改善できた。
 
@@ -877,11 +716,11 @@ print('%.2f' % (acc_test * 100.0))
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### Uniform LBP
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 元々のLBPが持つ回転に対して変化してしまう問題を解決した手法の一つに、Ojalaらが提案した**回転不変Uniform LBP** {cite}`ojala2002multiresolution` がある。
 
@@ -898,11 +737,6 @@ print('%.2f' % (acc_test * 100.0))
 以下ではscikit-imageの`local_binary_pattern`を用いて、 $N = 36$ とした場合のLBP画像を見てみる。同メソッドの`method="uniform"`は回転不変版 (LBP$^{riu2}$)に対応しており、回転で同一視しない版を使いたい場合は`method="nri_uniform"`を指定する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from skimage.feature import local_binary_pattern
 
 n_angles = 36
@@ -914,12 +748,8 @@ print(f'Uniform LBP has range from {lbp.min()} to {lbp.max()}.')
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 from matplotlib.gridspec import GridSpec
 
 fig = plt.figure(figsize=(8, 4))
@@ -937,8 +767,6 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 すると、上記の通り、輝度のパターン数は36 + 2 = 38通りになることが分かる (画像の輝度が0から37の38通りになっている)。
 
 また、画像の見た目から、文字がある部分の周りが一様に近いグレーで表現されており、回転に対してある程度の不変性を持っていそうなことも確認できる。
@@ -948,11 +776,6 @@ plt.show()
 では、このUniform LBPを用いて、再度SVMによる文字の分類を試してみる。Uniform LBPを使う場合、画像の拡大縮小への対応力を上げるために、**中心画素からどのくらい離れたところの画素をLBPの計算に使うか**を変えつつ、LBPを取得して、それらを結合した特徴量を使う。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 class UniformLBPFeature(TransformerMixin):
     """
     Uniform LBPを特徴として計算するクラス
@@ -991,12 +814,8 @@ class UniformLBPFeature(TransformerMixin):
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 clf = make_pipeline(
     UniformLBPFeature(image_size=(48, 48)),
     PCA(n_components=128),
@@ -1007,48 +826,33 @@ clf.fit(X, y)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 訓練時の識別精度の確認
 acc_train = clf.score(X, y)
 acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: ulbp_acc_train
 result_df.loc[len(result_df), :] = ['Uniform LBP', acc_train, 'Train']
 print('%.2f' % (acc_train * 100.0))
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: ulbp_acc_test
 result_df.loc[len(result_df), :] = ['Uniform LBP', acc_test, 'Test']
 print('%.2f' % (acc_test * 100.0))
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: Uniform LBPの利用**
 
 - 訓練時精度: ![](#ulbp_acc_train)%
 - 評価時精度: ![](#ulbp_acc_test)%
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Uniform LBPの結果と前述のLBPの結果を比較すると、有意には精度が上昇していない。一因として、LBP特徴を用いる時点で画像をパッチに分割して特徴を取得していたために、ある程度、文字の回転に頑健な特徴となっていたということが考えられる。
 
@@ -1074,11 +878,11 @@ LBPとUniform LBPについて、文字の画像の輝度を増減したり、画
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## Histogram of Oriented Gradient (HOG)
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Histogram of Oriented Gradient (HOG)が広く知られるようになったのは2005年のことで、コンピュータ・ビジョンの国際会議であるCVPRで発表された論文{cite}`dalal2005histograms`がきっかけとなっている。
 
@@ -1087,11 +891,6 @@ Histogram of Oriented Gradient (HOG)が広く知られるようになったの�
 HOGは画像全体で計算した勾配情報をパッチごとに集計することで計算する。今回用いるひらがな画像は48×48の大きさなので、これを8×8のパッチに区切ってみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 ps = 8  # パッチのサイズ
 img = X[0].reshape((48, 48))
 h, w = img.shape
@@ -1099,12 +898,8 @@ patches = [img[y : y + ps, x : x + ps] for y in range(0, h, ps) for x in range(0
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 fig = plt.figure(figsize=(3, 3))
 gs = GridSpec(6, 6, figure=fig)
 
@@ -1119,8 +914,6 @@ plt.tight_layout(pad=0.2)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 次に、この各画像に対して、勾配強度と勾配方向を画素ごとに計算する。以下の実装では、x方向の勾配$d_x$とy方向の勾配$d_y$をSobelフィルタを使って求め、勾配強度$g$と勾配方向$\theta$を以下のように定義する。
 
 $$
@@ -1130,7 +923,7 @@ $$
 \end{align}
 $$
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 なお、今回は向きのない方向 (= orientation, 0°から180°)を求めるため、上記の$\theta$の式において$d_y$に絶対値がかかっていることに注意すること。
 
@@ -1152,11 +945,6 @@ CV_8U : [0, 0,    0,    0,     0,    0,    0, 0, 0]
 この際、各画素の方向に対応するビンには**勾配強度を加算**して、ヒストグラムを計算する。なお、以下の計算では、勾配の方向を単純に量子化してビンの番号を決めるのではなく、隣接する2つのビンに線形補間で寄与を分配している。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 n_angles = 9  # 角度の量子化数
 
 # エッジの抽出を最初に行う
@@ -1194,8 +982,6 @@ histograms = np.stack(histograms, axis=0)
 print(f'{len(histograms):d} histograms with {histograms.shape[1]:d} bins are obtained!')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 これにより6×6=36個のヒストグラムが求まった。ここで注意したいのは、これらのヒストグラムは勾配強度で計算されており、**場所によって、ヒストグラムのスケールが異なる**という点である。
 
 そこで、HOGでは、この6×6=36個のパッチを3×3のブロックごとに走査し、そのブロック内で連結したヒストグラムを正規化して用いる。今、勾配方向は9つに離散化されており、ブロック内のパッチが3×3=9個なので、1ブロックが持つヒストグラムの次元は9×9=81次元である。この81次元ベクトルをノルムが1になるように正規化しておく。
@@ -1205,11 +991,6 @@ print(f'{len(histograms):d} histograms with {histograms.shape[1]:d} bins are obt
 最終的に、81次元のヒストグラムが複数 (今回の場合は(6-3+1)×(6-3+1)=16個)求まるので、これらを連結して、画像の特徴量として用いる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 bs = 3  # ブロックサイズ
 histograms = histograms.reshape((6, 6, -1))  # 6x6のパッチ
 
@@ -1226,8 +1007,6 @@ hog = hog / (np.sqrt(np.sum(hog * hog, axis=1, keepdims=True)) + 1.0e-8)
 
 hog = hog.flatten()
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 これらの処理をまとめて特徴量抽出のクラスを作成すると次のようになる。
 
@@ -1303,17 +1082,11 @@ class HOGFeature(TransformerMixin):
         return np.stack(features, axis=0)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 計算されたHOGを用いて、再度SVMを用いた分類を試してみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 clf = make_pipeline(
     HOGFeature(image_size=(48, 48)),
     PCA(n_components=128),
@@ -1324,41 +1097,26 @@ clf.fit(X, y)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 訓練時の識別精度の確認
 acc_train = clf.score(X, y)
 acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: hog_acc_train
 result_df.loc[len(result_df), :] = ['HOG', acc_train, 'Train']
 print('%.2f' % (acc_train * 100.0))
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: hog_acc_test
 result_df.loc[len(result_df), :] = ['HOG', acc_test, 'Test']
 print('%.2f' % (acc_test * 100.0))
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: Histogram of Oriented Gradientの利用**
 
@@ -1367,7 +1125,7 @@ print('%.2f' % (acc_test * 100.0))
 
 +++
 
-HOGは、画素の単純な大小を特徴化するLBPと比較して、勾配強度をヒストグラム化するという点で背景等のノイズに頑健な手法になっている。しかし、今回の文字認識の例では、LBPと比較して大きな精度向上を得ることはできないようだ。
+HOGは、画素の単純な大小を特徴化するLBPと比較して、勾配強度をヒストグラム化するという点で背景等のノイズに頑健な手法になっている。実際、今回の文字認識でも、LBPと比べて評価時の精度が大きく改善している。文字画像では輪郭線の向きが文字の識別に直結するため、勾配方向のヒストグラムという表現が有効に働いたと考えられる。
 
 +++
 
@@ -1380,11 +1138,11 @@ HOGは、画素の単純な大小を特徴化するLBPと比較して、勾配�
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## Bag of Visual Words
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここまでの特徴量は、画素の情報を元にして何らかのヒストグラムを得る、という方法であったが、続いては、画像に内在する画像の構造としての特徴を疎に抽出し、その特徴の集合をヒストグラム化する手法である**Bag of Visual Words** (BoVW, Bag of Featuresとも呼ばれる)について見ていく。
 
@@ -1395,11 +1153,11 @@ BoVWは、自然言語処理分野の**Bag of Words**から着想を得たもの
 
 以下では、画像に対する疎な特徴量の代表格である**Scale-Invariant Feature Transform** (SIFT)について、BoVWによる画像認識を試みる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### Scale-Invariant Feature Transform (SIFT)
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Scale-Invariant Feature Transform (SIFT)は、深層学習以前の画像認識における金字塔的な技術で、2000年前後にLoweによって提案された{cite}`lowe1999object`, {cite}`lowe2004distinctive`。SIFTは画像の中に映り込む物体のスケールや回転に対して不変な特徴量を与えることができる。
 
@@ -1410,11 +1168,11 @@ SIFT特徴量の抽出処理は、少々複雑だが、大まかに分けて
 
 の二つの処理に分けられる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 #### 特徴点の抽出
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **特徴点の抽出**に置いては、Difference of Gaussian (DoG)というフィルタを用いて、特徴点のスケールを計算する。DoGは二つの異なる$\sigma_1$, $\sigma_2$ (ただし$\sigma_1 < \sigma_2$とする)を用いて、
 
@@ -1425,11 +1183,6 @@ $$
 のように書ける。ただし$G_\sigma$は$\sigma$を標準偏差のパラメータとするGauss関数とする。例えば、以下のような画像になる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 img = cv2.resize(X[0].reshape((48, 48)), (256, 256))
 img = (img / 255.0).astype('float32')
 B1 = cv2.GaussianBlur(img, None, sigmaX=2.0)
@@ -1438,12 +1191,8 @@ DoG = B1 - B2
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 fig = plt.figure(figsize=(6, 3))
 gs = GridSpec(1, 2, figure=fig)
 ax = plt.subplot(gs[0])
@@ -1456,11 +1205,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 DoGの抽出を初期のパラメータ$\sigma$とスケールパラメータ$k$を用いて、$k^n\sigma$と$k^{n+1}\sigma$の間で$n=0, 1, 2, ...$の順で計算をしていく。この計算の過程でDoGの値が極値を取っていたら、そこをキーポイントの候補点として選ぶ。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 選ばれた候補点が実際に特徴点になるかどうかは、DoG値が極値を取るスケールにおいて、DoG画像$D$のその画素における勾配情報を参考にして決定する。具体的には、画像$D$から有限差分を用いて、ヘッセ行列
 
@@ -1492,12 +1239,8 @@ $$
 のように定義している。この式は$t = r + 2 + 1 / r$と書き直せるので、$t$は$r = 1$のときに最小値$4$を取り、$r$が大きい範囲では以下のグラフのようにほぼ線形に増加する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 fig, ax = plt.subplots(figsize=(4, 3))
 r = np.linspace(1.0, 50.0, 100, endpoint=True)
 t = (r + 1) ** 2 / r
@@ -1507,29 +1250,23 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 以上の処理を、直感的に述べれば、前半のDoGの処理は画像中の勾配がある箇所を検出し、さらに、その**勾配がどの程度の鮮鋭度を持つのかをスケールとして定量化**しようとしている。
 
 後半の処理は、その盛り上がりが**どの方向にも同じように尖っているか**を見ている。エッジの上では、エッジに沿う方向の曲率が小さく、エッジと直交する方向の曲率が大きいため、ヘッセ行列の2つの固有値は大きく偏る。$r = 10$とした場合に{eq}`eq:ratio-tr-det`が$t$より小さい、ということは、即ち**ヘッセ行列の2つの固有値の比が一定以下** (10:1以下)であること、言い換えればエッジ上の点を候補から除くことを意味している。
 
 なお、この$r$の値は以下のOpenCVのコードでは`edgeThreshold`という変数に対応する。もし、各画像から検出される特徴点が少なすぎるようであれば、この値を上げると、固有値の比がより大きい(=よりエッジに近い)特徴点も残されるようになる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 また、詳細は割愛するが、各特徴点には、勾配方向も同時に計算される。これは特徴点周りの画素に対して計算された勾配方向のヒストグラムの中で、いくつかの支配的な方向を特徴点に与えるものである。従って、各特徴点には2つ以上の勾配方向が割り当てられる可能性がある。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 では、実際にOpenCVを用いて画像からSIFT特徴点と特徴量を計算する。以下では、特徴量の抽出結果を分かりやすくするために、48×48画素の画像を256×256画素にリサイズして特徴量を計算している。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
+:tags: [hide-input]
+
 # 画像のリサイズ
 img = X[0].reshape((48, 48)).copy()
 img = cv2.resize(img, (256, 256))
@@ -1541,16 +1278,9 @@ sift = cv2.SIFT.create()
 keypoints = sift.detect(img)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 前述の通り、SIFT特徴点の検出では、位置、スケール、勾配方向が計算されるので、それらを`cv2.drawKeypoints`で可視化してみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 特徴点の描画 (画像に書き込みをするだけで表示はしない)
 img_sift = cv2.drawKeypoints(
     img,
@@ -1561,12 +1291,8 @@ img_sift = cv2.drawKeypoints(
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 fig = plt.figure(figsize=(6, 3))
 gs = GridSpec(1, 2, figure=fig)
 ax = plt.subplot(gs[0])
@@ -1583,8 +1309,6 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 画像中では、円の中心が特徴点の位置を、円の大きさが特徴点のスケールを、そして円の中心から弧に向かって伸びる線分が勾配方向をそれぞれ表わしている。この際、文字の輪郭線のぼけ具合と円の大きさに相関があり、なおかつ勾配方向が輪郭線とおよそ直交する方向となっていることに注目してほしい。また、特徴点の中には2つ以上の勾配方向を持つものが存在することにも注目してほしい。
 
 +++
@@ -1598,11 +1322,11 @@ $\rho = (r + 1)^2 / r$ が $r \geq 1$ の範囲で単調増加し、$r = 1$ で�
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 #### 特徴量の計算
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 特徴量の計算には、特徴点の計算で得られたスケールと方向を用いる。特徴量の計算には4×4のグリッドを用いるのだが、このグリッドの大きさを特徴点のスケールに応じて拡大縮小し、また勾配方向に応じてグリッドの向きを変更する。
 
@@ -1610,22 +1334,15 @@ $\rho = (r + 1)^2 / r$ が $r \geq 1$ の範囲で単調増加し、$r = 1$ で�
 
 グリッドの姿勢が計算できたら、4×4=16個のグリッドのそれぞれについて、特徴点の勾配方向ヒストグラムを45°刻みの8方向について計算する。この8個のビンの値を16個分連結することで、SIFT特徴量としての128次元ベクトルが得られる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 では、先ほど求めた特徴点に対して、OpenCVを用いて特徴量(記述子=descriptorとも言う)を計算する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 特徴量の計算
 _, features = sift.compute(img, keypoints)
 print(f'{features.shape[0]:d} features with {features.shape[1]:d} dimensions')
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 このように特徴量 (`features`)は「特徴点の数」×「特徴量の次元=128」で与えられることが確認できる。なお、特徴点の抽出と特徴量の計算は`sift.detectAndCompute`を用いることで同時に行うこともできる。
 
@@ -1638,7 +1355,7 @@ SIFT特徴量がスケールや画像の回転に対して頑健であるのは�
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 技術と特許
 :class: note
@@ -1651,20 +1368,15 @@ SIFT特徴量がスケールや画像の回転に対して頑健であるのは�
 
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 特徴量のクラスタリング
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 BoVWを計算するためには、訓練データに含まれる全ての画像について、特徴量を計算し、それをクラスタリングする必要がある。以下のコードでは、48×48という比較的小さな画像を扱うために`edgeThreshold`を調整して、検出される特徴点の数を増やしている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 extractor = cv2.SIFT.create(edgeThreshold=32, contrastThreshold=0.0)
 
 features = []
@@ -1676,26 +1388,15 @@ for x in tqdm(X, desc='Extract SIFT'):
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 all_features = np.concatenate(features, axis=0)
 print(f'SIFT: {len(all_features):d} keypoints ({len(all_features) / len(X):.1f}pts per image)')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 特徴量が得られたら、これをk平均法 (k-means法)によってクラスタリングする。今回は特徴量の数が20万を超えるため、scikit-learnの`MiniBatchKMeans`を用いて、ミニバッチによる近似的なクラスタリングを行う。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 from sklearn.cluster import MiniBatchKMeans
 
 cb_size = 128  # コードブックのサイズ
@@ -1704,12 +1405,8 @@ cluster.fit(all_features)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 feature = features[0]
 cb_ids = cluster.predict(feature)
 bovw_feat = np.bincount(cb_ids, minlength=cb_size)
@@ -1757,12 +1454,8 @@ class BoVWFeature(TransformerMixin):
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 clf = make_pipeline(
     BoVWFeature(image_size=(48, 48), n_clusters=128),
     StandardScaler(),
@@ -1772,59 +1465,45 @@ clf.fit(X, y)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 # 識別精度の確認
 acc_train = clf.score(X, y)
 acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: bovw_acc_train
 result_df.loc[len(result_df), :] = ['BoVW', acc_train, 'Train']
 print('%.2f' % (acc_train * 100.0))
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: bovw_acc_test
 result_df.loc[len(result_df), :] = ['BoVW', acc_test, 'Test']
 print('%.2f' % (acc_test * 100.0))
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: Bag of Visual Wordsの利用**
 
 - 訓練時精度: ![](#bovw_acc_train)%
 - 評価時精度: ![](#bovw_acc_test)%
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 発展: Gauss混合モデルを用いた改良
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 上記の例では、離散的に特徴量をクラスタ分割して、**最も近いクラスタ**に対して、各特量を割り当てることでヒストグラムを作成した。ただし、複数のクラスタの境界に特徴量が存在している可能性もあるため、その情報を捨てて、一番近いクラスタに特徴量を割り当てるのは、あまり適切とは言えない。
 
 そこで、クラスタリングを用いる代わりに、特徴量の分布をGauss混合モデルによって近似しておき、各Gauss分布への寄与 (小数で表わされる)を画像の特徴ベクトルとして与えることを考える。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **Gauss混合モデル**とは、複数のGauss分布を和が1となるような正の重みによって重み付けたものであり、確率密度関数$P(\mathbf{x} | \boldsymbol\Theta)$, $\mathbf{x} \in \mathbb{R}^D$が以下の形で書ける。
 
@@ -1908,12 +1587,8 @@ class BoVWGMMFeature(TransformerMixin):
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 clf = make_pipeline(
     BoVWGMMFeature(image_size=(48, 48), n_clusters=128),
     StandardScaler(),
@@ -1923,42 +1598,28 @@ clf.fit(X, y)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 # 識別精度の確認
 acc_train = clf.score(X, y)
 acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: bovwg_acc_train
 result_df.loc[len(result_df), :] = ['GMM-BoVW', acc_train, 'Train']
 print('%.2f' % (acc_train * 100.0))
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: bovwg_acc_test
 result_df.loc[len(result_df), :] = ['GMM-BoVW', acc_test, 'Test']
 print('%.2f' % (acc_test * 100.0))
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: GMM-BoVW**
 
@@ -1974,19 +1635,19 @@ k平均法やGauss混合モデルは、教師なし学習法の一種で、そ�
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### Fisherベクトルの利用
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 BoVWの改良としてFisherベクトルを利用する手法は2007年にPerronninらによって提案された{cite}`perronnin2007fisher`。Fisherベクトルは、統計学等でも用いられるFisher情報量に基づく特徴表現である。とある確率密度分布が、パラメータ (母数)$\boldsymbol\Theta$を与えたときの$\mathbf{x} \in \mathcal{X}$の条件付き密度 $P(\mathbf{x} | \boldsymbol\Theta)$ として与えられる場合を考える。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 #### 発展: Fisherベクトルの導出
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Fisher情報量を求めるに当たり、Fisherベクトル$V(\mathbf{x}; \boldsymbol\Theta)$を
 
@@ -1996,7 +1657,7 @@ $$
 
 のように表わす。なお、微分と積分の順序交換が許される正則条件の下では、$\mathbf{x}$を$P(\mathbf{x} | \boldsymbol\Theta)$に従って取ったときのFisherベクトルの平均はゼロベクトルになる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Fisher情報量は上記のFisherベクトルの分散として定義される。この際、Fisherベクトルの平均が$\mathbf{0}$であることを用いると、分散共分散行列は次の式で与えられる。
 
@@ -2004,7 +1665,7 @@ $$
 \mathbf{I}(\boldsymbol\Theta) = \mathbb{E}_{\mathbf{x} \sim P(\cdot | \boldsymbol\Theta)} \left[ \nabla_{\boldsymbol\Theta} \log P(\mathbf{x} | \boldsymbol\Theta) \left( \nabla_{\boldsymbol\Theta} \log P(\mathbf{x} | \boldsymbol\Theta) \right)^\top \right]
 $$
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 さて、ここで、$P(\mathbf{x} | \boldsymbol\Theta)$が{eq}`eq:gaussian-mixture`のガウス混合分布で与えられる場合を考える。以後、計算を簡単にするために、共分散行列は対角成分を$\boldsymbol\sigma_k$とする対角行列であるとする。
 
@@ -2016,7 +1677,7 @@ $$
 
 と書けることは言うまでもない。また、$P(\mathbf{x} | \boldsymbol\Theta)$の$\pi_k$, $\mu_{k,d}$, $\sigma_{k,d}$に関する偏微分はそれぞれ以下のように書ける。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 $$
 \begin{align}
@@ -2031,7 +1692,7 @@ $$
 \end{align}
 $$
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 したがって、{eq}`eq:membership`の寄与率$\gamma_k$を用いると、フィッシャーベクトルの各次元は以下のように書き直せる。
 
@@ -2048,7 +1709,7 @@ $$
 \end{align}
 $$
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここで、$\mathcal{X} = \{ \mathbf{x}_1, \ldots, \mathbf{x}_N \}$として、これらの同時分布$P(\mathcal{X} | \boldsymbol\Theta)$を考える。$\mathbf{x}_i$は互いに独立なサンプルであるので、
 
@@ -2078,19 +1739,19 @@ $$
 = \sum_{i=1}^N \gamma_k(\mathbf{x}_i) \left[ \frac{(x_{i,d} - \mu_{k,d})^2}{\sigma_{k,d}^3} - \frac{1}{\sigma_{k,d}} \right]
 $$ (eq:deriv-sigma)
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ただし、{eq}`eq:deriv-alpha`では、$\sum_{k} \alpha_k = 1$であることを用いて、自由度を一つ減らしてある。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここまでの式から、Fisherベクトルの次元は$\alpha_k$に関する成分が$K - 1$次元、$\mu_{k,d}$に関する成分が$DK$次元、$\sigma_{k,d}$に関する成分が$DK$次元あるので、合計で$(2D + 1) K - 1$次元となる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 #### 発展: Fisherベクトルの意味
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 上記の通り、Fisherベクトルはとあるデータ集合$\mathcal{X}$を近似的に表わすGauss混合モデルについて、そのパラメータ$\boldsymbol\Theta$に関する勾配を要素に持つ。この意味を考えてみよう。
 
@@ -2098,19 +1759,23 @@ $$ (eq:deriv-sigma)
 
 この影響の大きさの期待値を表わしているのがFisher情報量であり、各パラメータに関するFisher情報量はFisherベクトルの各要素の二乗平均により与えられる。Fisher情報量は、推定するパラメータを正しく推定するために、どの程度十分な情報(=サンプル)が得られているかを示しており、**情報量が大きければ大きいほど、サンプルから求まるパラメータの最尤推定量が真の値に近づくことが期待される** (推定量の分散とFisher情報量の逆数の関係はCramér-Raoの不等式で与えられる)。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
-従って、とある画像に対して計算されるFisherベクトルは、**その画像(から得られた特徴量の集合)が、画像全体(のGauss混合分布)から見て、どのような意外性を持つか、と言い換えても良い**。その画像が全体のGauss混合分布にとって十分尤もらしいものであれば、尤度の勾配から定まるFisherベクトルの要素は小さな値(特に意外ではない)を取り、そうでなければ、大きな値(意外である)を取る、という訳である。
+従って、とある画像に対して計算されるFisherベクトルは、 **その画像(から得られた特徴量の集合)が、画像全体(のGauss混合分布)から見て、どのような意外性を持つか、と言い換えても良い** 。その画像が全体のGauss混合分布にとって十分尤もらしいものであれば、尤度の勾配から定まるFisherベクトルの要素は小さな値(特に意外ではない)を取り、そうでなければ、大きな値(意外である)を取る、という訳である。
 
 ただし、画像の分類の観点から言えば、Fisherベクトルがどのような意味を持つか、ということよりも、それ自体が、単なるクラスタへの所属や、Gauss混合モデル以上に画像を上手く表現できるような特徴を与えるということに価値がある。
 
-実際、{eq}`eq:deriv-alpha`は画像が含む特徴量に関して、どの分布にどのくらいの割合で属するかを表わす0次統計量であるのに対し、{eq}`eq:deriv-mu`ならびに{eq}`eq:deriv-sigma`は、それぞれ1次統計量、2次統計量を表わしている。
+実際、{eq}`eq:deriv-alpha`は画像が含む特徴量に関して、どの分布にどのくらいの割合で属するかを表わす0次統計量であるのに対し、{eq}`eq:deriv-mu`ならびに{eq}`eq:deriv-sigma`は、それぞれ1次統計量、2次統計量を表している。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
+実装上は、この Fisher 情報量を実際に用いる。Fisher カーネルは $K(\mathcal{X}a, \mathcal{X}b) = \mathbf{g}a^\top \mathbf{F}^{-1} \mathbf{g}b$ で定義されるので、$\mathbf{F}^{-1/2} \mathbf{g}$ を特徴ベクトルとすれば、通常の内積 (すなわち線形SVM) で Fisher カーネルが計算できる。Perronnin と Dance は $\mathbf{F}$ を対角行列で近似しており、対数尤度を $N$ で割った平均を用いると、各 $\mathbf{x}$ がほぼ1つの成分 $k$ にだけ属するという仮定の下で、
+
+と近似できる ($z = (x_d - \mu{k,d})/\sigma{k,d}$ は標準正規分布に従い、$\mathbb{E}[z^4] = 3$ を用いた)。したがって $\mathbf{F}^{-1/2}$ を掛けることは、$\mu$ の成分に $\sigma{k,d}/\sqrt{\alpha_k}$ を、$\sigma$ の成分に $\sigma{k,d}/\sqrt{2\alpha_k}$ を掛けることに対応する。以下の実装ではこの正規化を行っている。なお $\alpha_k$ の成分については、本資料のパラメータ化では $\mathbf{F}$ が対角にならないため、$N$ で割るだけにとどめている。
+
++++
 
 #### Fisherベクトルを用いた画像分類
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 それでは、実際に全画像から取得したSIFT特徴量を用いて、各画像に対応するFisherベクトルを求めてみよう。Perronninらの元論文 {cite}`perronnin2007fisher`では、計算量を削減するために、得られたSIFT特徴量を主成分分析によって50次元減らした後、Gauss混合モデルをフィッティングしてFisherベクトルを求めている。
 
@@ -2129,12 +1794,8 @@ sub_gmm.fit(all_sub_feats)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 feature = features[0]
 
 sub_feat = pca.transform(feature)  # (N, D)
@@ -2243,12 +1904,8 @@ class FisherVectorFeature(TransformerMixin):
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 clf = make_pipeline(
     FisherVectorFeature(image_size=(48, 48), n_clusters=128),
     StandardScaler(),
@@ -2258,42 +1915,28 @@ clf.fit(X, y)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-output]
----
+:tags: [remove-output]
+
 # 識別精度の確認
 acc_train = clf.score(X, y)
 acc_test = clf.score(X_test, y_test)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: fisher_acc_train
 result_df.loc[len(result_df), :] = ['Fisher-BoVW', acc_train, 'Train']
 print('%.2f' % (acc_train * 100.0))
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-cell]
----
+:tags: [remove-cell]
+
 # | label: fisher_acc_test
 result_df.loc[len(result_df), :] = ['Fisher-BoVW', acc_test, 'Test']
 print('%.2f' % (acc_test * 100.0))
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 **結果: FisherベクトルによるBoVW**
 
@@ -2311,23 +1954,19 @@ Fisherベクトルの次元が $(2D + 1)K - 1$ 次元になることを、{eq}`e
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 手法の比較
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここまでの手法の訓練時、ならびにテスト時のスコアを比較してみよう。画像をそのまま入力した場合や、単に主成分分析で次元を落とした場合と比べると、LBP、HOG、BoVWといった特徴量を経由した手法はいずれも高いスコアを示している。中でも、Gauss混合モデルの尤度勾配までを特徴に取り込んだFisherベクトルは、他の手法を大きく引き離している。特徴量の設計次第で、同じ分類器・同じデータからでも引き出せる情報量が大きく変わることが分かる。
 
 また、訓練時と評価時のスコアの差にも注目したい。この差が大きい手法は、訓練データに含まれる個々の画像の癖まで覚え込んでしまっている、すなわち過学習を起こしていることを意味する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 plt.figure(figsize=(9, 6))
 
 ax = sns.barplot(
@@ -2347,8 +1986,6 @@ plt.grid(axis='y', color='gray', linestyle='--', linewidth=0.5)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ::::{admonition} 問
 :class: question
 
@@ -2356,7 +1993,7 @@ BoVWの性能がSIFT以外の特徴量 (OpenCVにはORB {cite}`rublee2011orb` (=
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 参考文献
 

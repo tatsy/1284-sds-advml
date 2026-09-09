@@ -16,26 +16,24 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:exercise-othello)=
 # 演習3 - オセロAIの作成
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 前節、{ref}`sec:othello-player`では、オセロAIの基本であるゲーム木の探索方法について、盤面評価値に基づくアルファベータ探索や、プレイアウトの結果に基づくモンテカルト木探索等について解説した。
 
 今回の演習では、この延長として、より強いオセロのAIを作成してみよう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 演習内容
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 今回の演習ではオセロプレイヤーのクラスを実装し、レベル別のオセロAIに対して1勝でも多く勝利することを目指す。以下が実装すべき`MyPlayer`クラスの雛形である。複雑なAIを実装しない限りは、はオセロ環境が渡されてくる`MyPlayer`クラスの`play`関数のみを編集すれば十分だろう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ```python
 import numpy as np
@@ -61,15 +59,15 @@ class MyPlayer(BasePlayer):
         return np.random.choice(actions)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 より詳細な課題作成の流れについては以下の説明に従うと入手できるテンプレート・レポジトリの[README.md](https://github.com/tatsy-classes/othello-template)に従うこと。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 対戦相手のレベル
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 対戦相手の詳細な実装については公開しないが、概ね以下の方針に従った実装になっている。
 
@@ -79,11 +77,11 @@ class MyPlayer(BasePlayer):
 
 なお、上記のAIは、レベルが上がるに従って、思考時間が長くなれば強くなるように実装されているが、今回は各AIが一手につき0.1秒だけ考慮するので、必ずしもレベルが高いほど強いとは限らない。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### ローカル環境でのテスト
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 本演習の採点は[GitHub Classroom](https://classroom.github.com/classrooms)を使って行う。講義中で演習用のClassroomのURLを指示するので、そのURLをブラウザで開き、テンプレート・レポジトリを自分のGitHubアカウントと紐付けること。
 
@@ -103,11 +101,11 @@ pytest
 pytest -k minimax --n_match 20
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 本番環境でのテスト
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Github Classroomでは、演習用のレポジトリにコードをプッシュする度にテストが実行される。
 
@@ -115,15 +113,15 @@ Github Classroomでは、演習用のレポジトリにコードをプッシュ�
 
 また、1回の対戦時間は15秒で終了するようになっており、もし時間切れとなった場合には自動的に負けとなる。各AIはおよそ0.1秒で手を指すようにプログラムされているので、それを考慮の上、自分のAIの考慮時間を調整すること。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 課題の進め方
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### ゲームAIの概観
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 前節、{ref}`sec:othello-player`では
 
@@ -147,11 +145,11 @@ Github Classroomでは、演習用のレポジトリにコードをプッシュ�
 
 これら2つのタイプのAIの側面を考慮した上で、どのようなAIを実装するのかを検討してみてほしい。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 課題の始めに試すこと
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 まずは、テンプレート・レポジトリに与えられているミニマックス探索に基づくAI(`players/minimax.py`)が与えられているので、このプログラムを`MyPlayer`に反映して、各レベルのAIに対して、どの程度の勝率になるのかをチェックしておこう。
 
@@ -159,11 +157,11 @@ Github Classroomでは、演習用のレポジトリにコードをプッシュ�
 
 また、前節でモンテカルロ木探索に基づく着手の手法は紹介済みであるので、このコードを`MyPlayer`に移植するだけでも、それなりの強さのAIを作ることができる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### より強いAIを作るために
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 今回の演習では、1回のテストプレイの制限時間が15秒であり、対戦相手の考慮時間を除くと、1手の考慮に掛けられる時間は多くとも0.4秒程度である。
 
@@ -171,11 +169,11 @@ Github Classroomでは、演習用のレポジトリにコードをプッシュ�
 
 よって、ミニマックス系かモンテカルロ系のどちらについても、**効率的により良い手を見つけるにはどうすれば良いか**を考える必要があるだろう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 #### ミニマックス系
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **ミニマックス系**に関しては、まず、{ref}`ssec:alpha-beta`による枝刈りは必須だろう。単純なアルファベータ探索を実装するだけでも、ミニマックス探索と比較して(計算時間にもよるが)相当多くの手を読むことができる。
 
@@ -185,11 +183,11 @@ Github Classroomでは、演習用のレポジトリにコードをプッシュ�
 
 最後に、より良い手を見つけるために、**セルの評価値に基づく盤面の評価を改善する**ことが考えられる。オセロには、相手が着手できなければパスになるというルールがあるため、なるべく相手の合法手の数が少なくなるように指す方が有利になると考えられる。また確定石と呼ばれる確実に自分の色の石になるマスが決まるため、確定石の数がより多くなるように指す方が当然有利だろう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 #### モンテカルロ系
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **モンテカルロ系**に関して、前節のモンテカルロ木探索に基づく手法には1つ大きく改善すべき点がある。
 
