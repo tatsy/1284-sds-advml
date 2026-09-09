@@ -16,12 +16,10 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:data-visualization)=
 # データ可視化と次元削減
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 機械学習において、データを扱う際には、データそのものがどのような性質を持っているかをよ事前に調べておくことが有効である。しかし、多くのデータは多次元のデータであるため、そのままデータがどのような分布になっているかを見ることは難しい。
 
@@ -34,12 +32,8 @@ kernelspec:
 このようなデータの散らばりは、ある程度、高次元空間上の曲面付近での散らばりと見なせることが多い。この曲面の構造をある種の**多様体**であると見なして、低次元空間への埋め込みを行う方法を、特に**多様体学習**と呼ぶ。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 """
 下準備のコード
 """
@@ -72,20 +66,13 @@ sns.set_theme(style='white', palette='colorblind', rc=rc)
 print(f'{n_samples}')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 今回は、以下のスイスロールのデータを題材に次元削減と可視化の方法について見ていこう。例によって、計算時間を削減するために、下記の例では ![](#n_samples) 個の頂点をサンプルしている。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **スイスロールのデータ**
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 必要なモジュールのインポート
 import numpy as np
 import matplotlib.pyplot as plt
@@ -116,15 +103,13 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## 線形の次元削減
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 主成分分析 (PCA)
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **主成分分析** (PCA = Principal Component Analysis)は、データの散らばりが大きい方向に沿うように軸を取って次元削減を行う方法である。
 
@@ -141,33 +126,21 @@ $$
 \end{aligned}
 $$
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 NumPyを用いて、平均と分散共分散行列を計算すると、以下のようになる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 分散共分散行列の計算
 mu_sr = np.mean(X_sr, axis=0, keepdims=True)
 C_sr = np.dot((X_sr - mu_sr).T, X_sr - mu_sr) / n_samples
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 主成分分析では分散共分散行列の大きな固有値に対応する固有ベクトルを順に次元削減に用いる。
 
 分散共分散行列は実対称行列であるので、固有値と固有ベクトルが必ず実数で求まる(実非対称行列の場合には、固有値や固有ベクトルが複素数になることがある)。固有値を求める場合は`np.linalg.eig`ではなく`np.linalg.eigh` (接尾字の`h`はHermiteの意味)を用いると、より効率が良い。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 固有値分解
 eigval, eigvec = np.linalg.eigh(C_sr)
 
@@ -182,12 +155,8 @@ z_sr = X_sr @ eigvec.T
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
@@ -197,20 +166,13 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 スイスロールのデータを二次元空間に主成分分析で次元削減してみると、データの散らばりが大きなx軸方向とz軸方向を基底ベクトルとするxz平面上に射影される。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 なお、PCAをscikit-learnを用いて実行する場合には、以下のようになる。同様に2次元空間で可視化してみると、先ほどと同じ画像が得られていることが確認できる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from sklearn.decomposition import PCA
 
 pca = PCA(n_components=2)
@@ -220,12 +182,8 @@ z_sr = pca.transform(X_sr)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # データの可視化
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -236,11 +194,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### 多次元尺度構成法 (MDS)
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **多次元尺度構成法**(MDS = Multi-Dimensional Scaling)は**距離空間学習法の一種で元の空間における点と点の距離をなるべく保つように低次元空間に点を射影**する。今回はデータとデータの間の距離を通常のEuclidノルムで求めて多次元尺度構成法を実行してみる。
 
@@ -270,7 +226,7 @@ $$ (eq:D-square)
 
 となる。ここでさらに、
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 $$
 \begin{align}
@@ -292,7 +248,7 @@ $$
 
 これらの関係式を用いて、 $\| \mathbf{z}_i \|^2$, $\| \mathbf{z}_j \|^2$ , ならびに $\mathbf{z}_i^\top \mathbf{z}_j$を、それぞれ、$D_{i*}$, $D_{*j}$, ならびに $D_{**}$ を用いて書き直す。結果だけを示すと以下のようになる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 $$
 \begin{align}
@@ -302,52 +258,47 @@ $$
 \end{align}
 $$
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 最後の式を用いると、$\mathbf{Z} = [ \mathbf{z}_1 \cdots \mathbf{z}_N ] \in \mathbb{R}^{M \times N}$に対して、
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 $$
 \mathbf{Z}^\top \mathbf{Z} = -\frac{1}{2} \mathbf{H} \mathbf{D}^2 \mathbf{H}
 $$ (eq:mds)
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 という式が成り立つ。なお、ここでは、$\mathbf{D}^2$は$\mathbf{D}$の各要素を二乗したものであるとし、$\mathbf{H}$は以下のように定義される。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 $$
 \mathbf{H} = \mathbf{I} - \frac{1}{N} \mathbf{1} \mathbf{1}^\top
 $$
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ただし、$\mathbf{I}$は単位行列、$\mathbf{1}\mathbf{1}^\top$は全ての要素が1の$N\times N$要素を持つ行列であるとする。
 
 今、{eq}`eq:mds`の右辺を$\mathbf{K}$と置くこととすると、$\mathbf{K}$は半正定値行列であり、$\mathbf{Z}$の解として、以下が得られる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 $$
 \mathbf{Z} = [ \sqrt{\lambda_1} \mathbf{u}_1 \cdots \sqrt{\lambda_M} \mathbf{u}_M ]^\top
 $$
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ただし、$\{ \lambda_i \in \mathbb{R} : i = 1, \ldots, N \}$は、$\mathbf{K}$の固有値を絶対値が大きい順に並べたものであり、$\{ \mathbf{u}_i \in \mathbb{R}^{N} : i = 1, \ldots, N \}$は、それに対応する固有ベクトルである。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 以上の議論を元にスイスロールのデータに対して多次元尺度構成法を適用してみる。なお、今回は、固有値分解を行う対象の行列が巨大であるため、SciPyの`eigh`関数を用いて、絶対値が大きい順に先頭から2個だけ固有値と固有ベクトルを求める。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 import scipy as sp
 
 # 距離行列の計算
@@ -368,12 +319,8 @@ z_sr = eigvec * np.sqrt(np.maximum(0.0, eigval[None, :]))
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
@@ -382,8 +329,6 @@ ax.axis('equal')
 plt.tight_layout()
 plt.show()
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 この多次元尺度構成法の結果は、定義式から分かるとおり、元のベクトルを線形に射影した物であり、元々のスイスロールのデータをとある方向 (元の空間での距離が最大限保たれる方向)から見たものと等価である。従って、主成分分析と比べて、ややスイスロールの帯の部分に拡がりのあるデータとなっているものの、全体の見た目としてはそれほど変わりがない。
 
@@ -407,7 +352,7 @@ SMACOFは、$\mathbf{Z}$ をランダムに初期化した状態からスター�
 
 これにより、元の多次元尺度構成法とは異なった非線形変換による低次元空間表現を得ることができ、低次元空間でのデータ $\{ \mathbf{z}_1, \ldots, \mathbf{z}_N\}$ の配置が、より元の空間での距離を反映したものになる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 SMACOFでは**ストレス** $S$ と**比率行列** $\mathbf{R}$ を、現在の $\mathbf{Z}$ から求まる距離行列 $\mathbf{D}'$ を用いて以下のように定義する。
 
@@ -432,16 +377,11 @@ $$
 
 この式は、ストレス$S$を最急降下法により最小化する場合の更新ルールに対応しており、この変換を繰り返すことで、ストレス、即ち低次元空間表現から求まる距離行列と、目的の距離行列の相対フロベニウスノルムを最小化することができる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 上記のSMACOFの数式をソースコードに落とすと以下のようになる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from tqdm.notebook import tqdm
 
 # SMACOFのパラメータ
@@ -481,12 +421,8 @@ progbar.close()
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
@@ -496,18 +432,11 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 すると、先ほどのSMACOFを用いない多次元尺度構成法と比べて、よりスイスロールの帯が広がったような結果となっていることが確認でき、SMACOFにより、観測空間におけるデータ間の距離がより保存される形で次元削減できていることが分かる。
 
 このSMACOFを用いた実装はscikit-learnでのデフォルト実装となっており、上記と同様の結果は、scikit-learnにより以下のコードで得ることができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from sklearn.manifold import MDS
 
 # 距離行列が求まっている場合には「dissimilarity="precomputed"」を指定する
@@ -523,12 +452,8 @@ z_sr = mds.fit_transform(D_sr)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
@@ -538,24 +463,17 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## 非線形の次元削減
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### ISOMAP
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **ISOMAP**は多次元尺度構成法の拡張の一種で、**データ間の距離の計算にk-nearest neighbor graph (kNNグラフ)上で計算された測地距離**を用いる。なお、kNNグラフとは、各点とその近傍を結んで作られるグラフ構造を指す。このようなグラフを作成するために、以下のコードでは [KD木](https://en.wikipedia.org/wiki/K-d_tree)を用いた最近某探索を用いる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from sklearn.neighbors import NearestNeighbors
 
 # 各データ点に対する最近傍点の探索
@@ -569,18 +487,11 @@ distances = distances[:, 1:]
 indices = indices[:, 1:]
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ここで`distances`と`indices`は`[1000, 5]`の大きさのデータになっていて、各頂点に対する近傍点までの距離と、近傍点のインデックスが入っている。なお、探索元のデータ群と探索先のデータ群を同じにすると、`distances[:, 0]`が自分自身の点までの距離で0となってしまうため、kNNグラフを作る際には、このようなデータを除去しておく。
 
 次にグラフ計算のためのライブラリである`networkx`を用いて、グラフ上での点と点の距離を計算する。まずはグラフの作成。`networkx`でグラフを作成するためには`(i, j, {"weight": 1.0})`のような辺の端点を表わす点のインデックス`i`, `j`と、辺に対する重みの除法を表わす`{"weight": 1.0}`を辺の数分だけ配列に格納し、その配列を用いて `from_edgelist` からグラフを作成する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # kNNグラフの作成
 import networkx as nx
 
@@ -595,31 +506,17 @@ for i in range(n):
 G = nx.from_edgelist(edges)
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 グラフが作成できたら、[Warshall-Floyd法](https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm)によって、全点対間の距離を計算する。なお、Warshall-Floyd法はグラフの頂点数 $N$に対して $O(N^3)$のアルゴリズムなので、計算量に注意すること。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # Warshall-Floyd法による全点対間距離の計算
 # 注意: networkxのグラフのノードはインデックス順になっていないので、第2引数にノード順を指定する
 D_sr = nx.floyd_warshall_numpy(G, nodelist=np.arange(n))
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ここまででkNNグラフ上での頂点間距離が求まったので、この距離行列を用いて多次元尺度構成法と同様の計算を行う。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 n = len(X_sr)
 H = np.eye(n) - np.ones((n, n)) / n
 K = -0.5 * (H @ (D_sr**2) @ H)
@@ -632,12 +529,8 @@ z_sr = eigvec * np.sqrt(eigval[None, :])
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # データの可視化
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -647,18 +540,11 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 このように非線形次元削減の一手法であるISOMAPを用いるとスイスロールのように曲線的に巻き込まれたような構造を非線形的に展開するような次元削減が可能となる。
 
 ここまでと同様の結果は、scikit-learnの`Isomap`でも得ることができる。`Isomap`はパラメータにkNNグラフを作成するためのアルゴリズム`neighbors_algorith`と、グラフ上の距離を計算するためのアルゴリズム`path_method`を取る。今回は、上記のコードに合わせて`"kd_tree"`と`"FW"` (Floyd-Warshallの頭文字)を指定してある。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from sklearn.manifold import Isomap
 
 isomap = Isomap(
@@ -671,12 +557,8 @@ z_sr = isomap.fit_transform(X_sr)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=4)
@@ -692,7 +574,7 @@ ISOMAPの結果は頂点間の「グラフ上での距離」に依存するた�
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 局所線形埋め込み法 (LLE)
 
@@ -919,11 +801,6 @@ plt.show()
 上記と同様の結果はscikit-learnを用いて、以下のコードで得ることができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from sklearn.manifold import LocallyLinearEmbedding
 
 lle = LocallyLinearEmbedding(n_components=2, n_neighbors=10, method='standard')
@@ -931,12 +808,8 @@ z_sr = lle.fit_transform(X_sr)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # データの可視化
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -948,11 +821,11 @@ plt.show()
 
 局所線形埋め込み法には、その発展形として、改良局所線形埋め込み法 (Modified LLE) {cite}`zhang2006mlle` やHessian Eigenmap {cite}`donoho2003hessian` などがある。興味のある読者は是非、原論文を当たってみてほしい。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### カーネル主成分分析
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **カーネル主成分分析**は[サポートベクトルマシン](#ssec:support-vector-machine)の項で紹介したカーネル法を用いた主成分分析の拡張であり、非線形の次元削減法に分類される。
 
@@ -1082,11 +955,6 @@ $$
 では、ここまでの議論を元にカーネル主成分分析を実装してみよう。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # カーネル行列の計算
 n = len(X_sr)
 gamma = 0.01
@@ -1105,12 +973,8 @@ z_sr = K_sr @ eigvec / np.sqrt(eigval[None, :])
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
+:tags: [hide-input]
+
 # データの可視化
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -1126,11 +990,6 @@ plt.show()
 上記と等価のコードをscikit-learnによって実現すると以下のようになる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from sklearn.decomposition import KernelPCA
 
 kpca = KernelPCA(n_components=2, kernel='rbf', gamma=0.01)
@@ -1138,12 +997,8 @@ z_sr = kpca.fit_transform(X_sr)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [hide-input]
----
+:tags: [hide-input]
+
 # データの可視化
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -1154,16 +1009,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ただし、カーネル主成分分析は、カーネル法に用いるカーネルの種類と、そのカーネルを定義するパラメータに大きく依存している。例えば、上記のようにRBFカーネル $k(\mathbf{x}_i, \mathbf{x}_j) = \exp(-\gamma \| \mathbf{x}_i - \mathbf{x}_j \|^2)$を用いる場合、$\gamma$変化させることで全く異なる低次元空間表現が与えられる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 gammas = [0.005, 0.01, 0.05]
 fig, axs = plt.subplots(1, len(gammas), figsize=(12, 4))
 
@@ -1181,8 +1029,6 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 これはカーネル主成分分析に限らないが、次元削減のアルゴリズムにはいくつかのパラメータがあることがほとんどで、それらを変更すると、全く異なる結果が得られることも多い。従って、scikit-learn等のライブラリを用いる場合も、その背景でどのような計算が行われているのかを考えた上で、パラメータを適切に設定することが大切である。
 
 +++
@@ -1194,20 +1040,15 @@ scikit-learnの`KernelPCA`には`SVC`クラスと同様に`kernel=...`に対し�
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## MNISTの分析
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ここからは、MNISTの手書き文字データに対して、主成分分析とカーネル主成分分析を適用して、データの散らばりを確認するとともに、その画像的意味について考えてみよう。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 以下のコードはデータのダウンロードを伴うため、少々時間がかかる
 X, y = datasets.fetch_openml('mnist_784', return_X_y=True, data_home='./mnist', parser='auto')
 X = np.array(X, dtype='uint8')
@@ -1215,11 +1056,6 @@ y = np.array(y, dtype='uint8')
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 画像として見られるように配列の形を変更
 ims = np.reshape(X[:8], (-1, 28, 28))
 
@@ -1237,16 +1073,9 @@ for i in range(8):
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 例のごとく、実験にかかる時間を短縮するために、先頭 ![](#n_samples) 個のデータだけを実験に用いる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from sklearn import model_selection
 
 X, X_test = model_selection.train_test_split(X, train_size=60000, test_size=10000, shuffle=False)
@@ -1255,31 +1084,19 @@ y, y_test = model_selection.train_test_split(y, train_size=60000, test_size=1000
 X, y = X[:n_samples], y[:n_samples]
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### データ分布の可視化
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 まずは、MNISTの画像データを784次元のベクトルと見なして、主成分分析により、2次元ベクトルに次元削減してみる。ここでは見やすさのために[Seabornの併用](#ssec:seaborn)で紹介した`seaborn`の`jointplot`を用いて可視化してみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # PCAによる次元削減
 pca = PCA(n_components=2)
 z = pca.fit_transform(X)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # Seabornによるデータ可視化
 import pandas as pd
 import seaborn as sns
@@ -1300,8 +1117,6 @@ plt.subplots_adjust(top=0.95)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 このように、次元削減によって「0」や「1」のデータなど、重なりが少ないデータも見られる一方で、「4」、「6」、「7」のデータなどはかなり重なりが大きいことが分かる。
 
 +++
@@ -1313,7 +1128,7 @@ MNISTのデータに対して、単純なMDSとSMACOFを用いたMDSを適用し
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 次にカーネル主成分分析を用いて、次元削減をしてみよう。やや天下り式ではあるが、今回は以下の式で表わされるコサインカーネルを用いてカーネル主成分分析を実行する。
 
@@ -1322,22 +1137,12 @@ k(\mathbf{x}_i, \mathbf{x}_j) = \frac{\mathbf{x}_i^\top \mathbf{x}_j}{\| \mathbf
 $$
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # カーネルPCAによる次元削減
 kpca = KernelPCA(n_components=2, kernel='cosine')
 z = kpca.fit_transform(X)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # Seabornによるデータ可視化
 df = pd.DataFrame({'x': z[:, 0], 'y': z[:, 1], 'label': y})
 sns.jointplot(
@@ -1355,24 +1160,17 @@ plt.subplots_adjust(top=0.95)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 このように、次元削減の手法を変化させたことで、各クラスタの重なり具合が多少緩和されていることが分かる。ただし、どのような次元削減法であれば、より異なるラベルを持つデータの判別に役立つか、という部分は、明確でない場合が多く、あくまで、データの散らばりを見極める際の目安として、このような可視化結果を用いることが有効であろう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 主成分分析の画像的な意味
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 次にMNISTのデータについて主成分分析をかけてみる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 mu = np.mean(X, axis=0, keepdims=True)
 C = np.dot((X - mu).T, (X - mu)) / n_samples
 
@@ -1386,12 +1184,8 @@ eigvec = eigvec[:, idx[:5]].T
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 # 画像として見られるように配列の形を変更
 ims = np.reshape(eigvec, (-1, 28, 28))
 
@@ -1408,19 +1202,13 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 このように得られる固有ベクトルを画像としてみてみると、0から9の数字の影のようなものが見える。定性的には、これらの画像は数字の画像の共通成分のようなものを表わしており、これらの画像の線形結合を取ると、0-9に近しい画像が作れる、というわけである。
 
 以下に、上記の5枚の画像をブレンドすることで、対話的に画像を変更できるシステムを用意してあるので、各自、スライダーを動かすことで画像がどのように変化するかを確認してみてほしい。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 import numpy as np
 from bokeh.models import Slider, CustomJS, ColumnDataSource
 from bokeh.layouts import row, column
@@ -1506,11 +1294,9 @@ w5.js_on_change('value', callback)
 show(row(plot, column(w1, w2, w3, w4, w5)))
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 図を見てみると、概ね同じ数字が近くに集まってクラスタを形成していることが分かる。上図は2次元までベクトルを圧縮して作成しているため、数字同士の領域に大きな重複が見られるが、もう少し高い次元であれば、各数字の占める領域が重ならないようにすることができそうだ。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ::::{admonition} 問
 :class: question
@@ -1528,7 +1314,7 @@ scikit-learnには次元削減の手法としては他にもHessian Eigenmap{cit
 
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## 参考文献
 
@@ -1539,10 +1325,5 @@ scikit-learnには次元削減の手法としては他にもHessian Eigenmap{cit
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 
 ```

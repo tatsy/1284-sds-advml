@@ -16,18 +16,12 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:exercise-ogura)=
 # 演習2 - 百人一首エージェントの作成
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 import cv2
 import japanize_matplotlib
 import matplotlib.pyplot as plt
@@ -38,11 +32,9 @@ sns.set_theme(style='white', rc=rc)
 japanize_matplotlib.japanize()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 今回の演習では、小倉百人一首をプレイヤーAIを作成してみよう。ご存じの通り、小倉百人一首は、100種類の短歌からなる**かるた**の一種であり、**読み札**は短歌の上の句 (5・7・5の部分)であり、**取り札**が下の句(7・7の部分)である。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 通常の小倉百人一種では、読み札には上の句と下の句の両方が漢字で書かれており、さらに挿絵がある。一方で取り札は下の句が濁点や半濁点を含まないひらがな48種類(「ゐ」と「ゑ」を含む)によって書かれている。
 
@@ -72,7 +64,7 @@ plt.show()
 :figwidth: 80%
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 百人一首には、「チラシ」や「源平」などのいくつかのルールがあるが、一般的な個人競技の場合は100枚の札のうち50枚だけを並べて、それを2人のプレイヤーによって取り合う。
 
@@ -94,7 +86,7 @@ plt.show()
 
 今回の演習では、取り札が複数含まれた画像と、上の句の文字列が複数与えられる。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **入力画像:**
 
@@ -104,7 +96,7 @@ plt.show()
 :class: float-none mb-3
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **入力文字列:**
 
@@ -142,7 +134,7 @@ plt.show()
 
 これらを踏まえて、以下のような**画像 (image)** と **文字列の配列 (poems)** および**問題のレベル (level)**を引数として、各和歌の決まりの状況を示す配列 (各要素は0-2)を返す以下の関数を実装すること。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ```python
 def solve(image: npt.NDArray[np.uint8], poems: list[str], level: int) -> list[int]:
@@ -164,7 +156,7 @@ def solve(image: npt.NDArray[np.uint8], poems: list[str], level: int) -> list[in
 
 ### 問題のレベル
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 今回の演習では、以下の3つのレベルの入力を用意している。なお全レベルにおいて、与えられる読み札の文字列の数は3-5であり、取り札同士が重なっていることはない。
 
@@ -175,12 +167,8 @@ def solve(image: npt.NDArray[np.uint8], poems: list[str], level: int) -> list[in
 これら、各レベルの入力が10枚ずつ与えられ、レベルに対応する点数、すなわちレベル1なら1点、レベル2なら2点、レベル3なら3点が、出力が完璧に正しい場合にのみ与えられる(したがって部分点はない)。以下に、実際に与えられる画像の例を示す。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 import cv2
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -214,11 +202,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### ローカル環境でのテスト
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 本番の採点は[GitHub Classroom](https://classroom.github.com/classrooms)を使って行う。講義中で課題用のClassroomのURLを指示するので、そのURLをブラウザで開き、テンプレート・レポジトリを自分のGitHubアカウントと紐付けること。
 
@@ -232,11 +218,11 @@ plt.show()
 **百人一首の一覧**
 - <https://github.com/tatsy-classes/ogura-agent-template/raw/master/data/ogura.csv>
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 本番環境でのテスト
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 以後、課題用のレポジトリにコードをpushする度にテストが走る。
 
@@ -262,11 +248,11 @@ plt.show()
 また、仮にPyTorch以外のライブラリを用いた場合に生じる問題については質問は受け付けないので、各自で解決すること。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## プログラム作成のヒント
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 取り札の取り出しについて
 
@@ -278,7 +264,7 @@ plt.show()
 
 ただし、入力画像には**取り札以外の余計なものは写っていない**ことが保証されているので、それを利用すれば取り札の検出はそれほど難しくはないだろう。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 決り字について
 
@@ -288,7 +274,7 @@ plt.show()
 
 従って、この「実際の決り字」は、画像から取り札を全て検出した上で計算する必要がある。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### ひらがなの認識について
 

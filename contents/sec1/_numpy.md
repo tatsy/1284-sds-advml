@@ -16,13 +16,11 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:numpy)=
 
 # NumPyの基本
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 NumPy は一口に言えば、多次元の配列で表わされるデータ (例えば音声なら 1 次元の配列、画像なら 2 次元の配列)の処理と線形代数的な演算を簡易なコードで実行できるようにするライブラリといえる。まずは、Python のリストと NumPy の配列の違いについて見てみたい。
 
@@ -252,8 +250,6 @@ numbers = numbers.astype('float32')  # 型をfloat32に変更
 print(f'Updated type is {numbers.dtype}')
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 :::{admonition} オブジェクト指向型言語の用語
 :class: note
 
@@ -449,15 +445,15 @@ print('newaxis', arr2d[:, np.newaxis].shape)
 `np.arange(24).reshape((2, 3, 4))`により作られる三次元配列に対して、`np.transpose`を用いて形状が (4, 3, 2) となるように軸を入れ替えよ。また、この配列に`.T`を適用した場合の形状がどうなるかも確かめよ。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## ベクトル・行列の演算
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### スカラに対する演算
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ベクトルや行列に対して、スカラを四則演算すると、要素ごとに同じ計算が行われる。例えば、
 

@@ -94,7 +94,8 @@ log_cli_format = "%(asctime)s [%(levelname)s] %(message)s (%(filename)s:%(lineno
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 
 [dependency-groups]
-dev = ["jupytext>=1.19.1", "pytest>=8.4.2", "ruff>=0.16.4", "ty>=0.0.73"]
+dev = ["jupytext>=1.19.5", "pytest>=8.4.2", "ruff>=0.16.4", "ty>=0.0.73"]
 
 [tool.jupytext]
 notebook_metadata_filter = "kernelspec,jupytext,downloads"
+cell_metadata_filter = "-editable,-slideshow,-raw_mimetype"

@@ -5,7 +5,7 @@
   },
   // Python
   "python.defaultInterpreterPath": "python",
-  "python.languageServer": "Default",
+  "python.languageServer": "None",
   "flake8.enabled": false,
   "[python]": {
     "editor.formatOnSave": true,

@@ -16,17 +16,15 @@ kernelspec:
   name: python3
 ---
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 (sec:matplotlib)=
 
 # Matplotlibの基本
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## Matplotlibとは？
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Matplotlib はデータ可視化のための Python のライブラリで、様々なグラフを細かく調整を入れて作成することができる。
 
@@ -35,12 +33,8 @@ Matplotlib はデータ可視化のための Python のライブラリで、様�
 本講義では、その単純さから Matplotlib を用いるが、必要に応じて、Seaborn, Plotly, Bokeh のギャラリーなどを見て、自分の好みのライブラリを使うのが良いだろう。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
-tags: [remove-input]
----
+:tags: [remove-input]
+
 """
 下準備のコード
 """
@@ -58,8 +52,6 @@ rc = {'figure.dpi': 150}
 sns.set_theme(style='white', palette='colorblind', rc=rc)
 color_palette = sns.color_palette('colorblind')
 ```
-
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 ## 基本的なグラフの作成
 
@@ -126,11 +118,6 @@ plt.show()
 棒グラフはラベルと、各ラベルに対する値の組み合わせによって作成する。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 labels = ['Apple', 'Banana', 'Cherry', 'Durian']
 prices = [100, 200, 300, 400]
 
@@ -139,8 +126,6 @@ plt.bar(labels, prices, color=color_palette)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### 円グラフ
 
 +++
@@ -148,11 +133,6 @@ plt.show()
 円グラフを描く関数 `plt.pie` の使い方は棒グラフのものとほとんど同じだが、引数の指定の仕方が微妙に異なるので注意 (特に色を指定するための引数が棒グラフは`color=...`にも関わらず、円グラフは`colors=...`)。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 labels = ['Apple', 'Banana', 'Cherry', 'Durian']
 prices = [100, 200, 300, 400]
 
@@ -161,38 +141,24 @@ plt.pie(prices, labels=labels)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### ヒストグラム
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ヒストグラムは `plt.hist` 関数を用いれば、グラフの作成とヒストグラム自体の計算を両方行うことができる。以下では、正規分布に従う乱数を 1000 個作成して、その分布がどうなっているかをヒストグラムで表示している。また、以下のコードで使用してはいないものの `freq` と `ranges` はそれぞれヒストグラムの頻度と、その頻度の範囲を示す値の配列 (ビン数+1 の長さ)となっている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 x = np.random.normal(size=(1000))
 plt.figure()
 freq, ranges, _ = plt.hist(x, bins=20, range=(-5, 5))
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 また、 ヒストグラムを描画する際には、その合計が 1 になるように正規化することも多い。そのようにしたい場合には `plt.hist` の引数に `density=True` を指定する
 
 また、これに加えて、先ほどの `plt.plot` を用いて正規分布 (平均が 0 で分散が 1 のもの)を折れ線グラフでプロットすると、より分かりやすい。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # ヒストグラムの表示
 x = np.random.normal(size=(10000))
 w = np.ones(len(x)) / len(x)
@@ -206,20 +172,13 @@ plt.plot(xs, ys)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### グラフを保存する
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 グラフを保存するには `plt.savefig` を用いる。この際、JPEG や PNG といったラスタ形式のフォーマットの他、EPS や PDF といったベクタ形式の画像も出力できる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # グラフを描画
 xs = np.linspace(-np.pi, np.pi, 100)
 ys = np.sin(xs)
@@ -230,11 +189,9 @@ plt.savefig('image.jpg')
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 画像の計算機上での表現方法には大きく分けてラスタ画像(ピクセル形式とも呼ぶ)とベクタ画像(ドロー形式とも呼ぶ)があり、JPEG 形式等、一般的なカメラで撮影される画像は通常、ラスタ形式で表わされている。詳細については、以下の Tips を見てほしい。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ::::{admonition} ラスタ画像
 :class: tip
@@ -246,7 +203,7 @@ plt.show()
 なお余談にはなるがラスタ画像のラスタ (raster)とは元はラテン語の"rastrum" (英語では rake, 日本語では熊手のこと)から来ており、画素が「くまなく」画像平面を埋め尽くしている様子を表わしている。
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ::::{admonition} ベクタ形式
 :class: tip
@@ -256,30 +213,25 @@ plt.show()
 境界の曲線の表し方には複数の方法があるが、最も広く用いられているのは三次多項式によって部分曲線を表す三次 Bezier 曲線であり、そのつなぎ合わせで複雑な曲線を表わす。この他にも、Catmull-Rom スプラインや B-スプラインといった複数の曲線の表現方がある。なお、ここでいうスプラインとは、一定の弾性を持ち、変形させることで自由な曲線を引くことができる定規のことである。
 ::::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ## グラフの調整
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 以下では、sin 関数と cos 関数を描画したものを例にして、グラフの見た目を調整していく。なお`plt.figure`を用いた`Figure`の作成は、`Axis`を作成する関数を呼び出すと同時に自動的に行なわれるので、以下では特に意図しない限り`plt.figure`の呼び出しを省略する。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### グラフのタイトル、軸ラベル
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Matplotlib でグラフにタイトルをつけるには`plt.title`を用いる。また、軸のラベルを設定するには横軸には`plt.xlabel`、縦軸には`plt.ylabel`を用いる。
 
 なお、この際、グラフのタイトル等の文字列中に`$ ... $`のようにドルマークで囲んだ領域を設けると、ここに LaTeX で用いるような数式を入れることができる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 xs = np.linspace(-np.pi, np.pi, 100)
 ys_sin = np.sin(xs)
@@ -294,11 +246,9 @@ plt.ylabel('$f(x)$')  # 数式モード
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### グラフの色、スタイルの設定
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 グラフの色を設定する方法はグラフの種類により微妙に異なるが、`plt.plot`で描く曲線のグラフに関しては、曲線の太さを`linewidth`、曲線の色を`linecolor`、曲線のスタイルを`linestyle`でそれぞれ設定できる。
 
@@ -315,11 +265,6 @@ plt.show()
 - Linestyles: <https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html>
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 xs = np.linspace(-np.pi, np.pi, 100)
 ys_sin = np.sin(xs)
@@ -336,20 +281,13 @@ plt.ylabel('$f(x)$')
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### 軸の刻み幅、表示形式の調整
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 軸の刻み幅を変更するには、`plt.xticks`、`plt.yticks`を用いる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 xs = np.linspace(-2.0 * np.pi, 2.0 * np.pi, 100)
 ys_sin = np.sin(xs)
@@ -370,18 +308,11 @@ plt.yticks([-1, 0, 1])
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 なお、このままでも良いのだが、三角関数を描画するときには、`-3.14`や`3.14`の代わりに$-\pi$や$\pi$と描画したいと考えるだろう。このような場合には、`AxisSubplot`のメソッドである`set_major_formatter`ならびに`set_major_locator`を用いる。
 
 下記のコードでは`unit_of_pi`の中で、横軸の値を$\pi$で除算し、その商に応じて軸の表示方法を変更している。特に、横軸の値が$\pi$の-1 倍、0 倍、1 倍の場合にわざわざ$-1 \pi$と書くのは冗長なので、そのような場合には 1 を削ったり、単に 0 とだけ表示するようにしている。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from matplotlib.ticker import FuncFormatter
 
 
@@ -416,24 +347,17 @@ ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(base=np.pi))
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ※ 上記コードの`plt.gca()`は、現在描画中のグラフオブジェクト(より厳密には`AxisSubplot`)を返す関数。
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 ### 凡例の表示
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 凡例を表示するには、各描画要素に`label="xxx"`という引数を与えた上で、描画直前に`plt.legend()`と書けば良い。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 xs = np.linspace(-np.pi, np.pi, 100)
 ys_sin = np.sin(xs)
@@ -453,8 +377,6 @@ plt.legend()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 なお、凡例の位置は`plt.legend`に対して`loc={位置}`という引数を与えれば良く、位置には
 
 - upper right
@@ -468,11 +390,6 @@ plt.show()
 また、凡例の内側マージン (padding)は少々狭めに設定されているので`borderpad`引数を設定するとより見やすくなる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 xs = np.linspace(-np.pi, np.pi, 100)
 ys_sin = np.sin(xs)
@@ -493,20 +410,13 @@ plt.tight_layout(rect=[0.0, 0.0, 1.2, 1.0])
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### グリッド線を引く
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 グリッド線を引くには`plt.grid`を用いる。この関数に軸を表わす`axis`、色を表わす`color`、線のスタイルを表わす`linestyle`等を指定することで、グリッド線の表示をコントロールできる。なおグリッド線は tick の入っている箇所に引かれるので、本数を減らしたい場合は前述の`xticks`、`yticks`で調整をすると良い。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 xs = np.linspace(-np.pi, np.pi, 100)
 ys_sin = np.sin(xs)
@@ -527,20 +437,13 @@ plt.grid(axis='y', color='gray', linestyle='--', linewidth=0.5)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### 片対数グラフ、両対数グラフ
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 x 軸、y 軸のそれぞれを対数目盛に変更することもできる。これには`plt.xscale("log")`、`plt.yscale("log")`を用いる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 xs = np.linspace(0.0001, 10.0, 1000)
 ys = np.exp(-xs)
@@ -563,20 +466,13 @@ plt.grid(axis='y', color='gray', linestyle='--', linewidth=0.5)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### エラーバーの表示
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 以下の例では、リンゴ、バナナ、サクランボ、ドリアンの価格に対して、平均と標準偏差を求めて、エラーバーを表示してみる。使用するデータは以下の通り。 (Pandas の使い方については[次節](#sec:pandas)で詳しく紹介)
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 import pandas as pd
 
 df = pd.DataFrame(columns=['Apple', 'Banana', 'Cherry', 'Durian'])
@@ -590,11 +486,6 @@ df
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 avgs = []
 errs = []
 for key in df.columns:
@@ -610,22 +501,15 @@ plt.grid(axis='y', color='tab:gray', linestyle='--')
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ### その他の機能
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 #### 背景色の設定
 
 `plt.gca().set_facecolor`を用いる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 xs = np.linspace(-np.pi, np.pi, 100)
 ys_sin = np.sin(xs)
@@ -644,18 +528,11 @@ plt.gca().set_facecolor((0.95, 0.95, 0.95))
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 #### 注釈を入れる
 
 `plt.gca().annotate`を用いる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 xs = np.linspace(-np.pi, np.pi, 100)
 ys_sin = np.sin(xs)
@@ -681,22 +558,15 @@ plt.gca().annotate(
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 #### 複数のグラフを並べる
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 複数のグラフを並べるにはいくつの方法がある。
 
 一つ目は、`plt.figure`で`Figure`型の変数を取得した後に`fig.add_subplot(...)`を用いる方法で、`add_subplot`の引数に列数、行数、その何番目か、を表わす 3 つの数字を渡す。例えば、2 行 3 列の要素のうち、1 行 3 列の要素が欲しければ`add_subplot(233)`となり、2 行 2 列の要素が欲しければ`add_subplot(235)`と言った具合だ。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 xs = np.linspace(-np.pi, np.pi, 100)
 ys_sin = np.sin(xs)
@@ -704,11 +574,6 @@ ys_cos = np.cos(xs)
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 """
 add_subplotを使う場合
 """
@@ -736,16 +601,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 2 つめは、`plt.subplots`関数により、一度に全てのグラフ要素を作ってしまう方法で、2 行 3 列の要素が作りたければ、`plt.subplots(2, 3)`のようにする。すると、`Figure`と`Axes`の配列が返ってくるので、配列の要素に対して、グラフの描画命令を呼び出せば良い。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 """
 plt.subplotsを使う場合
 """
@@ -771,11 +629,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 ## 三次元データのプロット
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 最後に、Matplotlib を用いた三次元プロットについてみてみる。今回は機械学習で広く用いられる Swiss Roll のデータを用いて可視化をしてみよう。
 
@@ -784,11 +640,6 @@ plt.show()
 あとは、これまで x 座標と y 座標だけを引数として渡していた`scatter`関数に対して、z 座標を表わす値を合わせて指定すれば良い。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 from sklearn.datasets import make_swiss_roll
 
 # データの取得
@@ -824,8 +675,6 @@ plt.tight_layout()
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 :::{admonition} Matplotlib の Figure の画素数
 :class: note
 
@@ -834,13 +683,13 @@ Matplotlib で Figure を作成する際、`plt.figure(figsize=(5, 5))`のよう
 これとは別に`plt.figure(figsize=(5, 5), dpi=100)`のように DPI (dots per inch)を指定することもでき、これは 1 インチに含まれる画素数を指定する。従って、この例では、500×500 画素の画像が作られることになる。
 :::
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 (ssec:seaborn)=
 
 ## Seaborn の併用
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Seaborn は Matplotlib と同様にデータ可視化のためのライブラリで、より複雑なグラフをより洗練された見た目で表示することができる。データを Pandas の DataFrame で準備する必要があるなど、少し覚えるのには段階を踏む必要があるが、慣れればより目的に沿った見た目のグラフを簡単に作成できる。
 
@@ -858,22 +707,17 @@ sns.set()
 - Controlling figure aesthetics: <https://seaborn.pydata.org/tutorial/aesthetics.html>
 - Choosing color palettes: <https://seaborn.pydata.org/tutorial/color_palettes.html>
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 **例 1: ヒストグラムと近似曲線**
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 冒頭では Matplotlib で表示したヒストグラムと近似曲線の描画だが、Seaborn を使うと、より簡単に作成することができる。ここでは、二種類の正規分布から抽出したデータを重ねてグラフに表示してみる。
 
 ヒストグラムを描画する Seaborn の関数は`histplot`で、これに適当な引数を与える。この時、Matplotlib では自分で計算する必要があった近似曲線が`kde=True` (kde は kernel density estimation の略)を指定するだけで簡単に描画できる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # 準備
 import pandas as pd
 import seaborn as sns
@@ -883,11 +727,6 @@ sns.set_theme(style='whitegrid', palette='colorblind')
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データをPandasのDataFrameにセットする
 x0 = np.random.normal(size=(10000)) * 0.1 + 0.1
 x1 = np.random.normal(size=(10000)) * 0.2 - 0.2
@@ -901,11 +740,6 @@ df.loc[:, 'labels'] = labels
 ```
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # x=...に指定された値に対してヒストグラムを計算
 # hue=...に指定したラベルに応じて、ヒストグラムの色を変更
 # kde=Trueとすることで、近似曲線が描画される
@@ -921,20 +755,13 @@ g.set(title='Histogram')
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 **例 2: 二次元散布図と各軸における周辺分布の描画**
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 Seaborn の`joinplot`を使うと、二次元散布図を作成して、さらにそれぞれの分布を表わす近似曲線を同時に描画することもできる。
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 # データの用意
 data0 = np.random.multivariate_normal(mean=[1.0, 1.0], cov=np.diag([1.0, 2.0]), size=(1000))
 data1 = np.random.multivariate_normal(mean=[-1.0, -1.0], cov=np.diag([2.0, 3.0]), size=(1000))
@@ -958,13 +785,11 @@ plt.subplots_adjust(top=0.92)
 plt.show()
 ```
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
-
 Seaborn では、この他にも数え切れないほど、様々なグラフが作成できるので、より深く勉強したい人は、Seaborn のギャラリーを見て、自分の作りたいグラフを探してみると良い。
 
 seaborn - Example gallery: <https://seaborn.pydata.org/examples/>
 
-+++ {"editable": true, "slideshow": {"slide_type": ""}}
++++
 
 :::{admonition} 色覚障がいを持つ方への配慮
 :class: important
@@ -979,10 +804,5 @@ seaborn - Example gallery: <https://seaborn.pydata.org/examples/>
 :::
 
 ```{code-cell} ipython3
----
-editable: true
-slideshow:
-  slide_type: ''
----
 
 ```

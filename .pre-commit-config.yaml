@@ -1,7 +1,7 @@
 repos:
   # Synchronize staged MyST/notebook pairs before notebook tools mutate them.
   - repo: https://github.com/jupytext/jupytext
-    rev: v1.19.1
+    rev: v1.19.5
     hooks:
       - id: jupytext
         name: jupytext-pre
@@ -45,7 +45,7 @@ repos:
 
   # Propagate Ruff's notebook updates to their paired MyST files.
   - repo: https://github.com/jupytext/jupytext
-    rev: v1.19.1
+    rev: v1.19.5
     hooks:
       - id: jupytext
         name: jupytext-post
