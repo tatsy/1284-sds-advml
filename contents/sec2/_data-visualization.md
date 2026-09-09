@@ -150,8 +150,8 @@ idx = np.argsort(-1.0 * eigval)
 eigval = eigval[idx[:2]]
 eigvec = eigvec[:, idx[:2]].T
 
-# 固有ベクトルの方向にデータを射影する
-z_sr = X_sr @ eigvec.T
+# 中心化したデータを固有ベクトルの方向に射影する
+z_sr = (X_sr - mu_sr) @ eigvec.T
 ```
 
 ```{code-cell} ipython3
