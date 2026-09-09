@@ -1166,8 +1166,8 @@ mu = mu.reshape((-1,))
 target = X[10].astype('float32')
 ws = np.dot(target - mu, eigvec.T) / np.sqrt(eigval)
 
-# 画像の再構成
-avg = mu.reshape((28, 28))
+# 画像の再構成 (Bokehの画像は原点が左下なので、平均画像と主成分画像の両方を上下反転しておく)
+avg = np.flip(mu.reshape((28, 28)), axis=0)
 components = np.reshape(eigvec, (-1, 28, 28)) * np.sqrt(eigval[:, None, None])
 components = np.flip(components, axis=1)
 res = avg + sum([w * c for w, c in zip(ws, components)])
