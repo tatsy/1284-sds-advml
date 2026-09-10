@@ -21,7 +21,7 @@ kernelspec:
 
 +++
 
-機械学習において、データを扱う際には、データそのものがどのような性質を持っているかをよ事前に調べておくことが有効である。しかし、多くのデータは多次元のデータであるため、そのままデータがどのような分布になっているかを見ることは難しい。
+機械学習において、データを扱う際には、データそのものがどのような性質を持っているかをよく事前に調べておくことが有効である。しかし、多くのデータは多次元のデータであるため、そのままデータがどのような分布になっているかを見ることは難しい。
 
 そこで、データを2次元や3次元といった、人間にとって理解のしやすい次元に落として、データの分布の様子を見ることが必要になる。ここで用いるのが**次元削減**である。
 
@@ -122,7 +122,7 @@ plt.show()
 $$
 \begin{aligned}
 \boldsymbol{\mu} &= \frac{1}{N} \sum_{i=1}^N \mathbf{x}_i \\
-\mathbf{C} &= \frac{1}{N} \sum_{i=1}^N (\bar{\mathbf{x}} - \mathbf{x}_i) (\bar{\mathbf{x}} - \mathbf{x}_i)^\top
+\mathbf{C} &= \frac{1}{N} \sum_{i=1}^N (\mathbf{x}_i - \boldsymbol{\mu}) (\mathbf{x}_i - \boldsymbol{\mu})^\top
 \end{aligned}
 $$
 
@@ -150,8 +150,8 @@ idx = np.argsort(-1.0 * eigval)
 eigval = eigval[idx[:2]]
 eigvec = eigvec[:, idx[:2]].T
 
-# 固有ベクトルの方向にデータを射影する
-z_sr = X_sr @ eigvec.T
+# 中心化したデータを固有ベクトルの方向に射影する
+z_sr = (X_sr - mu_sr) @ eigvec.T
 ```
 
 ```{code-cell} ipython3
@@ -193,6 +193,15 @@ ax.axis('equal')
 plt.tight_layout()
 plt.show()
 ```
+
+::::{admonition} 問
+:class: question
+
+分散共分散行列 $\mathbf{C}$ の固有値の和が、各次元の分散の和 $\mathrm{tr}\,\mathbf{C}$ に等しいことを示せ。その上で、スイスロールのデータについて `PCA` の `explained_variance_ratio_` を確認し、2次元に落としたときに全分散の何割が保たれているかを求めよ。
+
+::::
+
++++
 
 ### 多次元尺度構成法 (MDS)
 
@@ -240,9 +249,9 @@ $$
 
 $$
 \begin{align}
-D_{i*}^2 &= N \| \mathbf{z}_i \|^2 + \sum_{j=1} \| \mathbf{z}_j \|^2 \\
+D_{i*}^2 &= N \| \mathbf{z}_i \|^2 + \sum_{j=1}^N \| \mathbf{z}_j \|^2 \\
 D_{*j}^2 &= \sum_{i=1}^N \| \mathbf{z}_i \|^2 + N \| \mathbf{z}_j \|^2 \\
-D_{**}^2 &= 2N \sum_{i=1} \| \mathbf{z}_i \|^2
+D_{**}^2 &= 2N \sum_{i=1}^N \| \mathbf{z}_i \|^2
 \end{align}
 $$
 
@@ -252,8 +261,8 @@ $$
 
 $$
 \begin{align}
-\| \mathbf{z}_i \|^2 &= \frac{1}{N} D_{*j}^2 - \frac{1}{2N^2} D_{**}^2 \\
-\| \mathbf{z}_j \|^2 &= \frac{1}{N} D_{i*}^2 - \frac{1}{2N^2} D_{**}^2 \\
+\| \mathbf{z}_i \|^2 &= \frac{1}{N} D_{i*}^2 - \frac{1}{2N^2} D_{**}^2 \\
+\| \mathbf{z}_j \|^2 &= \frac{1}{N} D_{*j}^2 - \frac{1}{2N^2} D_{**}^2 \\
 \mathbf{z}_i^\top \mathbf{z}_j &= \frac{1}{2} \left( \frac{1}{N} D_{i*}^2 + \frac{1}{N} D_{*j}^2 - \frac{1}{N^2} D_{**}^2 - D_{ij}^2 \right)
 \end{align}
 $$
@@ -330,7 +339,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-この多次元尺度構成法の結果は、定義式から分かるとおり、元のベクトルを線形に射影した物であり、元々のスイスロールのデータをとある方向 (元の空間での距離が最大限保たれる方向)から見たものと等価である。従って、主成分分析と比べて、ややスイスロールの帯の部分に拡がりのあるデータとなっているものの、全体の見た目としてはそれほど変わりがない。
+この多次元尺度構成法の結果は、主成分分析の結果と (回転や鏡映を除いて) **完全に一致する**。距離行列 $\mathbf{D}$ をEuclid距離で作った場合、$\mathbf{K} = -\frac{1}{2}\mathbf{H}\mathbf{D}^2\mathbf{H}$ は中心化したデータのGram行列 $\mathbf{X}_c \mathbf{X}_c^\top$ に等しく、その固有ベクトルは分散共分散行列 $\mathbf{X}_c^\top \mathbf{X}_c / N$ の固有ベクトルと1対1に対応するためである。つまり、古典的な多次元尺度構成法は「距離だけが与えられたときに主成分分析と同じ結果を得る方法」と言うことができ、線形の次元削減法に分類される理由もここにある。この同値性を示すことは、次の練習問題としておく。
 
 +++
 
@@ -338,11 +347,13 @@ plt.show()
 :class: question
 
 多次元尺度構成法の項で紹介した{eq}`eq:mds`を自身で導出せよ。
+
+また、$\mathbf{H} = \mathbf{I} - \frac{1}{N}\mathbf{1}\mathbf{1}^\top$ が $\mathbf{H}^2 = \mathbf{H}$、$\mathbf{H}^\top = \mathbf{H}$、$\mathbf{H}\mathbf{1} = \mathbf{0}$ を満たすこと (すなわち、$\mathbf{1}$ に直交する部分空間への射影行列であること)を示し、それを用いて、Euclid距離から作った $\mathbf{D}$ に対しては $-\frac{1}{2}\mathbf{H}\mathbf{D}^2\mathbf{H} = \mathbf{X}_c \mathbf{X}_c^\top$ ($\mathbf{X}_c$ は各行を中心化したデータ行列)となること、従って古典的な多次元尺度構成法が主成分分析と同じ結果を与えることを示せ。
 ::::
 
 +++
 
-### SMACOF
+### 発展: SMACOF
 
 +++
 
@@ -375,7 +386,7 @@ $$
 \mathbf{Z}_{\rm new} = \mathbf{B} \mathbf{Z}
 $$
 
-この式は、ストレス$S$を最急降下法により最小化する場合の更新ルールに対応しており、この変換を繰り返すことで、ストレス、即ち低次元空間表現から求まる距離行列と、目的の距離行列の相対フロベニウスノルムを最小化することができる。
+この更新は、SMACOFの名前 (Scaling by MAjorizing a COmplicated Function)が示す通り、**優関数法** (majorization)に基づいている。ストレス$S$は$\mathbf{Z}$について複雑な関数だが、現在の$\mathbf{Z}$で$S$に接し、常に$S$以上の値を取る単純な二次関数 (優関数)を作ることができ、その最小点がGuttman変換 $\mathbf{B}\mathbf{Z}$ で与えられる。優関数の最小点に移るたびに$S$は単調に減少するので、この変換を繰り返すことで、低次元空間表現から求まる距離行列と目的の距離行列の差、即ちストレスを最小化することができる。以下の実装では、収束の判定に、ストレスを点の座標の大きさで割って無次元化した値の変化量を用いている。
 
 +++
 
@@ -385,7 +396,8 @@ $$
 from tqdm.notebook import tqdm
 
 # SMACOFのパラメータ
-eps = 1.0e-3
+eps = 1.0e-3  # ゼロ除算を防ぐための微小量
+tol = 1.0e-3  # 収束判定の閾値
 max_iter = 100
 k = 2
 
@@ -397,25 +409,21 @@ old_stress = 1.0e20
 # SMACOF iterations
 progbar = tqdm(range(max_iter))
 for _ in progbar:
-    # Zから距離行列を計算
+    # 現在のZから距離行列とストレスを計算
     D_sr_prime = np.sqrt(np.sum((z_sr[:, None] - z_sr[None, :]) ** 2, axis=2))
-
-    # Guttman transformによるZの更新
-    ratio = D_sr / (D_sr_prime + 1.0e-3)
-    B = (np.diag(ratio.sum(axis=1)) - ratio) / n
-    z_sr = np.dot(B, z_sr)
-
-    # ストレスの計算
     stress = ((D_sr_prime.ravel() - D_sr.ravel()) ** 2).sum() / 2
     rel_stress = stress / np.sqrt((z_sr**2).sum(axis=1)).sum()
+    progbar.set_description(f'Stress: {rel_stress:.4f}')
 
     # ストレスの変化が一定以下になったら処理を終了
-    loss = np.abs(old_stress - rel_stress)
-    progbar.set_description(f'Stress: {rel_stress:.4f}')
-    if loss < eps:
+    if np.abs(old_stress - rel_stress) < tol:
         break
-
     old_stress = rel_stress
+
+    # Guttman transformによるZの更新
+    ratio = D_sr / (D_sr_prime + eps)
+    B = (np.diag(ratio.sum(axis=1)) - ratio) / n
+    z_sr = np.dot(B, z_sr)
 
 progbar.close()
 ```
@@ -457,7 +465,7 @@ z_sr = mds.fit_transform(D_sr)
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (MDS with SMACOF, scikit-learn)')
+ax.set_title('Swiss Roll (MDS with SMACOF, scikit-learn)')
 ax.axis('equal')
 plt.tight_layout()
 plt.show()
@@ -471,7 +479,7 @@ plt.show()
 
 +++
 
-**ISOMAP**は多次元尺度構成法の拡張の一種で、**データ間の距離の計算にk-nearest neighbor graph (kNNグラフ)上で計算された測地距離**を用いる。なお、kNNグラフとは、各点とその近傍を結んで作られるグラフ構造を指す。このようなグラフを作成するために、以下のコードでは [KD木](https://en.wikipedia.org/wiki/K-d_tree)を用いた最近某探索を用いる。
+**ISOMAP**は多次元尺度構成法の拡張の一種で、**データ間の距離の計算にk-nearest neighbor graph (kNNグラフ)上で計算された測地距離**を用いる。なお、kNNグラフとは、各点とその近傍を結んで作られるグラフ構造を指す。このようなグラフを作成するために、以下のコードでは [KD木](https://en.wikipedia.org/wiki/K-d_tree)を用いた最近傍探索を用いる。
 
 ```{code-cell} ipython3
 from sklearn.neighbors import NearestNeighbors
@@ -487,9 +495,9 @@ distances = distances[:, 1:]
 indices = indices[:, 1:]
 ```
 
-ここで`distances`と`indices`は`[1000, 5]`の大きさのデータになっていて、各頂点に対する近傍点までの距離と、近傍点のインデックスが入っている。なお、探索元のデータ群と探索先のデータ群を同じにすると、`distances[:, 0]`が自分自身の点までの距離で0となってしまうため、kNNグラフを作る際には、このようなデータを除去しておく。
+ここで`distances`と`indices`は`(1500, 10)`の大きさ (サンプル数 × 近傍数)のデータになっていて、各頂点に対する近傍点までの距離と、近傍点のインデックスが入っている。なお、探索元のデータ群と探索先のデータ群を同じにすると、`distances[:, 0]`が自分自身の点までの距離で0となってしまうため、kNNグラフを作る際には、このようなデータを除去しておく。
 
-次にグラフ計算のためのライブラリである`networkx`を用いて、グラフ上での点と点の距離を計算する。まずはグラフの作成。`networkx`でグラフを作成するためには`(i, j, {"weight": 1.0})`のような辺の端点を表わす点のインデックス`i`, `j`と、辺に対する重みの除法を表わす`{"weight": 1.0}`を辺の数分だけ配列に格納し、その配列を用いて `from_edgelist` からグラフを作成する。
+次にグラフ計算のためのライブラリである`networkx`を用いて、グラフ上での点と点の距離を計算する。まずはグラフの作成。`networkx`でグラフを作成するためには`(i, j, {"weight": 1.0})`のような辺の端点を表わす点のインデックス`i`, `j`と、辺に対する重みの情報を表わす`{"weight": 1.0}`を辺の数分だけ配列に格納し、その配列を用いて `from_edgelist` からグラフを作成する。
 
 ```{code-cell} ipython3
 # kNNグラフの作成
@@ -535,7 +543,7 @@ z_sr = eigvec * np.sqrt(eigval[None, :])
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (ISOMAP)')
+ax.set_title('Swiss Roll (ISOMAP)')
 plt.tight_layout()
 plt.show()
 ```
@@ -562,7 +570,7 @@ z_sr = isomap.fit_transform(X_sr)
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=4)
-ax.set_title('Swiss Role (ISOMAP, scikit-learn)')
+ax.set_title('Swiss Roll (ISOMAP, scikit-learn)')
 plt.tight_layout()
 plt.show()
 ```
@@ -570,7 +578,7 @@ plt.show()
 ::::{admonition} 問
 :class: question
 
-ISOMAPの結果は頂点間の「グラフ上での距離」に依存するため、各頂点において何個の頂点を近傍点と見なすかによって大きく次元削減の結果が変化する。上記の例において `n_neighbors` の値を変化させたときに結果がどのように変化するかを調べて見よ。
+ISOMAPの結果は頂点間の「グラフ上での距離」に依存するため、各頂点において何個の頂点を近傍点と見なすかによって大きく次元削減の結果が変化する。上記の例において `n_neighbors` の値を変化させたときに結果がどのように変化するかを調べてみよ。
 
 ::::
 
@@ -582,144 +590,96 @@ ISOMAPの結果は頂点間の「グラフ上での距離」に依存するた�
 
 **局所線形埋め込み法** (LLE = Locally Linear Embedding) {cite}`roweis2000nonlinear`は、高次元空間上の点である$\mathbf{x}_i$とその近傍において、線形性を保存するように低次元空間での表現を得る次元削減法である。
 
-今、$\mathbf{x}_i \in \mathbb{R}^D$ の近傍点として、 $\mathbf{x}_{i_1}, \ldots, \mathbf{x}_{i_K}$ が与えられたとしよう。LLEが仮定する線形性とは、 $\mathbf{x}_i$ が近傍点の凸結合として、以下のように表せることを意味する。
+今、$\mathbf{x}_i \in \mathbb{R}^D$ の近傍点として、 $\mathbf{x}_{i_1}, \ldots, \mathbf{x}_{i_K}$ が与えられたとしよう。LLEが仮定する局所線形性とは、 $\mathbf{x}_i$ が近傍点の**重みの和が1となる線形結合**として、以下のように表せることを意味する。
 
 $$
-\mathbf{x}_i = \sum_{k=1}^K w_{ik} \mathbf{x}_{i_k}, \quad \forall i, \forall k, ~~ w_{ik} \geq 0, ~~ \sum_{k=1}^K w_{ik} = 1
+\mathbf{x}_i \approx \sum_{k=1}^K w_{ik} \mathbf{x}_{i_k}, \quad \sum_{k=1}^K w_{ik} = 1
 $$ (eq:local-linearity)
 
-$\mathbf{d}_{i_k} = \mathbf{x}_{i_k} - \mathbf{x}_i$ を新たに導入し、さらに $\mathbf{D}_i = [ \mathbf{d}_{i_1} \cdots \mathbf{d}_{i_K} ] \in \mathbb{R}^{K \times D}$, $\mathbf{w}_i = (w_{i1} \cdots w_{iK})^\top \in \mathbb{R}^K$ と置くと、{eq}`eq:local-linearity`は以下のように書き直せる。
+重みの和を1に制限しているのは、近傍点全体を平行移動しても同じ重みで $\mathbf{x}_i$ を表せるようにするためである。なお、Roweis と Saul の原論文では重みに非負の制約は課しておらず、実際、以下の解法で得られる重みには負の値も現れる (このデータでは全体の2割弱が負になる)。従って、この線形結合は凸結合ではなく、**アフィン結合**である。
+
+$\mathbf{d}_{i_k} = \mathbf{x}_{i_k} - \mathbf{x}_i$ を新たに導入し、さらに、これらを行として並べた行列 $\mathbf{D}_i = [ \mathbf{d}_{i_1} \cdots \mathbf{d}_{i_K} ]^\top \in \mathbb{R}^{K \times D}$ と、重みを並べたベクトル $\mathbf{w}_i = (w_{i1} \cdots w_{iK})^\top \in \mathbb{R}^K$ を置く。重みの和が1であることを用いると、{eq}`eq:local-linearity`の両辺の差は
 
 $$
-\mathbf{D}_i^\top \mathbf{w}_i = \mathbf{0}
+\sum_{k=1}^K w_{ik} \mathbf{x}_{i_k} - \mathbf{x}_i = \sum_{k=1}^K w_{ik} (\mathbf{x}_{i_k} - \mathbf{x}_i) = \mathbf{D}_i^\top \mathbf{w}_i
 $$
 
-+++
-
-これを用いると、解くべき最適化問題は次のようになることが分かる。
+と書き直せる。従って、解くべき最適化問題は次のようになる。
 
 $$
 \begin{align}
 & \underset{\mathbf{w}_i}{\text{minimize:}} \quad \frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2 \\
-&\begin{aligned}
-    \text{subject to:} \quad & \mathbf{1}^\top \mathbf{w}_i = 1 & \\
-    & w_{ik} \geq 0 & (i = 1, \ldots, K)
-\end{aligned}
+& \text{subject to:} \quad \mathbf{1}^\top \mathbf{w}_i = 1
 \end{align}
 $$ (eq:lle-weight-derivation)
 
-+++
-
-この最適化問題は不等式制約を含むため、目的関数が二次、制約条件が一次であるものの、単純な線形問題には帰着されない。具体的にはKarush-Kuhn-Tucker条件 (KKT条件)を満たすように、以下のラグランジアンに関する制約付き最適化問題を解く必要がある。
+結果だけを先に述べると、この問題の解は、線形方程式 $\mathbf{D}_i \mathbf{D}_i^\top \mathbf{w}'_i = \mathbf{1}$ を解いて得られる $\mathbf{w}'_i$ を、和が1になるように正規化したものである。導出は以下の発展項目に示す。
 
 +++
+
+#### 発展: 重みの導出
+
++++
+
+これは等式制約だけを持つ二次計画問題なので、Lagrangeの未定乗数法で解くことができる。ラグランジアンを
 
 $$
-\mathcal{L}(\mathbf{w}_i, \beta, \boldsymbol\mu) = \frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2 - \lambda (\mathbf{1}^\top \mathbf{w}_i - 1) - \sum_{k=1}^K \mu_k w_{ik}
+\mathcal{L}(\mathbf{w}_i, \lambda) = \frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2 - \lambda (\mathbf{1}^\top \mathbf{w}_i - 1)
 $$
 
-+++
-
-このラグランジアンを用いると、{eq}`eq:lle-weight-derivation`の不等式制約付きの最小化問題におけるKKT条件は以下のように書ける。
-
-+++
+と置き、$\mathbf{w}_i$ に関する勾配を $\mathbf{0}$ とすると、
 
 $$
-\begin{align}
-\nabla \mathcal{L} = \mathbf{0}, & &\\
-w_{ik} \geq 0, & & k = 1, \ldots, K \\
-\mu_k w_{ik} = 0, & & k = 1, \ldots, K \\
-\mu_k \geq 0, & & k = 1, \ldots, K
-\end{align}
+\mathbf{D}_i \mathbf{D}_i^\top \mathbf{w}_i = \lambda \mathbf{1}
 $$
 
-+++
-
-すると、ラグランジアンの勾配が$\mathbf{0}$になるという条件から、
-
-+++
-
-$$
-\mathbf{D}_i \mathbf{D}_i^\top \mathbf{w}_i = \lambda \mathbf{1} + \boldsymbol\mu
-$$
-
-+++
-
-となることが分かる。この時、行列 $\mathbf{D}_i \mathbf{D}_i^\top$ が半正定値行列であることを考慮すると、両辺に左側から $\mathbf{w}_i^\top$ を書けることにより、以下の不等式が得られる。
-
-+++
-
-$$
-\lambda \mathbf{1}^\top \mathbf{w}_i + \boldsymbol\mu^\top \mathbf{w}_i = \mathbf{w}_i^\top (\mathbf{D}_i \mathbf{D}_i^\top) \mathbf{w}_i \geq 0
-$$
-
-+++
-
-KKT条件より任意の$k$について$\mu_k w_{ik} = 0$であるので、結局、以下のように書ける。
-
-+++
-
-$$
-\frac{1}{2} \| \mathbf{D}_i^\top \mathbf{w}_i \|^2 = \frac{1}{2} \mathbf{w}_i (\mathbf{D}_i \mathbf{D}_i^\top) \mathbf{w}_i \geq \frac{1}{2} \lambda \mathbf{1}^\top \mathbf{w}_i
-$$
-
-+++
-
-以上より、{eq}`eq:lle-weight-derivation`を満たすように$\frac{1}{2} \| \mathbf{D}_i^\top \mathbf{z}_i \|^2$を最小化するとき、その最小値は$\frac{1}{2} \lambda \mathbf{1}^\top \mathbf{w}_i$になることが分かる。
-
-よって、その時の$\mathbf{w}_i$を求めるためには、等式を満たす場合に関して、両辺を$\mathbf{w}_i$で微分することにより得られる以下の線形方程式を解けば良い。
-
-+++
-
-$$
-\mathbf{D}_i \mathbf{D}_i^\top \mathbf{w}_i = \frac{1}{2} \lambda \mathbf{1}
-$$
-
-+++
-
-ここで、$\lambda$が未知であったことを考慮し、以下のように問題を書き換える。
-
-+++
+が得られる。ここで $\lambda$ は未知であるが、$\mathbf{w}_i$ は $\lambda$ に比例するだけなので、まず
 
 $$
 \mathbf{D}_i \mathbf{D}_i^\top \mathbf{w}'_i = \mathbf{1}
 $$
 
+を解いて $\mathbf{w}'_i$ を求め、その後、重みの和が1になるように
+
+$$
+\mathbf{w}_i = \frac{\mathbf{w}'_i}{\sum_{k=1}^K w'_{ik}}
+$$
+
+と正規化すれば良い ($\mathbf{w}_i = \lambda \mathbf{w}'_i$ であり、和が1という条件から $\lambda = 1 / \sum_k w'_{ik}$ と定まる)。
+
+なお、近傍点の数 $K$ がデータの次元 $D$ より大きい場合、$\mathbf{D}_i \mathbf{D}_i^\top$ は階数が $D$ 以下の特異行列になり得る。そのため、以下の実装では対角成分に小さな正則化項を加えてから線形方程式を解いている。
+
+これで、とある頂点$\mathbf{x}_i$について、その近傍から$\mathbf{x}_i$を線形結合により表現するための重み$w_{ik}$を求めることができた。
+
 +++
 
-ただし、$\mathbf{w}'_i = \frac{2}{\lambda} \mathbf{w}_i$とする。今、この線形方程式を解いて$\mathbf{w}'_i$が求まれば、$w_{ik}$の和が1であったことから、
-
-$$
-\mathbf{w}_i = \frac{{w}'_i}{\sum w'_{ik}}
-$$
-
-と書ける。これで、とある頂点$\mathbf{x}_i$について、その近傍から$\mathbf{x}_i$を凸結合により表現するための重み$w_{ik}$を求めることができた。
+#### 低次元空間への埋め込み
 
 +++
 
 局所線形埋め込みにおいては$\mathbf{x}_i$に対応する低次元空間表現$\mathbf{z}_i \in \mathbb{R}^d ~ (d \leq D)$が同じ局所線形性を有することを仮定する。即ち、
 
 $$
-\mathbf{z}_i = \sum_{k=1}^K w_{ik} \mathbf{z}_{i_k}, \quad \forall i, \forall k, ~~ w_{ik} \geq 0, ~~ \sum_{k=1}^K w_{ik} = 1
+\mathbf{z}_i \approx \sum_{k=1}^K w_{ik} \mathbf{z}_{i_k}, \quad \sum_{k=1}^K w_{ik} = 1
 $$
 
 が成立すると仮定する。これを全てのデータ点に対して考慮すれば、解くべき問題は以下の二乗誤差の最小化に帰着される。
 
 $$
-\sum_{i=1}^N \left\| \mathbf{z}_i - \sum_{k=1} w_{ik} \mathbf{z}_{i_k} \right\|^2 = \mathbf{z}^\top (\mathbf{I} - \mathbf{W})^\top (\mathbf{I} - \mathbf{W}) \mathbf{z}
+\sum_{i=1}^N \left\| \mathbf{z}_i - \sum_{k=1}^K w_{ik} \mathbf{z}_{i_k} \right\|^2 = \mathrm{tr} \left( \mathbf{Z}^\top (\mathbf{I} - \mathbf{W})^\top (\mathbf{I} - \mathbf{W}) \mathbf{Z} \right)
 $$ (eq:lle-quadratic-form)
 
 +++
 
-ただし、行列$\mathbf{W}$は、その$i$行において$i_1, \ldots, i_K$列の成分だけが非零の値を持つような疎行列、$\mathbf{Z} = [ \mathbf{z}_i \cdots \mathbf{z}_N ]^\top \in \mathbb{R}^{N\times d}$である。
+ただし、行列$\mathbf{W}$は、その$i$行において$i_1, \ldots, i_K$列の成分だけが非零の値を持つような疎行列、$\mathbf{Z} = [ \mathbf{z}_1 \cdots \mathbf{z}_N ]^\top \in \mathbb{R}^{N\times d}$である。
 
-{eq}`eq:lle-quadratic-form` は、行列 $\mathbf{M} = (\mathbf{I} - \mathbf{W})^\top (\mathbf{I} - \mathbf{W})$の二次形式なので、これを最小化するためには、$\mathbf{z}$を$\mathbf{M}$の固有値の絶対値が小さい順に、固有ベクトルを並べて、
+{eq}`eq:lle-quadratic-form` は、行列 $\mathbf{M} = (\mathbf{I} - \mathbf{W})^\top (\mathbf{I} - \mathbf{W})$ による $\mathbf{Z}$ の各列の二次形式の和である。$\mathbf{Z} = \mathbf{0}$ のような自明な解を除くため、各列が単位ノルムで互いに直交する ($\mathbf{Z}^\top \mathbf{Z} = \mathbf{I}$) という制約の下でこれを最小化すると、$\mathbf{M}$ の固有ベクトルを固有値の小さい順に並べて、
 
 $$
-\mathbf{z} = [\mathbf{u}_2 \cdots \mathbf{u}_{d+1}]
+\mathbf{Z} = [\mathbf{u}_2 \cdots \mathbf{u}_{d+1}]
 $$
 
-とすれば良いことが分かる。ただし、$\mathbf{M}$は半正定値行列で、絶対値最小の固有値$\lambda_1 = 0$であるため、これに対応する固有ベクトル$\mathbf{u}_1$を除いて、先頭から$d$個を並べている。
+とすれば良いことが分かる。ただし、$\mathbf{M}$ は半正定値行列で、最小の固有値は $\lambda_1 = 0$ であり、対応する固有ベクトル $\mathbf{u}_1$ は全ての成分が等しい定数ベクトルである (重みの和が1なので $(\mathbf{I} - \mathbf{W}) \mathbf{1} = \mathbf{0}$)。これは全ての点を同じ場所に写す意味のない解なので、$\mathbf{u}_1$ を除いて先頭から $d$ 個を並べている。
 
 以上の計算により、局所線形埋め込み法による低次元空間表現が得られた。
 
@@ -791,7 +751,7 @@ z_sr = eigvec
 # データの可視化
 fig, ax = plt.subplots()
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (LLE)')
+ax.set_title('Swiss Roll (LLE)')
 plt.tight_layout()
 plt.show()
 ```
@@ -814,12 +774,21 @@ z_sr = lle.fit_transform(X_sr)
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (LLE, scikit-learn)')
+ax.set_title('Swiss Roll (LLE, scikit-learn)')
 plt.tight_layout()
 plt.show()
 ```
 
 局所線形埋め込み法には、その発展形として、改良局所線形埋め込み法 (Modified LLE) {cite}`zhang2006mlle` やHessian Eigenmap {cite}`donoho2003hessian` などがある。興味のある読者は是非、原論文を当たってみてほしい。
+
++++
+
+::::{admonition} 問
+:class: question
+
+LLEの重み $\mathbf{w}_i$ が、近傍点全体の平行移動 $\mathbf{x} \mapsto \mathbf{x} + \mathbf{t}$、回転 $\mathbf{x} \mapsto \mathbf{R}\mathbf{x}$、拡大縮小 $\mathbf{x} \mapsto s\mathbf{x}$ に対して不変であることを、{eq}`eq:lle-weight-derivation`の目的関数と制約条件から示せ。平行移動に対する不変性には、重みの和が1という制約がどのように使われるか。
+
+::::
 
 +++
 
@@ -829,15 +798,23 @@ plt.show()
 
 **カーネル主成分分析**は[サポートベクトルマシン](#ssec:support-vector-machine)の項で紹介したカーネル法を用いた主成分分析の拡張であり、非線形の次元削減法に分類される。
 
-カーネル法では、与えられたデータ$\mathbf{x}_i$をとある線形汎関数$\phi \in \mathcal{H}$を用いて、$\phi(\mathbf{x}_i)$のように変換する。カーネル主成分分析はこの$\phi(\mathbf{x}_i)$に対して主成分分析を行う手法である。
+カーネル法では、与えられたデータ$\mathbf{x}_i$を**特徴写像** $\phi$ によって、再生核ヒルベルト空間 $\mathcal{H}$ の元 $\phi(\mathbf{x}_i) \in \mathcal{H}$ に変換する。カーネル主成分分析はこの$\phi(\mathbf{x}_i)$に対して主成分分析を行う手法である。
 
-今、仮に $\phi(\mathbf{x}_i)$ の平均が原点にあると仮定すると、その分散共分散行列 $\mathbf{C}$ は次のように書ける (今、 $\phi$ が線形汎関数であるので、分散共分散行列がヒルベルト空間 $\mathcal{H}$ 上の線形演算子になっていることに注意)。
+今、仮に $\phi(\mathbf{x}_i)$ の平均が原点にあると仮定すると、その分散共分散行列 $\mathbf{C}$ は次のように書ける (今、 $\phi(\mathbf{x}_i)$ は $\mathcal{H}$ の元、すなわち関数であるので、分散共分散行列も行列ではなく $\mathcal{H}$ 上の線形演算子になっていることに注意)。
 
 $$
 \mathbf{C}(u, v) = \frac{1}{N} \sum_{i=1}^N \phi(\mathbf{x}_i)(u) \phi(\mathbf{x}_i)(v)
 $$ (eq:kpca-covariance)
 
 しかし、一般に関数 $\phi$ は未知であり、 $\phi(\mathbf{x}_i)$ がどのような形になるかを知ることはできない。そこで、 $\mathbf{C}$ を陽に求める代わりに、カーネル法を用いて、主成分分析の結果だけを求めることを試みる。
+
++++
+
+結果だけを先に述べると、カーネル行列 $K_{ij} = k(\mathbf{x}_i, \mathbf{x}_j)$ を中心化行列 $\mathbf{H} = \mathbf{I} - \frac{1}{N}\mathbf{1}\mathbf{1}^\top$ で両側から挟んだ $\mathbf{HKH}$ の固有値分解を行い、固有値 $\lambda_j$ と固有ベクトル $\mathbf{u}_j$ から $\mathbf{Z} = \mathbf{HKH} \left[ \mathbf{u}_1 / \sqrt{\lambda_1} \cdots \mathbf{u}_d / \sqrt{\lambda_d} \right]$ として低次元表現が得られる。多次元尺度構成法の $-\frac{1}{2}\mathbf{H}\mathbf{D}^2\mathbf{H}$ と同じ形の行列を扱っていることに注目してほしい。なぜこの形になるかの導出は以下の発展項目に示す。
+
++++
+
+#### 発展: カーネル主成分分析の導出
 
 +++
 
@@ -859,7 +836,7 @@ $$
 
 +++
 
-次に $\phi(\mathbf{x}_i), i = 1, \ldots, N$ を考え、その平均を関数 $\mu \in \mathcal{H}$ で表わす。とある線形汎関数 $\psi \in \mathcal{H}$ の方向に沿った分散 $V$ は
+次に $\phi(\mathbf{x}_i), i = 1, \ldots, N$ を考え、その平均を $\mu \in \mathcal{H}$ で表わす。とある単位ベクトル $\psi \in \mathcal{H}$ の方向に沿った分散 $V$ は
 
 $$
 V = \frac{1}{N} \sum_{i=1}^N \langle \psi, \phi(\mathbf{x}_i) - \mu \rangle^2, \quad \mu = \frac{1}{N} \sum_{i=1}^N \phi(\mathbf{x}_i)
@@ -875,13 +852,13 @@ $$ (eq:kpca-psi)
 
 +++
 
-{eq}`eq:kpca-variance`に対して{eq}`eq:kpca-psi`を代入し、更に$k(\mathbf{x}_i, \mathbf{x}_j) = \langle \phi(\mathbf{x}_i, \mathbf{x}_j)$の性質を用いると、分散$V$は次のように書き直せる。
+{eq}`eq:kpca-variance`に対して{eq}`eq:kpca-psi`を代入し、更に$k(\mathbf{x}_i, \mathbf{x}_j) = \langle \phi(\mathbf{x}_i), \phi(\mathbf{x}_j) \rangle$の性質を用いると、分散$V$は次のように書き直せる。
 
 +++
 
 $$
 \begin{equation}
-V = \frac{1}{N} \sum_{i=1}^N \sum_{j=1}^N \alpha_j \langle \phi(\mathbf{x}_i) - \mu, \phi(\mathbf{x}_j) - \mu \rangle^2
+V = \frac{1}{N} \sum_{i=1}^N \left( \sum_{j=1}^N \alpha_j \langle \phi(\mathbf{x}_i) - \mu, \phi(\mathbf{x}_j) - \mu \rangle \right)^2
 \end{equation}
 $$ (eq:kpca-quadratic)
 
@@ -890,7 +867,7 @@ $$ (eq:kpca-quadratic)
 $$
 \begin{align}
 \langle \phi(\mathbf{x}_i) - \mu, \phi(\mathbf{x}_j) - \mu \rangle
-&= k(\mathbf{x}_i, \mathbf{x}_j) + \frac{1}{N} \sum_{i=1}^N k(\mathbf{x}_i, \mathbf{x}_j) + \frac{1}{N} \sum_{j=1}^N k(\mathbf{x}_i, \mathbf{x}_j) + \frac{1}{N^2} \sum_{i=1}^N \sum_{j=1}^N k(\mathbf{x}_i, \mathbf{x}_j)
+&= k(\mathbf{x}_i, \mathbf{x}_j) - \frac{1}{N} \sum_{l=1}^N k(\mathbf{x}_l, \mathbf{x}_j) - \frac{1}{N} \sum_{m=1}^N k(\mathbf{x}_i, \mathbf{x}_m) + \frac{1}{N^2} \sum_{l=1}^N \sum_{m=1}^N k(\mathbf{x}_l, \mathbf{x}_m)
 \end{align}
 $$
 
@@ -903,7 +880,7 @@ $$
 とおくと、{eq}`eq:kpca-quadratic`は以下のように書き直せる。
 
 $$
-V = \boldsymbol\alpha^\top (\mathbf{H} \mathbf{K} \mathbf{H})^2 \boldsymbol\alpha
+V = \frac{1}{N} \boldsymbol\alpha^\top (\mathbf{H} \mathbf{K} \mathbf{H})^2 \boldsymbol\alpha
 $$
 
 ただし、$\boldsymbol\alpha = (\alpha_1, \ldots, \alpha_N)^\top$である。以上より、分散を最大化させるような$\psi$を与える係数$\boldsymbol\alpha$は$\mathbf{H}\mathbf{K}\mathbf{H}$に対して、固有値の絶対値が大きい順に固有ベクトルをいくつか取ることで、カーネル主成分分析における主成分方向を得ることができる。
@@ -952,6 +929,10 @@ $$
 
 +++
 
+#### カーネル主成分分析の実装
+
++++
+
 では、ここまでの議論を元にカーネル主成分分析を実装してみよう。
 
 ```{code-cell} ipython3
@@ -979,7 +960,7 @@ z_sr = K_sr @ eigvec / np.sqrt(eigval[None, :])
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (Kernel PCA)')
+ax.set_title('Swiss Roll (Kernel PCA)')
 ax.axis('equal')
 plt.tight_layout()
 plt.show()
@@ -1003,13 +984,13 @@ z_sr = kpca.fit_transform(X_sr)
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(z_sr[:, 0], z_sr[:, 1], color=c, s=10, lw=0)
-ax.set_title('Swiss Role (Kernel PCA, scikit-learn)')
+ax.set_title('Swiss Roll (Kernel PCA, scikit-learn)')
 ax.axis('equal')
 plt.tight_layout()
 plt.show()
 ```
 
-ただし、カーネル主成分分析は、カーネル法に用いるカーネルの種類と、そのカーネルを定義するパラメータに大きく依存している。例えば、上記のようにRBFカーネル $k(\mathbf{x}_i, \mathbf{x}_j) = \exp(-\gamma \| \mathbf{x}_i - \mathbf{x}_j \|^2)$を用いる場合、$\gamma$変化させることで全く異なる低次元空間表現が与えられる。
+ただし、カーネル主成分分析は、カーネル法に用いるカーネルの種類と、そのカーネルを定義するパラメータに大きく依存している。例えば、上記のようにRBFカーネル $k(\mathbf{x}_i, \mathbf{x}_j) = \exp(-\gamma \| \mathbf{x}_i - \mathbf{x}_j \|^2)$を用いる場合、$\gamma$を変化させることで全く異なる低次元空間表現が与えられる。
 
 ```{code-cell} ipython3
 gammas = [0.005, 0.01, 0.05]
@@ -1036,7 +1017,16 @@ plt.show()
 ::::{admonition} 問
 :class: question
 
-scikit-learnの`KernelPCA`には`SVC`クラスと同様に`kernel=...`に対して、いくつかのカーネル関数を指定することができる。多項式カーネル (`kernel=poly`)やコサインカーネル (`kernel=cosine`)を指定したときに次元削減の結果がどのように変化するかを調べて見よ。
+線形カーネル $k(\mathbf{x}_i, \mathbf{x}_j) = \mathbf{x}_i^\top \mathbf{x}_j$ を用いたカーネル主成分分析が、通常の主成分分析と同じ低次元表現を与えることを示せ (ヒント: このとき $\mathbf{HKH}$ は多次元尺度構成法の練習問題で扱った $\mathbf{X}_c \mathbf{X}_c^\top$ に一致する)。`KernelPCA(kernel='linear')` と `PCA` の結果を数値的にも比較せよ。
+
+::::
+
++++
+
+::::{admonition} 問
+:class: question
+
+scikit-learnの`KernelPCA`には`SVC`クラスと同様に`kernel=...`に対して、いくつかのカーネル関数を指定することができる。多項式カーネル (`kernel=poly`)やコサインカーネル (`kernel=cosine`)を指定したときに次元削減の結果がどのように変化するかを調べてみよ。
 
 ::::
 
@@ -1059,14 +1049,14 @@ y = np.array(y, dtype='uint8')
 # 画像として見られるように配列の形を変更
 ims = np.reshape(X[:8], (-1, 28, 28))
 
-# 最初の5枚を確認してみる
+# 最初の8枚を確認してみる
 from matplotlib.gridspec import GridSpec
 
 fig = plt.figure(figsize=(8, 4))
 gs = GridSpec(2, 4, figure=fig)
 for i in range(8):
     ax = plt.subplot(gs[i])
-    ax.imshow(ims[i], cmap='gray', interpolation=None)
+    ax.imshow(ims[i], cmap='gray', interpolation='none')
     ax.set_title(f'label is {y[i]:d}')
     ax.set_xticks([])
     ax.set_yticks([])
@@ -1162,6 +1152,8 @@ plt.show()
 
 このように、次元削減の手法を変化させたことで、各クラスタの重なり具合が多少緩和されていることが分かる。ただし、どのような次元削減法であれば、より異なるラベルを持つデータの判別に役立つか、という部分は、明確でない場合が多く、あくまで、データの散らばりを見極める際の目安として、このような可視化結果を用いることが有効であろう。
 
+いずれの図でも、概ね同じ数字が近くに集まってクラスタを形成していることが分かる。これらの図は2次元までベクトルを圧縮して作成しているため、数字同士の領域に大きな重複が見られるが、もう少し高い次元であれば、各数字の占める領域が重ならないようにすることができそうだ。
+
 +++
 
 ### 主成分分析の画像的な意味
@@ -1195,7 +1187,7 @@ from matplotlib.gridspec import GridSpec
 gs = GridSpec(1, 5)
 for i in range(5):
     ax = plt.subplot(gs[i])
-    ax.imshow(ims[i], cmap='gray', interpolation=None)
+    ax.imshow(ims[i], cmap='gray', interpolation='none')
     ax.set(title=f'#{i + 1:d}', xticks=[], yticks=[])
 
 plt.tight_layout()
@@ -1203,6 +1195,10 @@ plt.show()
 ```
 
 このように得られる固有ベクトルを画像としてみてみると、0から9の数字の影のようなものが見える。定性的には、これらの画像は数字の画像の共通成分のようなものを表わしており、これらの画像の線形結合を取ると、0-9に近しい画像が作れる、というわけである。
+
+#### 発展: 固有画像のブレンド
+
++++
 
 以下に、上記の5枚の画像をブレンドすることで、対話的に画像を変更できるシステムを用意してあるので、各自、スライダーを動かすことで画像がどのように変化するかを確認してみてほしい。
 
@@ -1225,8 +1221,8 @@ mu = mu.reshape((-1,))
 target = X[10].astype('float32')
 ws = np.dot(target - mu, eigvec.T) / np.sqrt(eigval)
 
-# 画像の再構成
-avg = mu.reshape((28, 28))
+# 画像の再構成 (Bokehの画像は原点が左下なので、平均画像と主成分画像の両方を上下反転しておく)
+avg = np.flip(mu.reshape((28, 28)), axis=0)
 components = np.reshape(eigvec, (-1, 28, 28)) * np.sqrt(eigval[:, None, None])
 components = np.flip(components, axis=1)
 res = avg + sum([w * c for w, c in zip(ws, components)])
@@ -1294,14 +1290,23 @@ w5.js_on_change('value', callback)
 show(row(plot, column(w1, w2, w3, w4, w5)))
 ```
 
-図を見てみると、概ね同じ数字が近くに集まってクラスタを形成していることが分かる。上図は2次元までベクトルを圧縮して作成しているため、数字同士の領域に大きな重複が見られるが、もう少し高い次元であれば、各数字の占める領域が重ならないようにすることができそうだ。
+スライダーの重み $w_1, \ldots, w_5$ は、各主成分方向の標準偏差 $\sqrt{\lambda_i}$ を単位としている。初期値はデータセットの11枚目の画像を5つの主成分に射影した係数であり、重みを $0$ に近づけると平均画像に、大きく動かすと対応する固有画像の模様が強調された像になることが確認できる。
 
 +++
 
 ::::{admonition} 問
 :class: question
 
-MNISTのデータについて、コサインカーネルを行った主成分分析により得られる画像を第5主成分まで調べて見よ (ヒント: `scikit-learn`の`KernelPCA`で`inverse_transform=True`を用いる)。
+MNISTのデータについて、コサインカーネルを行った主成分分析により得られる画像を第5主成分まで調べてみよ (ヒント: `scikit-learn`の`KernelPCA`で`fit_inverse_transform=True`を指定すると`inverse_transform`が使える)。
+
+::::
+
++++
+
+::::{admonition} 問
+:class: question
+
+MNISTの画像 `X[10]` を、主成分を $d = 5, 20, 50, 100$ 個用いて $\boldsymbol\mu + \sum_{j=1}^d w_j \mathbf{v}_j$ の形で再構成し、元画像との二乗誤差が $d$ とともにどのように減るかを調べよ。また、その誤差が、使わなかった主成分に対応する固有値の和とどのような関係にあるかを考察せよ。
 
 ::::
 
@@ -1322,8 +1327,4 @@ scikit-learnには次元削減の手法としては他にもHessian Eigenmap{cit
 
 ```{bibliography}
 :filter: docname in docnames
-```
-
-```{code-cell} ipython3
-
 ```
